@@ -20,7 +20,7 @@
     <main>
         <div id="login">
             <h2>Iniciar sesión</h2>
-            <form action="/login" method="post">
+            <form method="post" id="formLogin">
                 <label for="username">Usuario:</label>
                 <input type="text" id="username" name="username" required><br><br>
                 
@@ -28,6 +28,7 @@
                 <input type="password" id="password" name="password" required><br><br>
                 
                 <button type="submit">Iniciar sesión</button>
+                <p id="mensajeError" class="error"></p>
             </form><br><br>
             <p>¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a></p>
         </div>
@@ -35,5 +36,6 @@
     <footer>
         <p>&copy; 2026 LaburApp. Todos los derechos reservados.</p>
     </footer>
+    <script src="../JS/login.js"></script>
 </body>
 </html>
