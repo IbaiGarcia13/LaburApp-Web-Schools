@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa - LaburApp</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Estilos propios -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            height: 100vh; /* ocupa toda la pantalla */
+            width: 100%;
+        }
+
+        .popup-card {
+            font-size: 14px;
+        }
+
+        .popup-card h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .popup-card button {
+            margin-top: 5px;
+            padding: 5px 8px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .popup-card button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Tu archivo JS -->
+    <script src="mapa.js"></script>
+
+</body>
+</html>
