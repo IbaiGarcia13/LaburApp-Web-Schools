@@ -18,13 +18,18 @@
         <h1>LaburApp</h1>
     </header>
     <main>
-        <div id="download_app">
+        <section id="download_app">
             <img src="../IMAGENES/Ordenador.png" alt="Simbolo ordenador" class="ordenador">
-            <h2>¡Descarga LaburApp ahora!</h2>
-            <p>Accede a tu biblioteca personal desde cualquier lugar.</p>
-            <a href="" class="download-button">Descargar APP</a>
-        </div>
-        <div id="login">
+            <div class="download-text">
+                <h2>¡Descarga LaburApp ahora!</h2>
+                <p>Descarga la aplicación y muevete de manera mas cómoda para ganar dinero fácil</p>
+                <button type="submit" id="descargar">
+                    Descargar APP
+                    <img src="../IMAGENES/Descargar.png" alt="descargar icon">
+                </button>
+            </div>
+        </section>
+        <section id="login">
             <h2>Iniciar sesión</h2>
             <form method="post" id="formLogin">
                 <label for="username">Correo:</label>
@@ -37,7 +42,7 @@
                 <p id="mensajeError" class="error"></p>
             </form><br><br>
             <p>¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a></p>
-        </div>
+        </section>
     </main>
     <footer>
         <p>&copy; 2026 LaburApp. Todos los derechos reservados.</p>
