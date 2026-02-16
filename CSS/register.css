@@ -2,18 +2,27 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    user-select: none;
 }
+
 body{
     text-align: center;
-    background-color: rgb(220, 108, 108);
+    background-color: rgb(253, 205, 205);
+    font-family: Arial, sans-serif;
 }
+
+/*Esto oculta el scrollbar, sin mas, mas estetica*/
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* ---------------- HEADER ---------------- */
 
 header{
     display: flex; 
     align-items: center; 
-    justify-content: center;
-    color: black;
-    background-color: black;
+    justify-content: left;
+    padding: 15px;
 }
 
 header img{ 
@@ -24,35 +33,85 @@ header img{
 }
 
 h1{
-    font-size: 50px; 
-    color: white; 
-    background-color: black; 
+    font-size: 40px; 
+    color: black; 
 }
+
+/* ---------------- MAIN ---------------- */
 
 main{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    padding: 30px 15px;
 }
 
+h2{
+    margin-bottom: 10px;
+}
+
+a{
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+a:hover{
+    color: rgb(255, 0, 0);
+}
+
+/* CAJAS */
+
+#download_app{ 
+    display: flex;
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: center; 
+    background-color: white; 
+    padding: 25px; 
+    border-radius: 30px; 
+    border: 2px solid black;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 500px;
+}
+
+
+
 #login{ 
-    display: flex; 
+    display: flex;
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
     background-color: white; 
-    padding: 20px; 
-    border-radius: 10px; 
+    padding: 25px; 
+    border-radius: 30px; 
     border: 2px solid black;
-} 
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 500px;
+}
+
+/* IMAGEN */
+
+#download_app img{ 
+    width: 100px; 
+    height: 100px; 
+    margin: 10px; 
+    border-radius: 10px;
+}
+
+/* INPUTS */
 
 input{ 
-    margin: 10px; 
+    margin: 10px 0; 
     padding: 10px; 
-    width: 200px; 
+    width: 100%;
+    max-width: 100%;
 } 
+
+/* BOTÓN */
 
 button{ 
     padding: 10px 20px; 
@@ -61,10 +120,34 @@ button{
     border: none; 
     border-radius: 5px; 
     cursor: pointer; 
-} 
+    width: 100%;
+}
+
+#descargar{ 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    justify-self: center;
+    margin-top: 15px;
+    width: 70%;
+    height: 50px;
+    padding-right: -0px;
+    border-radius: 100px;
+}
+
+#descargar img{ 
+    width: 30px; 
+    height: 30px;
+}
+
+button:hover{ 
+    background-color: rgb(101, 101, 101); 
+}
+
+/* FOOTER */
 
 footer{ 
     font-size: 14px; 
-    color: white; 
-    background-color: black; 
+    color: black; 
+    padding: 15px;
 }
