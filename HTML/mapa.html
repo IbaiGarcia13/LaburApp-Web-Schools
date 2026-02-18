@@ -2,56 +2,79 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa - LaburApp</title>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-    <!-- Estilos propios -->
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        #map {
-            height: 100vh; /* ocupa toda la pantalla */
-            width: 100%;
-        }
-
-        .popup-card {
-            font-size: 14px;
-        }
-
-        .popup-card h4 {
-            margin: 0 0 5px 0;
-        }
-
-        .popup-card button {
-            margin-top: 5px;
-            padding: 5px 8px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .popup-card button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>LaburApp - Mapa</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link rel="stylesheet" href="../CSS/mapa.css">
 </head>
 <body>
 
-    <div id="map"></div>
+<div id="page-container">
+    <div id="main-layout">
+        <!-- MAPA -->
+        <div id="map"></div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <!-- PANEL LATERAL -->
+        <div id="side-panel">
 
-    <!-- Tu archivo JS -->
-    <script src="mapa.js"></script>
+            <div id="panel-tabs">
+                <button id="tab-mis" class="active-tab">Mis Tareas</button>
+                <button id="tab-trabajos">Trabajos</button>
+            </div>
 
+            <div id="panel-content"></div>
+
+        </div>
+    </div>
+
+    <!-- FORMULARIO CREAR TRABAJO -->
+    <div id="marker-form-container" class="hidden">
+        <div id="marker-form-box">
+            <h3>Configurar Trabajo</h3>
+            <label>Título<input type="text" id="job-title"></label>
+            <label>Descripción<input type="text" id="job-desc"></label>
+            <label>Dirección<input type="text" id="job-address" placeholder="Ej: Barakaldo, Bizkaia, Calle La Paz 21"></label>
+            <label>Fecha límite<input type="date" id="job-deadline"></label>
+            <label>Precio (€)<input type="number" id="job-price" step="0.01" min="2"><small id="price-preview"></small></label>
+            <label>Tiempo estimado (h)<input type="number" id="job-time" min="1"></label>
+            <label>Categoría
+                <select id="job-category">
+                    <option value="">Seleccione una opción</option>
+                    <option>Carpintería</option>
+                    <option>Informática</option>
+                    <option>Jardinería</option>
+                    <option>Limpieza</option>
+                    <option>Transporte</option>
+                    <option>Mudanza/Traslado</option>
+                    <option>Construcción/Reforma</option>
+                    <option>Cuidado personal</option>
+                    <option>Mascotas</option>
+                    <option>Diseño</option>
+                    <option>Evento</option>
+                    <option>Gastronomía</option>
+                    <option>Otros</option>
+                </select>
+            </label>
+            <button id="save-job-btn">Guardar</button>
+            <button id="cancel-job-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- FORMULARIO VER MÁS -->
+    <div id="marker-view-container" class="hidden">
+        <div id="marker-view-box">
+            <h3 id="view-title"></h3>
+            <p id="view-desc"></p>
+            <p><strong>Dirección:</strong> <span id="view-address"></span></p>
+            <p><strong>Fecha límite:</strong> <span id="view-deadline"></span></p>
+            <p><strong>Precio:</strong> <span id="view-price"></span> €</p>
+            <p><strong>Categoría:</strong> <span id="view-category"></span></p>
+            <p><span class="experience-circle"></span> <span id="view-xp"></span> XP</p>
+            <button id="close-view-btn">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="../JS/mapa.js"></script>
 </body>
 </html>
