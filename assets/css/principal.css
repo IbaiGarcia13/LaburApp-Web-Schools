@@ -1,0 +1,35 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body{
+    text-align: center;
+    background-color: rgb(253, 205, 205);
+    font-family: Arial, sans-serif;
+}
+
+/*Esto oculta el scrollbar, sin mas, mas estetica*/
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* ---------------- HEADER ---------------- */
+
+header{
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    padding: 15px;
+    color: white;
+    background-color: black;
+}
+
+header img{ 
+    width: 50px; 
+    height: 50px; 
+    margin-right: 10px; 
+    border-radius: 10px;
+}
