@@ -1,0 +1,300 @@
+/* --- RESET GENERAL --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: rgb(180, 80, 80);
+    color: #333;
+}
+
+/* --- HEADER --- */
+header {
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    height: 70px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo img {
+    height: 40px;
+    border-radius: 5px;
+}
+
+.logo span {
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    height: 100%;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0 20px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+nav a:hover, nav a.active {
+    background-color: white;
+    color: black;
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-left: 15px;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #3498db;
+    background-color: white;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+#container {
+    display: flex;
+    max-width: 1400px; /* Un poco más ancho para acomodar fotos grandes */
+    margin: 30px auto;
+    gap: 30px;
+    padding: 0 20px;
+}
+
+#content {
+    flex: 3; /* Le damos más prioridad al contenido */
+}
+
+.section-title {
+    color: white;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* --- TARJETAS DE USUARIO --- */
+#users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.user-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px; /* Más padding para que respire con la foto grande */
+    display: flex;
+    gap: 30px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+    align-items: flex-start;
+}
+
+.user-card:hover {
+    transform: translateY(-3px);
+}
+
+.user-img {
+    width: 200px; /* CAMBIO: Imagen más grande */
+    height: 200px; /* CAMBIO: Imagen más grande */
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #eee;
+    flex-shrink: 0; /* Evita que la imagen se encoja */
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h3 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: #111;
+}
+
+.user-desc {
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.user-stats p {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- PAGINACIÓN --- */
+.pagination {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 50px;
+}
+
+.pag-btn {
+    background: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 22px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#page-info {
+    background: white;
+    padding: 10px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* --- SIDEBAR --- */
+#sidebar {
+    flex: 1;
+    max-width: 320px;
+}
+
+.filter-box {
+    background-color: black;
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    border: 2px solid white;
+    position: sticky;
+    top: 100px;
+}
+
+.filter-box h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label, .label-style {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.filter-box select, 
+.filter-box input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: white;
+    color: black;
+}
+
+.range-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.input-unit span {
+    display: block;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    color: #bbb;
+}
+
+#update-btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 10px;
+    background-color: #ddd;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+}
+
+#update-btn:hover {
+    background-color: white;
+}
+
+.range-container {
+    display: flex;    /* Los pone en línea */
+    gap: 10px;        /* Separa los dos cuadros */
+}
+
+.input-unit {
+    flex: 1;          /* Obliga a que ambos midan exactamente lo mismo */
+}
+
+.input-unit span {
+    display: block;   /* Pone el texto "Desde/Hasta" arriba del cuadro */
+    font-size: 0.75rem;
+    color: #bbb;
+}

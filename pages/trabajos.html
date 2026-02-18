@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaburApp - Trabajos</title>
+    <link rel="stylesheet" href="../assets/css/trabajos.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="../assets/img/LaburApp-icono.png" alt="Logo LaburApp">
+            <span>LABURAPP</span>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li><a href="usuarios.html">Usuarios</a></li>
+                    <li><a href="trabajos.html" class="active">Trabajos</a></li>
+                    <li><a href="mapa.html">Mapa</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <img src="../assets/img/Ibai.jpg" alt="Perfil" class="profile-icon">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="container">
+        <section id="content">
+            <h2 class="section-title">TRABAJOS: Todos</h2>
+            
+            <div id="jobs-list">
+                </div>
+
+            <div class="pagination">
+                <button id="prev-page" class="pag-btn">&lt;</button>
+                <span id="page-info">1 - 4</span>
+                <button id="next-page" class="pag-btn">&gt;</button>
+            </div>
+        </section>
+
+        <aside id="sidebar">
+            <div class="filter-box">
+                <h3>FILTRAR</h3>
+                <form id="filter-form">
+                    <div class="filter-group">
+                        <label>Categoría:</label>
+                        <select id="filter-category">
+                            <option value="todas">Todas</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="informatica">Informática</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="limpieza">Limpieza</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="group-label">Tiempo estimado (h):</label>
+                        <div class="range-container">
+                            <div class="input-unit">
+                                <span>Desde</span>
+                                <input type="number" id="time-min" value="1">
+                            </div>
+                            <div class="input-unit">
+                                <span>Hasta</span>
+                                <input type="number" id="time-max" value="10">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="group-label">Pago (€):</label>
+                        <div class="range-container">
+                            <div class="input-unit">
+                                <span>Desde</span>
+                                <input type="number" id="pay-min" value="5">
+                            </div>
+                            <div class="input-unit">
+                                <span>Hasta</span>
+                                <input type="number" id="pay-max" value="200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="update-btn">ACTUALIZAR</button>
+                </form>
+            </div>
+        </aside>
+    </main>
+
+    <script src="../assets/js/trabajos.js"></script>
+</body>
+</html>
