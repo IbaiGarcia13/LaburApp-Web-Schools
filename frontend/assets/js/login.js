@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (usuario === "admin" && contraseña === "1234") {
-            window.location.href = "/pages/principal.html";
+            window.location.href = "pages/principal.html";
             return;
         }
 

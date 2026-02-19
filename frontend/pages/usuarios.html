@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LaburApp - Trabajos</title>
-    <link rel="stylesheet" href="../assets/css/trabajos.css">
+    <title>LaburApp - Usuarios</title>
+    <link rel="shortcut icon" href="../assets/img/LaburApp-icono.png" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/css/usuarios.css">
 </head>
 <body>
 
@@ -16,8 +17,8 @@
         <div class="header-right">
             <nav>
                 <ul>
-                    <li><a href="usuarios.html">Usuarios</a></li>
-                    <li><a href="trabajos.html" class="active">Trabajos</a></li>
+                    <li><a href="usuarios.html" class="active">Usuarios</a></li>
+                    <li><a href="trabajos.html">Trabajos</a></li>
                     <li><a href="mapa.html">Mapa</a></li>
                 </ul>
             </nav>
@@ -34,10 +35,8 @@
 
     <main id="container">
         <section id="content">
-            <h2 class="section-title">TRABAJOS: Todos</h2>
-            
-            <div id="jobs-list">
-                </div>
+            <h2 class="section-title">USUARIOS: Todos</h2>
+            <div id="users-list"></div>
 
             <div class="pagination">
                 <button id="prev-page" class="pag-btn">&lt;</button>
@@ -54,38 +53,29 @@
                         <label>Categoría:</label>
                         <select id="filter-category">
                             <option value="todas">Todas</option>
-                            <option value="jardineria">Jardinería</option>
-                            <option value="mascotas">Mascotas</option>
                             <option value="informatica">Informática</option>
-                            <option value="gastronomia">Gastronomía</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="carpinteria">Carpintería</option>
                             <option value="limpieza">Limpieza</option>
                         </select>
                     </div>
 
                     <div class="filter-group">
-                        <label class="group-label">Tiempo estimado (h):</label>
-                        <div class="range-container">
-                            <div class="input-unit">
-                                <span>Desde</span>
-                                <input type="number" id="time-min" value="1">
-                            </div>
-                            <div class="input-unit">
-                                <span>Hasta</span>
-                                <input type="number" id="time-max" value="10">
-                            </div>
-                        </div>
+                        <label>Nivel:</label>
+                        <input type="number" id="filter-level" value="1" min="1" max="10">
                     </div>
 
                     <div class="filter-group">
-                        <label class="group-label">Pago (€):</label>
+                        <label class="group-label">Valoración media:</label>
                         <div class="range-container">
                             <div class="input-unit">
                                 <span>Desde</span>
-                                <input type="number" id="pay-min" value="5">
+                                <input type="number" id="val-min" step="0.1" value="0.0" min="0" max="5">
                             </div>
                             <div class="input-unit">
                                 <span>Hasta</span>
-                                <input type="number" id="pay-max" value="200">
+                                <input type="number" id="val-max" step="0.1" value="5.0" min="0" max="5">
                             </div>
                         </div>
                     </div>
@@ -96,6 +86,6 @@
         </aside>
     </main>
 
-    <script src="../assets/js/trabajos.js"></script>
+    <script src="../assets/js/usuarios.js"></script>
 </body>
 </html>
