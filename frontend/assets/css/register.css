@@ -87,7 +87,7 @@ a:hover{
     background-color: white; 
     padding: 25px; 
     border-radius: 30px; 
-    border: 2px solid black;
+    border: 2px solid #ccc;
     margin-bottom: 20px;
     width: 100%;
     max-width: 500px;
