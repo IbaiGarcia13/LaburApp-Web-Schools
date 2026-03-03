@@ -1,13 +1,13 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     user-select: none;
 }
 
-body{
+body {
     text-align: center;
-    background-color: rgb(180,80,80);
+    background-color: rgb(180, 80, 80);
     font-family: Arial, sans-serif;
 }
 
@@ -18,28 +18,33 @@ body::-webkit-scrollbar {
 
 /* ---------------- HEADER ---------------- */
 
-header{
-    display: flex; 
-    align-items: center; 
+header {
+    display: flex;
+    align-items: center;
     justify-content: left;
     padding: 15px;
 }
 
-header img{ 
-    width: 50px; 
-    height: 50px; 
-    margin-right: 10px; 
-    border-radius: 10px;
+header img.icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
 }
 
-h1{
-    font-size: 40px; 
-    color: black; 
+header img.logo-text {
+    width: 200px;
+    height: auto;
+    margin-right: 10px;
+}
+
+h1 {
+    font-size: 40px;
+    color: black;
 }
 
 /* ---------------- MAIN ---------------- */
 
-main{
+main {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -47,30 +52,30 @@ main{
     padding: 30px 15px;
 }
 
-h2{
+h2 {
     margin-bottom: 10px;
 }
 
-a{
+a {
     color: black;
     text-decoration: none;
     font-size: 16px;
 }
 
-a:hover{
+a:hover {
     color: rgb(255, 0, 0);
 }
 
 /* CAJAS */
 
-#download_app{ 
+#download_app {
     display: flex;
-    flex-direction: row; 
-    align-items: center; 
-    justify-content: center; 
-    background-color: white; 
-    padding: 25px; 
-    border-radius: 30px; 
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    padding: 25px;
+    border-radius: 30px;
     border: 2px solid #ccc;
     margin-bottom: 20px;
     width: 100%;
@@ -79,22 +84,22 @@ a:hover{
 
 
 
-#login{ 
+#login {
     display: flex;
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    background-color: white; 
-    padding: 25px; 
-    border-radius: 30px; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    padding: 25px;
+    border-radius: 30px;
     border: 2px solid #ccc;
     margin-bottom: 20px;
     width: 100%;
     max-width: 500px;
 }
 
-#olvidar:hover{
-    background-color: rgb(208, 208, 208); 
+#olvidar:hover {
+    background-color: rgb(208, 208, 208);
     border-radius: 10px;
     padding: 10px;
     color: white;
@@ -102,38 +107,38 @@ a:hover{
 
 /* IMAGEN */
 
-#download_app img{ 
-    width: 100px; 
-    height: 100px; 
-    margin: 10px; 
+#download_app img {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
     border-radius: 10px;
 }
 
 /* INPUTS */
 
-input{ 
-    margin: 10px 0; 
-    padding: 10px; 
+input {
+    margin: 10px 0;
+    padding: 10px;
     width: 100%;
     max-width: 100%;
-} 
+}
 
 /* BOTÓN */
 
-button{ 
-    padding: 10px 20px; 
+button {
+    padding: 10px 20px;
     color: white;
-    background-color: black; 
-    border: none; 
-    border-radius: 5px; 
-    cursor: pointer; 
+    background-color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
     width: 100%;
 }
 
-#descargar{ 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+#descargar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     justify-self: center;
     margin-top: 15px;
     width: 70%;
@@ -142,19 +147,19 @@ button{
     border-radius: 100px;
 }
 
-#descargar img{ 
-    width: 30px; 
+#descargar img {
+    width: 30px;
     height: 30px;
 }
 
-button:hover{ 
-    background-color: rgb(101, 101, 101); 
+button:hover {
+    background-color: rgb(101, 101, 101);
 }
 
 /* FOOTER */
 
-footer{ 
-    font-size: 14px; 
-    color: black; 
+footer {
+    font-size: 14px;
+    color: black;
     padding: 15px;
 }

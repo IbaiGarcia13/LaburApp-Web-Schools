@@ -1,0 +1,141 @@
+/* --- SUSCRIPCIONES ESPECÍFICO --- */
+.main-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.main-title {
+    color: white;
+    margin-bottom: 40px;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.subscriptions-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.sub-card {
+    width: 350px;
+    min-height: 480px;
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease;
+}
+
+.sub-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Estilos comunes de texto */
+.sub-card h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.sub-features {
+    list-style: none;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.sub-features li {
+    margin-bottom: 15px;
+    position: relative;
+    font-weight: 500;
+}
+
+.sub-features li::before {
+    content: '•';
+    position: absolute;
+    left: -15px;
+}
+
+/* CARD NINGUNA */
+.card-none {
+    background: white;
+    color: #888;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-none h3 {
+    color: #ddd;
+}
+
+.card-none .price-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ddd;
+    margin-top: auto;
+}
+
+/* CARD CURRANTE (Azul Neón) */
+.card-currante {
+    background: #002350;
+    color: #fff;
+    border: 3px solid #0056b3;
+    box-shadow: 0 0 20px rgba(0, 86, 179, 0.6), inset 0 0 10px rgba(0, 86, 179, 0.4);
+}
+
+.card-currante h3 {
+    color: #b76bff;
+}
+
+.card-currante .price-val {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #00d2ff;
+}
+
+.card-currante .sub-type {
+    color: #0056b3;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* CARD JEFE */
+.card-jefe {
+    background: #002350;
+    color: #fff;
+    border: 3px solid #00bfff;
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.6), inset 0 0 10px rgba(0, 191, 255, 0.4);
+}
+
+.card-jefe h3 {
+    color: #6befff;
+}
+
+.card-jefe .price-val {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #6befff;
+}
+
+.card-jefe .sub-type {
+    color: #00bfff;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* ESPACIO ANUNCIO */
+.ad-placeholder {
+    height: 150px;
+    width: 100%;
+    margin-top: 60px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+    .subscriptions-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+}
