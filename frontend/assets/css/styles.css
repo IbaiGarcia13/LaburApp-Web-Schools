@@ -41,12 +41,10 @@ header {
     margin-left: 8px;
 }
 
-/* Contenedor derecho */
 .header-right {
     display: flex;
     align-items: center;
     gap: 30px;
-    /* Espacio entre 'Mapa' y la foto de perfil */
     height: 100%;
 }
 
@@ -62,7 +60,6 @@ nav a {
     text-decoration: none;
     padding: 0 20px;
     height: 100%;
-    /* Ocupa todo el alto del header */
     display: flex;
     align-items: center;
     font-weight: 500;
@@ -70,43 +67,36 @@ nav a {
     transition: all 0.3s ease;
 }
 
-/* EFECTO CORREGIDO: Caja blanca y texto negro al pasar el cursor */
 nav a:hover {
     background-color: white;
     color: black;
 }
 
-/* Contenedor específico para Foto y Hamburguesa */
 .header-icons {
     display: flex;
     align-items: center;
     gap: 20px;
-    /* Reducimos un poco el gap para que se vea más compacto como en la foto 1 */
     height: 100%;
 }
 
 .profile-toggle {
     width: 35px;
-    /* Ajustamos el tamaño para que no sea tan dominante */
     height: 35px;
     border-radius: 50%;
     cursor: pointer;
     border: none;
-    /* Quitamos el borde blanco/azul para que sea plano como en el diseño */
     object-fit: cover;
     display: block;
 }
 
-/* HAMBURGER (Ajustado verticalmente) */
+/* Botón - Panel Lateral */
 .hamburger {
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 5px;
-    /* Espacio entre barras */
     cursor: pointer;
     width: 25px;
-    /* Ancho fijo para control total */
 }
 
 .hamburger span {
@@ -116,33 +106,25 @@ nav a:hover {
     border-radius: 2px;
 }
 
-/* Nueva regla para el fondo gris del botón hamburguesa */
 .hamburger.active {
     background-color: rgba(128, 128, 128, 0.4);
-    /* Un gris translúcido */
     padding: 10px;
-    /* Espacio para que el fondo se vea alrededor de las barras */
     margin: -10px;
-    /* Evita que el padding desplace otros elementos del header */
     border-radius: 5px;
-    /* Bordes redondeados para estética */
     transition: background-color 0.3s ease;
 }
 
-/* Opcional: Si quieres que las barras cambien de color al abrirse, puedes añadir esto */
 .hamburger.active span {
     background: #ccc;
-    /* Cambia el color de las barras a un gris claro */
 }
 
 
-/* --- DROPDOWN PERFIL (Se mantiene) --- */
+/* Dropdown Perfil */
 .profile-dropdown {
     position: absolute;
     top: 75px;
     right: 54px;
     width: 240px;
-    /* Ajustado posición */
     background: white;
     border-radius: 15px;
     padding: 25px;
@@ -211,7 +193,7 @@ nav a:hover {
 }
 
 
-/* --- MENÚ LATERAL (Estilos básicos para que funcione, personalizar iconos luego) --- */
+/* --- MENÚ LATERAL --- */
 .side-menu {
     position: fixed;
     top: 70px;
@@ -251,7 +233,6 @@ nav a:hover {
     border-left: 5px solid black;
 }
 
-/* Ejemplo de active */
 .side-menu li img {
     width: 24px;
     height: 24px;
@@ -286,4 +267,13 @@ nav a:hover {
 
 .side-menu-footer img {
     width: 24px;
+}
+
+/* -- FOOTER --- */
+footer {
+    font-size: 14px;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    background-color: black
 }
