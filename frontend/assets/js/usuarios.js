@@ -40,7 +40,7 @@ function displayUsers() {
     pageItems.forEach(user => {
         const card = `
             <article class="user-card">
-                <img src="../assets/img/LaburApp-icono.png" class="user-img">
+                <img src="../assets/img/Ibai.jpg" class="user-img">
                 <div class="user-info">
                     <h3>${user.nombre}</h3>
                     <p class="user-desc">${user.desc}</p>

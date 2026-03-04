@@ -40,7 +40,7 @@ function displayJobs() {
     pageItems.forEach(job => {
         const card = `
             <article class="job-card">
-                <img src="../assets/img/LaburApp-icono.png" class="job-img">
+                <img src="../assets/img/principal1.png" class="job-img">
                 <div class="job-info">
                     <h3>${job.titulo}</h3>
                     <p class="job-desc">${job.desc}</p>
