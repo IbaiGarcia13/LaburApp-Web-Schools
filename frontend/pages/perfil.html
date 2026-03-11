@@ -59,9 +59,11 @@
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a></li>
+            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a></li>
+            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
@@ -69,9 +71,141 @@
         </div>
     </nav>
 
-    <main id="container">
-        <!-- Contenido principal aquí -->
+    <main class="main-content">
+        <section class="profile-section">
+            <div class="avatar-wrapper">
+                <img src="../assets/img/Ibai.jpg" alt="Foto de Perfil" class="profile-pic" id="displayPic">
+            </div>
+
+            <div class="profile-info">
+                <h1 id="displayName">Itxaso Sesmero Manzano</h1>
+                <p class="description" id="displayDescription">
+                    Soy una joven estudiante de bachillerato con especial interés en cocina y ciencia. Puedo ayudar a tu hijo con los deberes o hacer cualquier plato. 18 años de maestría :)
+                </p>
+                <div class="contact-links">
+                    <div class="link-row">
+                        <img src="../assets/img/icons/icono-pdf.png" alt="PDF" class="icon-img">
+                        <a href="../assets/docs/tu-curriculum-ejemplo.pdf" target="_blank" class="underline"
+                            id="displayPDF">Currículum</a>
+                    </div>
+                    <div class="link-row">
+                        <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
+                        <span class="italic" id="displayAddress">Uribarri, Bilbao 48007</span>
+                    </div>
+                </div>
+
+                <div class="edit-container">
+                    <img src="../assets/img/icons/icono-editar.png" alt="Editar" class="icon-edit" id="btnOpenEdit">
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <div class="level-container">
+                    <div class="level-box">
+                        <span class="lvl-val">3</span>
+                        <span class="lvl-label">NIVEL</span>
+                    </div>
+                    <div class="xp-bar-wrapper">
+                        <div class="xp-header">
+                            <span>0 XP</span>
+                            <span class="xp-focus">256 XP</span>
+                            <span>300 XP</span>
+                        </div>
+                        <div class="xp-bar">
+                            <div class="xp-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-item"><img src="../assets/img/icons/icono-estrella-color.png" class="icon-img" alt="Estrella">
+                    Valoración Media: <strong>4.2</strong></div>
+                <div class="stat-item"><img src="../assets/img/icons/icono-categoria-color.png" class="icon-img" alt="Cerebro">
+                    Especialidad: <strong>Gastronomía (7 pts)</strong></div>
+                <div class="stat-item"><img src="../assets/img/icons/icono-dinero-color.png" class="icon-img" alt="Dinero">
+                    Dinero conseguido: <strong>108 €</strong></div>
+            </div>
+        </section>
+
+        <section class="categories-container">
+            <h2 class="card-title">Categorías</h2>
+            <div class="cat-grid">
+                <div class="cat-item"><span class="dot d-yellow"></span> <strong>Gastronomía:</strong> 7 puntos</div>
+                <div class="cat-item"><span class="dot d-blue"></span> <strong>Informática:</strong> 1 puntos</div>
+                <div class="cat-item"><span class="dot d-purple"></span> <strong>Limpieza:</strong> 1 puntos</div>
+                <div class="cat-item"><span class="dot d-green-dark"></span> <strong>Mascotas:</strong> 5 puntos</div>
+                <div class="cat-item"><span class="dot d-brown"></span> <strong>Carpintería:</strong> 1 puntos</div>
+                <div class="cat-item"><span class="dot d-black"></span> <strong>Otros:</strong> 1 puntos</div>
+                <div class="cat-item"><span class="dot d-green-light"></span> <strong>Jardinería:</strong> 2 puntos
+                </div>
+                <div class="cat-item"><span class="dot d-pink"></span> <strong>Cuidado Personal:</strong> 1 puntos</div>
+                <div></div>
+                <div class="cat-item"><span class="dot d-red"></span> <strong>Evento:</strong> 2 puntos</div>
+                <div class="cat-item"><span class="dot d-teal"></span> <strong>Diseño:</strong> 1 puntos</div>
+            </div>
+        </section>
+
+        <section class="info-card">
+            <h2 class="card-title">Cuenta</h2>
+            <div class="card-body">
+                <p><strong>Correo electrónico:</strong> itxaso.sesmerom@gmail.com</p>
+                <p><strong>Contraseña:</strong> <span id="passLabel">*******</span></p>
+
+                <div class="card-actions">
+                    <div class="logout-action">
+                        <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Cerrar Sesión">
+                        <a href="../index.html" style="color: inherit; text-decoration: none;">Cerrar Sesión</a>
+                    </div>
+                    <div class="change-pass-action">
+                        <a href="#" id="btnChangePass">Cambiar Contraseña</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-card">
+            <h2 class="card-title">Suscripciones</h2>
+            <div class="card-body">
+                <p><strong>Suscripcion Trabajador:</strong> <img src="../assets/img/icons/icono-suscripciones.png"
+                        class="icon-img" alt="Diamante"> PRO - CURRANTE</p>
+                <p><strong>Suscripción Cliente:</strong> Ninguna</p>
+            </div>
+        </section>
     </main>
+
+    <div id="editModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Editar Perfil</h3>
+
+            <div class="input-group">
+                <label>Foto de Perfil:</label>
+                <input type="file" id="inputPhoto" accept="image/*">
+            </div>
+
+            <div class="input-group">
+                <label>Nombre Completo:</label>
+                <input type="text" id="inputName" placeholder="Escribe tu nombre...">
+            </div>
+
+            <div class="input-group">
+                <label>Descripción:</label>
+                <textarea id="inputDescription" rows="4" placeholder="Escribe tu descripción..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Dirección (Opcional):</label>
+                <input type="text" id="inputAddress" placeholder="Ciudad, CP...">
+            </div>
+
+            <div class="input-group">
+                <label>Currículum PDF (Opcional):</label>
+                <input type="file" id="inputPDF" accept=".pdf">
+            </div>
+
+            <div class="modal-buttons">
+                <button id="modal-btn cancel" class="modal-btn cancel">Cancelar</button>
+                <button id="modal-btn confirm" class="modal-btn confirm">Guardar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="../assets/js/general.js"></script>
     <script src="../assets/js/perfil.js"></script>

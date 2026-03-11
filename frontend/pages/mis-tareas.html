@@ -72,7 +72,77 @@
     </nav>
 
     <main id="container">
-        <!-- Contenido principal aquí -->
+        <section id="content">
+            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> MIS TAREAS: Todas</h2>
+
+            <div id="tareas-list">
+                <!-- Se rellena por JavaScript -->
+            </div>
+
+            <div class="pagination">
+                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);"></button>
+                <span id="page-info">1 - 12</span>
+                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;"></button>
+            </div>
+        </section>
+
+        <aside id="sidebar">
+            <div class="filter-box">
+                <h3>FILTRAR</h3>
+                <form id="filter-form">
+                    <div class="filter-group">
+                        <label>Categoría:</label>
+                        <select id="filter-category">
+                            <option value="todas">Todas</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="construccion">Construcción/Reforma</option>
+                            <option value="cuidado_personal">Cuidado personal</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="evento">Evento</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="informatica">Informática</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="limpieza">Limpieza</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="mudanza">Mudanza/Traslado</option>
+                            <option value="otros">Otros</option>
+                            <option value="transporte">Transporte</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="group-label">Tiempo estimado:</label>
+                        <div class="range-container">
+                            <div class="input-unit">
+                                <span>Desde</span>
+                                <input type="number" id="time-min" value="1">
+                            </div>
+                            <div class="input-unit">
+                                <span>Hasta</span>
+                                <input type="number" id="time-max" value="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="group-label">Pago:</label>
+                        <div class="range-container">
+                            <div class="input-unit">
+                                <span>Desde</span>
+                                <input type="number" id="pay-min" value="2">
+                            </div>
+                            <div class="input-unit">
+                                <span>Hasta</span>
+                                <input type="number" id="pay-max" value="1000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="update-btn">ACTUALIZAR</button>
+                </form>
+            </div>
+        </aside>
+
     </main>
 
     <script src="../assets/js/general.js"></script>

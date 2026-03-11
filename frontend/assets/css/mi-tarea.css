@@ -1,0 +1,236 @@
+/* Mi Tarea UI */
+.main-content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: black;
+}
+
+.job-header-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.job-image-wrapper {
+    flex-shrink: 0;
+}
+
+.job-img {
+    width: 220px;
+    height: 220px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
+.job-info-main {
+    flex: 1;
+}
+
+.job-title {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.job-description {
+    font-size: 15px;
+    line-height: 1.4;
+    padding-bottom: 50px;
+}
+
+.contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.icon-img {
+    width: 18px;
+    height: 18px;
+    margin-bottom: -3px;
+}
+
+.edit-container {
+    margin-top: -24px;
+    text-align: right;
+}
+
+.italic {
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.job-stats-container {
+    border-left: 3px solid white;
+    padding: 15px 25px;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.stat-box-large {
+    background: white;
+    padding: 20px 25px;
+    border-radius: 15px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    /* For absolutely positioning the edit icon */
+}
+
+.stat-label {
+    font-size: 28px;
+    color: #b5b5b5;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+}
+
+/* Información section */
+.info-section {
+    background-color: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.cat-title {
+    color: #d0d0d0;
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: center;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: #888;
+}
+
+.info-icon {
+    font-size: 18px;
+}
+
+.info-text {
+    color: #a0a0a0;
+}
+
+/* Edit Icons */
+.icon-edit {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.icon-edit:hover {
+    transform: scale(1.1);
+}
+
+.icon-edit-small {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background: transparent;
+    transition: transform 0.2s;
+    opacity: 0.6;
+}
+
+.icon-edit-small:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+/* Estilos del Modal (Ventana emergente) */
+.modal-content .input-group {
+    margin-bottom: 25px;
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.modal-content .input-group label {
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.modal-content .input-group input {
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.input-group {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    margin-bottom: 3px;
+    font-size: 14px;
+    color: black;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.input-group textarea {
+    resize: vertical;
+}
+
+.modal-buttons {
+    justify-content: right;
+}

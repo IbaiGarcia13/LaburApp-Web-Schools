@@ -59,9 +59,11 @@
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a></li>
+            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a></li>
+            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
@@ -69,8 +71,81 @@
         </div>
     </nav>
 
-    <main id="container">
-        <!-- Contenido principal aquí -->
+    <main class="main-content">
+        <section class="profile-section">
+            <div class="avatar-wrapper">
+                <img src="../assets/img/Ibai.jpg" alt="Foto de Perfil" class="profile-pic">
+            </div>
+
+            <div class="profile-info">
+                <h1>Itxaso Sesmero Manzano</h1>
+                <p class="description">
+                    Soy una joven estudiante de bachillerato con especial interés en cocina y ciencia.
+                    Puedo ayudar a tu hijo con los deberes o hacer cualquier plato. 18 años de maestría :)
+                </p>
+                <div class="contact-links">
+                    <div class="link-row">
+                        <img src="../assets/img/icons/icono-pdf.png" alt="PDF" class="icon-img">
+                        <span class="underline">Currículum</span>
+                    </div>
+                    <div class="link-row">
+                        <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
+                        <span class="italic">Uribarri, Bilbao 48007</span>
+                    </div>
+                </div>
+                <div class="message-container">
+                    <a href="chat.html" id="btn-chat"><img src="../assets/img/icons/icono-chat-1.png" alt="Mensaje" class="msg-icon">
+                    </a>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <div class="level-container">
+                    <div class="level-box">
+                        <span class="lvl-val">3</span>
+                        <span class="lvl-label">NIVEL</span>
+                    </div>
+                    <div class="xp-bar-wrapper">
+                        <div class="xp-header">
+                            <span>0 XP</span>
+                            <span class="xp-focus">256 XP</span>
+                            <span>300 XP</span>
+                        </div>
+                        <div class="xp-bar">
+                            <div class="xp-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-item"><img src="../assets/img/icons/icono-estrella-color.png" class="icon-img" alt="Estrella">
+                    Valoración Media: <strong>4.2</strong></div>
+                <div class="stat-item"><img src="../assets/img/icons/icono-categoria-color.png" class="icon-img" alt="Cerebro">
+                    Especialidad: <strong>Gastronomía (7 pts)</strong></div>
+                <div class="stat-item"><img src="../assets/img/icons/icono-dinero-color.png" class="icon-img" alt="Dinero">
+                    Dinero conseguido: <strong>108 €</strong></div>
+            </div>
+        </section>
+
+        <section class="categories-container">
+            <h2 class="cat-title">Categorías</h2>
+            <div class="cat-grid">
+                <div class="cat-item"><span class="dot d-yellow"></span> <strong>Gastronomía:</strong> 7 puntos</div>
+                <div class="cat-item"><span class="dot d-blue"></span> <strong>Informática:</strong> 1 puntos</div>
+                <div class="cat-item"><span class="dot d-purple"></span> <strong>Limpieza:</strong> 1 puntos</div>
+
+                <div class="cat-item"><span class="dot d-green-dark"></span> <strong>Mascotas:</strong> 5 puntos</div>
+                <div class="cat-item"><span class="dot d-brown"></span> <strong>Carpintería:</strong> 1 puntos</div>
+                <div class="cat-item"><span class="dot d-black"></span> <strong>Otros:</strong> 1 puntos</div>
+
+                <div class="cat-item"><span class="dot d-green-light"></span> <strong>Jardinería:</strong> 2 puntos
+                </div>
+                <div class="cat-item"><span class="dot d-pink"></span> <strong>Cuidado Personal:</strong> 1 puntos</div>
+                <div></div>
+                <div class="cat-item"><span class="dot d-red"></span> <strong>Evento:</strong> 2 puntos</div>
+                <div class="cat-item"><span class="dot d-teal"></span> <strong>Diseño:</strong> 1 puntos</div>
+            </div>
+        </section>
+
+        <div class="ad-placeholder"></div>
     </main>
 
     <script src="../assets/js/general.js"></script>

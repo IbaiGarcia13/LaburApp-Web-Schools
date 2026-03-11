@@ -1,0 +1,429 @@
+/* Perfil */
+.main-content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.profile-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.avatar-wrapper {
+    flex-shrink: 0;
+}
+
+.profile-pic {
+    width: 220px;
+    height: 220px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h1 {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+}
+
+.description {
+    font-size: 15px;
+    line-height: 1.4;
+    padding-bottom: 50px;
+}
+
+.contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.icon-img {
+    width: 18px;
+    height: 18px;
+    margin-bottom: -3px;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.italic {
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.message-container {
+    margin-top: -30px;
+    text-align: right;
+}
+
+.msg-icon {
+    width: 30px;
+    cursor: pointer;
+}
+
+/* Stats Box */
+.stats-card {
+    border-left: 3px solid white;
+    padding: 15px 25px;
+    min-width: 300px;
+}
+
+.level-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.level-box {
+    background: white;
+    color: #888;
+    padding: 8px 15px;
+    border-radius: 12px;
+    text-align: center;
+    line-height: 1;
+}
+
+.lvl-val {
+    display: block;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.lvl-label {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.xp-bar-wrapper {
+    flex: 1;
+}
+
+.xp-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.xp-focus {
+    font-weight: bold;
+}
+
+.xp-bar {
+    height: 15px;
+    background: white;
+    overflow: hidden;
+}
+
+.xp-fill {
+    width: 85%;
+    height: 100%;
+    background-color: #d12a2a;
+}
+
+.stat-item {
+    margin: 10px 0;
+    font-size: 15px;
+}
+
+/* Categorías */
+.categories-container {
+    background-color: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #d0d0d0;
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 30px;
+}
+
+.cat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #888;
+}
+
+.dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+/* Colores exactos de los círculos */
+.d-yellow {
+    background-color: #f1c40f;
+}
+
+.d-blue {
+    background-color: #2e5bff;
+}
+
+.d-purple {
+    background-color: #9b59b6;
+}
+
+.d-green-dark {
+    background-color: #27ae60;
+}
+
+.d-brown {
+    background-color: #a04000;
+}
+
+.d-black {
+    background-color: #000000;
+}
+
+.d-green-light {
+    background-color: #2ecc71;
+}
+
+.d-pink {
+    background-color: #f5b7b1;
+}
+
+.d-red {
+    background-color: #ff3333;
+}
+
+.d-teal {
+    background-color: #7fb3d5;
+}
+
+/* Espacio Anuncio */
+.ad-placeholder {
+    height: 120px;
+    width: 100%;
+    margin-top: 20px;
+    /* Se deja vacío como pediste */
+}
+
+/* Botón Editar superior */
+.edit-container {
+    text-align: right;
+    margin-top: -10px;
+}
+
+.btn-edit {
+    background-color: white;
+    color: #888;
+    border: 1px solid #ddd;
+    padding: 8px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Tarjetas de Información (Cuenta y Suscripciones) */
+.info-card {
+    background-color: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-body p {
+    margin: 15px 0;
+    font-size: 15px;
+    color: #888;
+}
+
+.card-body strong {
+    color: #666;
+}
+
+/* Acciones de la tarjeta cuenta */
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.logout-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #d12a2a;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.logout-action img {
+    width: 20px;
+}
+
+.change-pass-action a {
+    color: #888;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+/* Icono de editar */
+.edit-container {
+    text-align: right;
+    margin-top: -20px;
+}
+
+.icon-edit {
+    width: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.icon-edit:hover {
+    transform: scale(1.1);
+}
+
+/* Tarjetas de Información */
+.info-card {
+    background-color: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-body p {
+    margin: 15px 0;
+    font-size: 15px;
+    color: #888;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.logout-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #d12a2a;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.change-pass-action a {
+    color: #888;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+/* Estilos del Modal (Ventana emergente) */
+.modal-content .input-group {
+    margin-bottom: 25px;
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.modal-content .input-group label {
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.modal-content .input-group input {
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.input-group {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    margin-bottom: 3px;
+    font-size: 14px;
+    color: black;
+}
+
+.input-group input,
+.input-group textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.input-group textarea {
+    resize: vertical;
+}
+
+.modal-content {
+    background: white;
+    color: black;
+    padding: 35px;
+    border-radius: 15px;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    justify-self: center;
+    margin-top: 1%;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+/* Añade esto para que el enlace no cambie de color */
+#displayPDF {
+    color: black;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#displayPDF:hover {
+    color: #ccc;
+    /* Un ligero cambio al pasar el ratón */
+}

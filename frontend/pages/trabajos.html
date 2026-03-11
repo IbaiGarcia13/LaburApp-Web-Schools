@@ -59,9 +59,11 @@
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a></li>
+            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a></li>
+            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
@@ -71,15 +73,15 @@
 
     <main id="container">
         <section id="content">
-            <h2 class="section-title">TRABAJOS: Todos</h2>
+            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> TRABAJOS: Todos</h2>
 
             <div id="jobs-list">
             </div>
 
             <div class="pagination">
-                <button id="prev-page" class="pag-btn">&lt;</button>
+                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);"></button>
                 <span id="page-info">1 - 4</span>
-                <button id="next-page" class="pag-btn">&gt;</button>
+                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;"></button>
             </div>
         </section>
 
@@ -91,11 +93,19 @@
                         <label>Categoría:</label>
                         <select id="filter-category">
                             <option value="todas">Todas</option>
-                            <option value="jardineria">Jardinería</option>
-                            <option value="mascotas">Mascotas</option>
-                            <option value="informatica">Informática</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="construccion">Construcción/Reforma</option>
+                            <option value="cuidado_personal">Cuidado personal</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="evento">Evento</option>
                             <option value="gastronomia">Gastronomía</option>
+                            <option value="informatica">Informática</option>
+                            <option value="jardineria">Jardinería</option>
                             <option value="limpieza">Limpieza</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="mudanza">Mudanza/Traslado</option>
+                            <option value="otros">Otros</option>
+                            <option value="transporte">Transporte</option>
                         </select>
                     </div>
 
@@ -108,7 +118,7 @@
                             </div>
                             <div class="input-unit">
                                 <span>Hasta</span>
-                                <input type="number" id="time-max" value="10">
+                                <input type="number" id="time-max" value="100">
                             </div>
                         </div>
                     </div>
@@ -118,11 +128,11 @@
                         <div class="range-container">
                             <div class="input-unit">
                                 <span>Desde</span>
-                                <input type="number" id="pay-min" value="5">
+                                <input type="number" id="pay-min" value="2">
                             </div>
                             <div class="input-unit">
                                 <span>Hasta</span>
-                                <input type="number" id="pay-max" value="200">
+                                <input type="number" id="pay-max" value="1000">
                             </div>
                         </div>
                     </div>

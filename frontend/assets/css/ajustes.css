@@ -1,0 +1,272 @@
+/* Ajustes GLOBALS Y LAYOUT */
+/* Usa el fondo global que tengan las otras pantallas. Si styles.css centraliza esto, aquí no definimos body */
+
+.main-content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: white;
+}
+
+.page-title {
+    color: white;
+    /* Ajustado al fondo grante de la imagen */
+    font-size: 24px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+/* CARDS iguales a perfil.css (.info-card) */
+.settings-card {
+    background-color: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 24px;
+    color: #d0d0d0;
+    font-weight: bold;
+    margin: 0;
+}
+
+.icon-edit {
+    width: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.icon-edit:hover {
+    transform: scale(1.1);
+}
+
+/* CARD BODY AND TYPOGRAPHY */
+.card-body p {
+    margin: 15px 0;
+    font-size: 15px;
+    color: #888;
+}
+
+.card-body strong {
+    color: #666;
+}
+
+.icon-img {
+    width: 18px;
+    vertical-align: middle;
+    margin-top: -3px;
+    margin-right: 5px;
+}
+
+.icon-img-small {
+    width: 15px;
+    height: 15px;
+    vertical-align: middle;
+    margin-top: 1px;
+    margin-right: 5px;
+}
+
+/* INFO GRID */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 30px;
+}
+
+.info-grid .info {
+    margin: 0px;
+}
+
+/* ACCOUNT ACTIONS */
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.logout-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #d12a2a;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.logout-action img {
+    width: 20px;
+}
+
+.change-pass-action a,
+.right-action a {
+    color: #888;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.right-action {
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* PAYMENTS AND LISTS */
+.payment-methods {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.payment-methods li {
+    margin: 15px 0;
+    font-size: 15px;
+    color: #888;
+    display: flex;
+    align-items: center;
+}
+
+.payment-methods li strong {
+    margin-right: 5px;
+}
+
+.payment-history {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+    align-items: center;
+}
+
+.payment-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.payment-row p {
+    margin: 0;
+}
+
+/* DELETE ACCOUNT */
+.delete-account-container {
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+.delete-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.delete-action a {
+    color: white;
+    text-decoration: underline;
+    font-size: 16px;
+}
+
+.icon-delete {
+    width: 20px;
+}
+
+/* MODALES */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background-color: white;
+    color: black;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+}
+
+.input-group input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-save,
+.btn-cancel {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-save {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-save:hover {
+    background: #45a049;
+}
+
+.btn-cancel {
+    background: #ddd;
+    color: #333;
+}
+
+.btn-cancel:hover {
+    background: #ccc;
+}

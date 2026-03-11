@@ -1,13 +1,19 @@
-/* --- CONTENEDOR PRINCIPAL --- */
 #container {
     display: flex;
-    max-width: 1400px;
+    max-width: 1250px;
+    min-width: 800px;
     margin: 30px auto;
     gap: 30px;
     padding: 0 20px;
+    justify-content: center;
 }
 
-#content { flex: 3; }
+#content {
+    width: 900px;
+    flex-shrink: 1;
+    min-height: 80vh;
+    /* Altura mínima para no aplastar el layout si no hay cards */
+}
 
 .section-title {
     color: white;
@@ -24,13 +30,20 @@
     display: flex;
     gap: 30px;
     margin-bottom: 20px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     align-items: flex-start;
-    transition: transform 0.2s ease; /* Esto suaviza el movimiento */
+    transition: transform 0.2s ease;
+    height: 260px;
+    width: 100%;
+    max-width: 900px;
+    min-width: 600px;
+    box-sizing: border-box;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .job-card:hover {
-    transform: translateY(-5px); /* El valor negativo lo "levanta" */
+    transform: translateY(-5px);
 }
 
 .job-img {
@@ -41,42 +54,87 @@
     flex-shrink: 0;
 }
 
-.job-info h3 { font-size: 1.4rem; margin-bottom: 12px; color: #111; }
-.job-desc { font-size: 1rem; color: #444; line-height: 1.6; margin-bottom: 15px; }
+.job-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* Necesario para que el truncamiento de texto funcione en flexbox */
+}
+
+.job-info h3 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-desc {
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 15px;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 .job-details p {
     font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    color: #111;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.xp-icon {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    background-color: #2e5bff;
-    border-radius: 50%;
+.job-details p img {
+    vertical-align: middle;
+    margin-right: 5px;
 }
 
-/* --- PANEL DE FILTROS --- */
-#sidebar { flex: 1; max-width: 320px; }
+.job-details p:last-child {
+    font-size: 1.1rem;
+    text-align: right;
+    display: block;
+    margin-top: -32px;
+    margin-right: 15px;
+}
+
+
+
+#sidebar {
+    width: 320px;
+    min-width: 200px;
+    flex-shrink: 2;
+}
 
 .filter-box {
     background-color: black;
     color: white;
     padding: 30px;
     border-radius: 20px;
-    border: 2px solid white;
+    /*border: 2px solid white;*/
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     position: sticky;
     top: 100px;
 }
 
-.filter-box h3 { text-align: center; margin-bottom: 25px; letter-spacing: 2px; font-size: 1.4rem; }
+.filter-box h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+}
 
-.filter-group { margin-bottom: 20px; }
+.filter-group {
+    margin-bottom: 20px;
+}
 
 .filter-group label {
     display: block;
@@ -85,7 +143,8 @@
     font-weight: bold;
 }
 
-.filter-box select, .filter-box input {
+.filter-box select,
+.filter-box input {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
@@ -99,7 +158,9 @@
     gap: 10px;
 }
 
-.input-unit { flex: 1; }
+.input-unit {
+    flex: 1;
+}
 
 .input-unit span {
     display: block;
@@ -120,7 +181,9 @@
     transition: 0.3s;
 }
 
-#update-btn:hover { background-color: white; }
+#update-btn:hover {
+    background-color: white;
+}
 
 /* --- PAGINACIÓN --- */
 .pagination {
@@ -132,18 +195,19 @@
 }
 
 .pag-btn {
-    background: white;
+    background: transparent;
     border: none;
     width: 45px;
     height: 45px;
-    border-radius: 50%;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 22px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.pag-btn:hover {
+    transform: scale(1.2);
 }
 
 #page-info {
@@ -151,5 +215,5 @@
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }

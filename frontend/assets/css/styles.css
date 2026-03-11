@@ -9,6 +9,14 @@
 body {
     background-color: rgb(180, 80, 80);
     overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main#container,
+main.main-content {
+    flex: 1;
 }
 
 /* --- HEADER  --- */
@@ -48,14 +56,14 @@ header {
     height: 100%;
 }
 
-nav,
-nav ul {
+header nav,
+header nav ul {
     display: flex;
     height: 100%;
     list-style: none;
 }
 
-nav a {
+header nav a {
     color: white;
     text-decoration: none;
     padding: 0 20px;
@@ -67,7 +75,7 @@ nav a {
     transition: all 0.3s ease;
 }
 
-nav a:hover {
+header nav a:hover {
     background-color: white;
     color: black;
 }
@@ -198,7 +206,7 @@ nav a:hover {
     position: fixed;
     top: 70px;
     right: -320px;
-    width: 300px;
+    width: 250px;
     height: calc(100vh - 70px);
     background: white;
     transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -214,6 +222,7 @@ nav a:hover {
 .side-menu ul {
     list-style: none;
     display: block;
+    width: 100%;
 }
 
 .side-menu li {
@@ -222,6 +231,7 @@ nav a:hover {
     padding: 15px 30px;
     gap: 20px;
     transition: 0.3s;
+    position: relative;
 }
 
 .side-menu li:hover {
@@ -246,7 +256,19 @@ nav a:hover {
     font-size: 1.05rem;
     height: auto;
     padding: 0;
-    width: 100px;
+}
+
+.side-menu li a::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.side-menu li a:hover {
+    background-color: transparent;
 }
 
 .side-menu-footer {
@@ -275,5 +297,109 @@ footer {
     color: white;
     padding: 15px;
     text-align: center;
-    background-color: black
+    background-color: black;
+}
+
+.icon-img-small {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-top: -2px;
+    margin-bottom: 2px;
+}
+
+/* --- MODAL GLOBAL (Alerts & Confirms) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    color: black;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.modal-content p {
+    margin-bottom: 25px;
+    color: #555;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.modal-btn:hover {
+    transform: scale(1.05);
+}
+
+.modal-btn.confirm {
+    background: #000000;
+    color: white;
+}
+
+.modal-btn.confirm:hover {
+    background: #0d0d0d;
+}
+
+.modal-btn.delete {
+    background: #cc0000;
+    color: white;
+}
+
+.modal-btn.delete:hover {
+    background: #a30000;
+}
+
+.modal-btn.cancel {
+    background: #e0e0e0;
+    color: black;
+}
+
+.modal-btn.cancel:hover {
+    background: #ccc;
+}
+
+.hidden {
+    display: none !important;
 }

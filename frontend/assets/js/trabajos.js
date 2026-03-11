@@ -37,19 +37,20 @@ function displayJobs() {
         container.innerHTML = "<p style='color:white; text-align:center;'>No hay trabajos disponibles.</p>";
     }
 
-    pageItems.forEach(job => {
+    pageItems.forEach((job, index) => {
+        const mockId = start + index + 1; // Solo a los efectos de mock
         const card = `
-            <article class="job-card">
+            <article class="job-card" onclick="window.location.href='trabajo.html?id=${mockId}'">
                 <img src="../assets/img/principal1.png" class="job-img">
                 <div class="job-info">
                     <h3>${job.titulo}</h3>
                     <p class="job-desc">${job.desc}</p>
                     <div class="job-details">
-                        <p>📍 ${job.loc}</p>
-                        <p>🕒 Tiempo estimado: ${job.tiempo}h</p>
-                        <p>💰 Pago: ${job.pago} €</p>
-                        <p>🧠 Categoría: ${job.cat.charAt(0).toUpperCase() + job.cat.slice(1)}</p>
-                        <p><span class="xp-icon"></span> Experiencia: ${job.xp} XP</p>
+                        <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.loc}</p>
+                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo}h</p>
+                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${job.cat.charAt(0).toUpperCase() + job.cat.slice(1)}</p>
+                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${job.xp} XP</strong></p>
+                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""> Pago: <strong>${Number.isInteger(job.pago) ? job.pago : Number(job.pago).toFixed(2)} €</strong></p>
                     </div>
                 </div>
             </article>`;
@@ -66,6 +67,10 @@ document.getElementById('update-btn').onclick = () => {
     const tMax = parseInt(document.getElementById('time-max').value);
     const pMin = parseFloat(document.getElementById('pay-min').value);
     const pMax = parseFloat(document.getElementById('pay-max').value);
+
+    const isFiltered = cat !== "todas" || tMin !== 1 || tMax !== 100 || pMin !== 2 || pMax !== 1000;
+    const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
+    document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + "TRABAJOS: Filtrados" : iconHtml + "TRABAJOS: Todos";
 
     filteredJobs = trabajosData.filter(j => {
         const matchCat = (cat === "todas" || j.cat === cat);

@@ -10,7 +10,6 @@
     border-radius: 20px;
     overflow: hidden;
     margin-bottom: 40px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
     max-height: 400px;
 }
 
@@ -19,6 +18,8 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .main-title {
@@ -47,7 +48,7 @@
     padding: 40px;
     border-radius: 20px;
     flex: 3;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .text-card h3 {
@@ -66,7 +67,7 @@
     flex: 2;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     min-height: 300px;
 }
 

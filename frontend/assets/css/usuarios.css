@@ -1,16 +1,17 @@
-/* --- CONTENEDOR PRINCIPAL --- */
 #container {
     display: flex;
-    max-width: 1400px;
-    /* Un poco más ancho para acomodar fotos grandes */
+    max-width: 1250px;
+    min-width: 800px;
     margin: 30px auto;
     gap: 30px;
     padding: 0 20px;
+    justify-content: center;
 }
 
 #content {
-    flex: 3;
-    /* Le damos más prioridad al contenido */
+    width: 900px;
+    flex-shrink: 1;
+    min-height: 80vh;
 }
 
 .section-title {
@@ -20,49 +21,52 @@
     font-weight: bold;
 }
 
-/* --- TARJETAS DE USUARIO --- */
-#users-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
+/* --- TARJETAS DE USUARIO (Imágenes 200px) --- */
 .user-card {
     background: white;
     border-radius: 15px;
     padding: 30px;
-    /* Más padding para que respire con la foto grande */
     display: flex;
     gap: 30px;
+    margin-bottom: 20px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s;
     align-items: flex-start;
+    transition: transform 0.2s ease;
+    height: 260px;
+    width: 100%;
+    max-width: 900px;
+    min-width: 600px;
+    box-sizing: border-box;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .user-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
 }
 
 .user-img {
     width: 200px;
-    /* CAMBIO: Imagen más grande */
     height: 200px;
-    /* CAMBIO: Imagen más grande */
     object-fit: cover;
     border-radius: 12px;
-    background-color: #eee;
     flex-shrink: 0;
-    /* Evita que la imagen se encoja */
 }
 
 .user-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .user-info h3 {
     font-size: 1.4rem;
     margin-bottom: 12px;
     color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-desc {
@@ -70,54 +74,31 @@
     color: #444;
     line-height: 1.6;
     margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .user-stats p {
     font-size: 0.9rem;
-    margin-bottom: 6px;
-    color: #666;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: #111;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* --- PAGINACIÓN --- */
-.pagination {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    padding-bottom: 50px;
+.user-stats p img {
+    vertical-align: middle;
+    margin-right: 5px;
 }
 
-.pag-btn {
-    background: white;
-    border: none;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 22px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#page-info {
-    background: white;
-    padding: 10px 30px;
-    border-radius: 25px;
-    font-weight: bold;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
-
-/* --- SIDEBAR --- */
 #sidebar {
-    flex: 1;
-    max-width: 320px;
+    width: 320px;
+    min-width: 200px;
+    flex-shrink: 2;
 }
 
 .filter-box {
@@ -125,7 +106,8 @@
     color: white;
     padding: 30px;
     border-radius: 20px;
-    border: 2px solid white;
+    /*border: 2px solid white;*/
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     position: sticky;
     top: 100px;
 }
@@ -134,14 +116,14 @@
     text-align: center;
     margin-bottom: 25px;
     letter-spacing: 2px;
+    font-size: 1.4rem;
 }
 
 .filter-group {
     margin-bottom: 20px;
 }
 
-.filter-group label,
-.label-style {
+.filter-group label {
     display: block;
     margin-bottom: 8px;
     font-size: 0.9rem;
@@ -154,20 +136,24 @@
     padding: 12px;
     border-radius: 8px;
     border: none;
-    background: white;
-    color: black;
+    font-size: 0.9rem;
 }
 
-.range-inputs {
+/* Alineación Desde/Hasta corregida */
+.range-container {
     display: flex;
     gap: 10px;
+}
+
+.input-unit {
+    flex: 1;
 }
 
 .input-unit span {
     display: block;
     font-size: 0.75rem;
-    margin-bottom: 4px;
     color: #bbb;
+    margin-bottom: 4px;
 }
 
 #update-btn {
@@ -179,27 +165,43 @@
     font-weight: bold;
     cursor: pointer;
     border: none;
+    transition: 0.3s;
 }
 
 #update-btn:hover {
     background-color: white;
 }
 
-.range-container {
+/* --- PAGINACIÓN --- */
+.pagination {
+    margin: 40px 0 50px;
     display: flex;
-    /* Los pone en línea */
-    gap: 10px;
-    /* Separa los dos cuadros */
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
-.input-unit {
-    flex: 1;
-    /* Obliga a que ambos midan exactamente lo mismo */
+.pag-btn {
+    background: transparent;
+    border: none;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
 }
 
-.input-unit span {
-    display: block;
-    /* Pone el texto "Desde/Hasta" arriba del cuadro */
-    font-size: 0.75rem;
-    color: #bbb;
+.pag-btn:hover {
+    transform: scale(1.2);
+}
+
+#page-info {
+    border: 2px solid white;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
 }

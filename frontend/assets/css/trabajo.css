@@ -1,0 +1,159 @@
+/* Trabajo UI */
+.main-content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: black;
+}
+
+.job-header-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.job-image-wrapper {
+    flex-shrink: 0;
+}
+
+.job-img {
+    width: 220px;
+    height: 220px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
+.job-info-main {
+    flex: 1;
+}
+
+.job-title {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+}
+
+.job-description {
+    font-size: 15px;
+    line-height: 1.4;
+    padding-bottom: 50px;
+}
+
+.contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.icon-img {
+    width: 18px;
+    height: 18px;
+    margin-bottom: -3px;
+}
+
+.italic {
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.job-stats-container {
+    border-left: 3px solid white;
+    padding: 15px 25px;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.stat-box-large {
+    background: white;
+    padding: 20px 25px;
+    border-radius: 15px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+    font-size: 28px;
+    color: #b5b5b5;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+}
+
+.modal-content p {
+    text-align: center;
+}
+
+/* Información section */
+.info-section {
+    background-color: white;
+    color: #333;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cat-title {
+    color: #d0d0d0;
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+    font-weight: bold;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: center;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: #888;
+}
+
+.info-icon {
+    font-size: 18px;
+}
+
+.info-text {
+    color: #a0a0a0;
+}
+
+/* Container Chat */
+.message-container {
+    margin-top: -30px;
+    text-align: right;
+
+}
+
+.msg-icon {
+    width: 30px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.msg-icon:hover {
+    transform: scale(1.1);
+}

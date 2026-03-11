@@ -73,13 +73,13 @@
 
     <main id="container">
         <section id="content">
-            <h2 class="section-title">USUARIOS: Todos</h2>
+            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> USUARIOS: Todos</h2>
             <div id="users-list"></div>
 
             <div class="pagination">
-                <button id="prev-page" class="pag-btn">&lt;</button>
+                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);"></button>
                 <span id="page-info">1 - 4</span>
-                <button id="next-page" class="pag-btn">&gt;</button>
+                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;"></button>
             </div>
         </section>
 
@@ -91,17 +91,25 @@
                         <label>Categoría:</label>
                         <select id="filter-category">
                             <option value="todas">Todas</option>
-                            <option value="informatica">Informática</option>
-                            <option value="mascotas">Mascotas</option>
-                            <option value="jardineria">Jardinería</option>
                             <option value="carpinteria">Carpintería</option>
+                            <option value="construccion">Construcción/Reforma</option>
+                            <option value="cuidado_personal">Cuidado personal</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="evento">Evento</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="informatica">Informática</option>
+                            <option value="jardineria">Jardinería</option>
                             <option value="limpieza">Limpieza</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="mudanza">Mudanza/Traslado</option>
+                            <option value="otros">Otros</option>
+                            <option value="transporte">Transporte</option>
                         </select>
                     </div>
 
                     <div class="filter-group">
                         <label>Nivel:</label>
-                        <input type="number" id="filter-level" value="1" min="1" max="10">
+                        <input type="number" id="filter-level" value="1" min="1" max="50">
                     </div>
                     <div class="filter-group">
                         <label class="group-label">Valoración media:</label>

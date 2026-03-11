@@ -37,18 +37,19 @@ function displayUsers() {
         container.innerHTML = "<p style='color:white; text-align:center;'>No se encontraron usuarios.</p>";
     }
 
-    pageItems.forEach(user => {
+    pageItems.forEach((user, index) => {
+        const mockId = start + index + 1;
         const card = `
-            <article class="user-card">
+            <article class="user-card" onclick="window.location.href='usuario.html?id=${mockId}'">
                 <img src="../assets/img/Ibai.jpg" class="user-img">
                 <div class="user-info">
                     <h3>${user.nombre}</h3>
                     <p class="user-desc">${user.desc}</p>
                     <div class="user-stats">
-                        <p>📍 ${user.loc}</p>
-                        <p>💼 Nivel: ${user.lvl}</p>
-                        <p>⭐ Valoración Media: ${user.val}</p>
-                        <p>🧠 Especialidad: ${user.esp.charAt(0).toUpperCase() + user.esp.slice(1)}</p>
+                        <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${user.loc}</p>
+                        <p><img src="../assets/img/icons/icono-nivel.png" class="icon-img-small" alt=""> Nivel: ${user.lvl}</p>
+                        <p><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt=""> Valoración Media: ${user.val}</p>
+                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Especialidad: ${user.esp.charAt(0).toUpperCase() + user.esp.slice(1)}</p>
                     </div>
                 </div>
             </article>`;
@@ -64,6 +65,10 @@ document.getElementById('update-btn').onclick = () => {
     const lvl = parseInt(document.getElementById('filter-level').value);
     const minV = parseFloat(document.getElementById('val-min').value);
     const maxV = parseFloat(document.getElementById('val-max').value);
+
+    const isFiltered = cat !== "todas" || lvl !== 1 || minV !== 0.0 || maxV !== 5.0;
+    const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
+    document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + "USUARIOS: Filtrados" : iconHtml + "USUARIOS: Todos";
 
     filteredUsers = usuariosData.filter(u => {
         const matchCat = (cat === "todas" || u.esp === cat);

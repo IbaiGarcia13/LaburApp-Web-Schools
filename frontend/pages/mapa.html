@@ -71,73 +71,125 @@
         </div>
     </nav>
 
-    <div id="page-container">
+    <main class="main-content" id="page-container">
+        <h2 id="mapa-title" class="section-title" style="margin-bottom: 20px; color: white"><img
+                src="../assets/img/icons/icono-ajustes.png"
+                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> MAPA: Todos</h2>
         <div id="main-layout">
-            <!-- MAPA -->
-            <div id="map"></div>
 
-            <!-- PANEL LATERAL -->
-            <div id="side-panel">
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="left-column">
+                <!-- MAPA -->
+                <div id="map"></div>
 
-                <div id="panel-tabs">
-                    <button id="tab-mis" class="active-tab">Mis Tareas</button>
-                    <button id="tab-trabajos">Trabajos</button>
+                <!-- FORMULARIO CREAR TRABAJO (Bajo el mapa) -->
+                <div id="marker-form-box" class="hidden">
+                    <h3>Configurar Trabajo</h3>
+                    <label>Título<input type="text" id="job-title"></label>
+                    <label>Descripción<input type="text" id="job-desc"></label>
+                    <label>Dirección<input type="text" id="job-address"
+                            placeholder="Ej: Barakaldo, Bizkaia, Calle La Paz 21"></label>
+                    <label>Fecha límite<input type="date" id="job-deadline"></label>
+                    <label>Pago (€)<input type="number" id="job-price" step="0.01" min="2"><small
+                            id="price-preview"></small></label>
+                    <label>Tiempo estimado (h)<input type="number" id="job-time" min="1"></label>
+                    <label>Categoría
+                        <select id="job-category">
+                            <option value="">Seleccione una opción</option>
+                            <option>Carpintería</option>
+                            <option>Informática</option>
+                            <option>Jardinería</option>
+                            <option>Limpieza</option>
+                            <option>Transporte</option>
+                            <option>Mudanza/Traslado</option>
+                            <option>Construcción/Reforma</option>
+                            <option>Cuidado personal</option>
+                            <option>Mascotas</option>
+                            <option>Diseño</option>
+                            <option>Evento</option>
+                            <option>Gastronomía</option>
+                            <option>Otros</option>
+                        </select>
+                    </label>
+                    <div class="btn-group">
+                        <button id="save-job-btn" class="modal-btn confirm" style="width: 50%;">Guardar</button>
+                        <button id="cancel-job-btn" class="modal-btn cancel" style="width: 50%;">Cancelar</button>
+                    </div>
                 </div>
 
-                <div id="panel-content"></div>
-
+                <!-- FORMULARIO VER MÁS (Bajo el mapa) -->
+                <div id="marker-view-box" class="hidden">
+                    <h3 id="view-title"></h3>
+                    <p id="view-desc" style="margin-bottom: 15px;"></p>
+                    <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt="">
+                        <strong>Dirección:</strong> <span id="view-address"></span></p>
+                    <p><img src="../assets/img/icons/icono-fecha.png" class="icon-img-small" alt=""> <strong>Fecha
+                            límite:</strong> <span id="view-deadline"></span></p>
+                    <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" alt="">
+                        <strong>Pago:</strong> <span id="view-price"></span> €</p>
+                    <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt="">
+                        <strong>Categoría:</strong> <span id="view-category"></span></p>
+                    <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt="">
+                        <strong>Experiencia:</strong> <span id="view-xp"></span> XP</p>
+                    <div class="btn-group" style="margin-top: 15px;">
+                        <button id="view-all-btn" class="modal-btn" style="background: black; color: white; width: 48%;">Ver Todo</button>
+                        <button id="close-view-btn" class="modal-btn cancel" style="width: 48%;">Cerrar</button>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- FORMULARIO CREAR TRABAJO -->
-        <div id="marker-form-container" class="hidden">
-            <div id="marker-form-box">
-                <h3>Configurar Trabajo</h3>
-                <label>Título<input type="text" id="job-title"></label>
-                <label>Descripción<input type="text" id="job-desc"></label>
-                <label>Dirección<input type="text" id="job-address"
-                        placeholder="Ej: Barakaldo, Bizkaia, Calle La Paz 21"></label>
-                <label>Fecha límite<input type="date" id="job-deadline"></label>
-                <label>Precio (€)<input type="number" id="job-price" step="0.01" min="2"><small
-                        id="price-preview"></small></label>
-                <label>Tiempo estimado (h)<input type="number" id="job-time" min="1"></label>
-                <label>Categoría
-                    <select id="job-category">
-                        <option value="">Seleccione una opción</option>
-                        <option>Carpintería</option>
-                        <option>Informática</option>
-                        <option>Jardinería</option>
-                        <option>Limpieza</option>
-                        <option>Transporte</option>
-                        <option>Mudanza/Traslado</option>
-                        <option>Construcción/Reforma</option>
-                        <option>Cuidado personal</option>
-                        <option>Mascotas</option>
-                        <option>Diseño</option>
-                        <option>Evento</option>
-                        <option>Gastronomía</option>
-                        <option>Otros</option>
-                    </select>
-                </label>
-                <button id="save-job-btn">Guardar</button>
-                <button id="cancel-job-btn">Cancelar</button>
-            </div>
-        </div>
+            <!-- COLUMNA DERECHA -->
+            <div class="right-column">
 
-        <!-- FORMULARIO VER MÁS -->
-        <div id="marker-view-container" class="hidden">
-            <div id="marker-view-box">
-                <h3 id="view-title"></h3>
-                <p id="view-desc"></p>
-                <p><strong>Dirección:</strong> <span id="view-address"></span></p>
-                <p><strong>Fecha límite:</strong> <span id="view-deadline"></span></p>
-                <p><strong>Precio:</strong> <span id="view-price"></span> €</p>
-                <p><strong>Categoría:</strong> <span id="view-category"></span></p>
-                <p><span class="experience-circle"></span> <span id="view-xp"></span> XP</p>
-                <button id="close-view-btn">Cerrar</button>
+                <!-- PANEL FILTRAR -->
+                <div id="filter-panel" class="dark-box">
+                    <h2 class="text-center" style="margin-bottom: 20px;">FILTRAR</h2>
+
+                    <label>Categoría:
+                        <select id="filter-cat">
+                            <option value="">Todas</option>
+                            <option>Carpintería</option>
+                            <option>Informática</option>
+                            <option>Jardinería</option>
+                            <option>Limpieza</option>
+                            <option>Transporte</option>
+                            <option>Mudanza/Traslado</option>
+                            <option>Construcción/Reforma</option>
+                            <option>Cuidado personal</option>
+                            <option>Mascotas</option>
+                            <option>Diseño</option>
+                            <option>Evento</option>
+                            <option>Gastronomía</option>
+                            <option>Otros</option>
+                        </select>
+                    </label>
+
+                    <label style="margin-top: 20px;">Rango km: <span id="range-val">1</span> km</label>
+                    <input type="range" id="filter-range" value="1" min="1" max="200"
+                        style="width: 100%; margin-bottom: 20px;">
+
+                    <label>Pago:</label>
+                    <div class="input-row">
+                        <div class="input-half">
+                            <label style="font-size: 11px; font-weight: normal; margin-bottom: 2px;">Desde</label>
+                            <input type="number" id="filter-price-min" value="2" min="2">
+                        </div>
+                        <div class="input-half">
+                            <label style="font-size: 11px; font-weight: normal; margin-bottom: 2px;">Hasta</label>
+                            <input type="number" id="filter-price-max" value="1000" min="2">
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 12px;">
+                        <button id="apply-filters-btn" class="btn-apply-filter">ACTUALIZAR</button>
+                    </div>
+                </div>
+
+                <button id="create-marker-btn" class="btn-giant">AÑADIR MARCADOR</button>
             </div>
+
         </div>
-    </div>
+    </main>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="../assets/js/general.js"></script>
