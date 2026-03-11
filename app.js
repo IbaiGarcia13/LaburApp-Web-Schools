@@ -9,30 +9,34 @@ const messageInput = document.getElementById('message-input');
 const q = query(collection(db, "mensajes"), orderBy("fecha", "asc"));
 
 onSnapshot(q, (snapshot) => {
-    messagesContainer.innerHTML = ''; // Limpiamos para no duplicar
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        const p = document.createElement('p');
-        p.textContent = `${data.texto}`;
-        messagesContainer.appendChild(p);
-    });
+    if (messagesContainer) {
+        messagesContainer.innerHTML = ''; // Limpiamos para no duplicar
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const p = document.createElement('p');
+            p.textContent = `${data.texto}`;
+            messagesContainer.appendChild(p);
+        });
+    }
 });
 
 // 2. ENVIAR MENSAJES
-chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const texto = messageInput.value;
+if (chatForm) {
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const texto = messageInput.value;
 
-    try {
-        await addDoc(collection(db, "mensajes"), {
-            texto: texto,
-            fecha: serverTimestamp()
-        });
-        messageInput.value = ''; // Limpiar input
-    } catch (error) {
-        console.error("Error al enviar:", error);
-    }
-});
+        try {
+            await addDoc(collection(db, "mensajes"), {
+                texto: texto,
+                fecha: serverTimestamp()
+            });
+            messageInput.value = ''; // Limpiar input
+        } catch (error) {
+            console.error("Error al enviar:", error);
+        }
+    });
+}
 
 // PRUEBA DE FUEGO: Guardar un mensaje automático al cargar
 async function testFirestore() {
