@@ -1,3 +1,4 @@
+// Control de los datos mostrados y modales de edición en la vista de detalle de una tarea personal
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- ELEMENTOS DE PANTALLA ---
@@ -21,11 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancelMain = document.getElementById('btnCancelMain');
     const btnSaveMain = document.getElementById('btnSaveMain');
 
-    // Inputs Modal 1
+    // Inputs del Modal 1 (Formularios ocultos que recogen la edición)
     const inputTitle = document.getElementById('inputTitle');
     const inputDesc = document.getElementById('inputDesc');
     const inputLoc = document.getElementById('inputLoc');
 
+    // Botón para editar la primera sección: carga los datos actuales en el formulario y lo hace visible
     btnEditMain.onclick = () => {
         inputTitle.value = displayTitle.textContent;
         // Limpiamos espacios en blanco del HTML al leer la descripción
@@ -36,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnCancelMain.onclick = () => modalMain.classList.add('hidden');
 
+    // Botón para guardar los cambios y cerrar la ventana 1
     btnSaveMain.onclick = () => {
         displayTitle.textContent = inputTitle.value;
         displayDesc.textContent = inputDesc.value;
@@ -57,11 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnCancelPay.onclick = () => modalPay.classList.add('hidden');
 
+    // Evento de guardado del pago: actualiza el precio y recalcula mecánicamente la "experiencia" asociada a la tarea
     btnSavePay.onclick = () => {
         const newValue = parseFloat(inputPay.value);
         if (!isNaN(newValue)) {
             displayPay.textContent = newValue.toFixed(2);
-            // Experiencia es Pago * 10
+            // Experiencia es el 1000% del pago en LaburApp (Pago * 10)
             displayExp.textContent = Math.round(newValue * 10);
         }
         modalPay.classList.add('hidden');
@@ -78,8 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputTime = document.getElementById('inputTime');
     const inputDate = document.getElementById('inputDate');
 
+    // Abre y pre-llena el tercer modal dedicado a categorías, fechas y tiempo
     btnEditInfo.onclick = () => {
-        // Para seleccionar en el <select>, el option value debe coincidir, o iteramos sobre los options
+        // En el caso de un <select>, iteramos para forzar la selección de la opción ya cargada visualmente
         const currentCat = displayCat.textContent;
         for (let i = 0; i < inputCat.options.length; i++) {
             if (inputCat.options[i].value === currentCat) {
@@ -91,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inputTime.value = displayTime.textContent.replace('h', '').trim(); // Remove 'h' for editing convenience
 
         const dateParts = displayDate.textContent.split('/');
-        if(dateParts.length === 3) {
+        if (dateParts.length === 3) {
             inputDate.value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
         } else {
             inputDate.value = displayDate.textContent;
@@ -103,8 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCancelInfo.onclick = () => modalInfo.classList.add('hidden');
 
     btnSaveInfo.onclick = () => {
+        // Actualiza el texto con el valor seleccionado
         displayCat.textContent = inputCat.value;
-        
+
+        // Comprueba y añade la unidad 'h' de horas automáticamente si no está escrita
         let timeVal = inputTime.value.trim();
         if (timeVal && !timeVal.toLowerCase().endsWith('h')) {
             timeVal += 'h';
@@ -112,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayTime.textContent = timeVal;
 
         const dateVal = inputDate.value;
-        if(dateVal && dateVal.includes('-')) {
+        if (dateVal && dateVal.includes('-')) {
             const parts = dateVal.split('-');
             displayDate.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
         } else {

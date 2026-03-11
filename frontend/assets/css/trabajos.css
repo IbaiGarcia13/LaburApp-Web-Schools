@@ -1,3 +1,8 @@
+/* ==========================================================================
+   ESTILOS DE LISTA DE TRABAJOS (TABLÓN)
+   Establece el diseño en tarjetas horizontales para los trabajos disponibles,
+   además de su interacción por hover y los filtros laterales.
+   ========================================================================== */
 #container {
     display: flex;
     max-width: 1250px;

@@ -1,4 +1,6 @@
+// Variables globales para almacenar trabajos, marcadores en el mapa y controlar el modo de creación
 let trabajos = [], myMarkers = [], tempMarker = null, creatingMode = false;
+// Inicialización del mapa pasándole el elemento HTML con id 'map'
 const map = L.map('map').setView([0, 0], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
@@ -7,7 +9,9 @@ let userMarker = null, userCircle = null;
 let userLat = 0, userLng = 0;
 
 /* ===== UBICACIÓN REAL USUARIO ===== */
+// Pedimos permiso al navegador para usar el GPS o localización de la IP
 if (navigator.geolocation) {
+    // Si accede, ubicamos el marcador rojo ("Tú estás aquí")
     navigator.geolocation.getCurrentPosition(pos => {
         userLat = pos.coords.latitude;
         userLng = pos.coords.longitude;
@@ -27,19 +31,22 @@ if (navigator.geolocation) {
 }
 
 /* ===== COLORES ===== */
+// Diccionario de colores según la categoría elegida para pintar el marcador en el mapa
 function getColor(cat) {
     const colors = {
         "Carpintería": "brown", "Construcción/Reforma": "gray", "Cuidado personal": "pink",
         "Diseño": "cadetblue", "Evento": "red", "Gastronomía": "gold", "Informática": "blue",
         "Jardinería": "green", "Limpieza": "purple", "Mascotas": "darkgreen",
         "Mudanza/Traslado": "darkred", "Transporte": "orange", "Otros": "black"
-    };  
+    };
     return colors[cat] || "black";
 }
 
 /* CREAR MARCADOR */
+// Función invocada al hacer click en el mapa en "modo creación". Dibuja un pin temporal y abre el formulario Lateral.
 function crearMarcador(latlng) {
     if (tempMarker) map.removeLayer(tempMarker);
+    // Dibujamos un círculo marcando el lugar exacto pulsado
     tempMarker = L.circleMarker(latlng, { radius: 8, color: getColor("Otros"), fillColor: getColor("Otros"), fillOpacity: 0.9 }).addTo(map);
 
     document.getElementById("marker-view-box").classList.add("hidden");
@@ -53,6 +60,7 @@ function crearMarcador(latlng) {
 map.on("click", e => { if (creatingMode) { creatingMode = false; crearMarcador(e.latlng); } });
 
 /* PRECIO TIEMPO REAL */
+// Actualiza la previsualización de las ganancias ("Trabajador gana") restándole un supuesto 10% de comisión (0.9) al precio base
 document.getElementById("job-price").addEventListener("input", function () {
     let v = parseFloat(this.value);
     if (!isNaN(v)) document.getElementById("price-preview").innerText = "Trabajador gana: " + (v * 0.9).toFixed(2) + "€";
@@ -100,6 +108,7 @@ document.getElementById("cancel-job-btn").addEventListener("click", () => {
 });
 
 /* VER MÁS */
+// Función llamada desde el popup del marcador que abre el panel lateral derecho con detalles
 function verMas(title) {
     const t = trabajos.find(x => x.title === title);
     if (!t) return;
@@ -176,6 +185,7 @@ function editarMarcador(i) {
 }
 
 /* CÍRCULO RANGO DINÁMICO */
+// Dibuja o actualiza un círculo rojo semitransparente indicando el área de rango cubierta
 function updateVisibleMarkers() {
     if (!userMarker) return;
     const range = parseFloat(document.getElementById("filter-range")?.value || 10);
@@ -184,6 +194,7 @@ function updateVisibleMarkers() {
 }
 
 /* FILTROS TRABAJOS */
+// Evento para aplicar un filtro de distancia (en km) y precio basado en coordenadas y los inputs de formulario
 function aplicarFiltros() {
     const cat = document.getElementById("filter-cat").value;
     const range = parseFloat(document.getElementById("filter-range").value);

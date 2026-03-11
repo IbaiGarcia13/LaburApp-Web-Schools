@@ -1,3 +1,4 @@
+// Array que simula la base de datos de tareas propias del usuario
 let misTareasData = [
     { id: 1, titulo: "Cortar el césped", desc: "Necesito a una persona que me corte el césped, se requiere maquinaria propia y...", loc: "Barakaldo, Bizkaia, Calle La Paz 21, 2ºF", tiempo: 5, pago: 30.75, cat: "jardineria", xp: 307, img: "../assets/img/principal1.png" },
     { id: 2, titulo: "Sacar al perro", desc: "Requiero de una persona para sacar a mi perro durante 2 horas por mi vecindario.", loc: "Castro Urdiales, Cantabria", tiempo: 2, pago: 20.5, cat: "mascotas", xp: 205, img: "../assets/img/trabajos/perro.jpg" },
@@ -5,10 +6,12 @@ let misTareasData = [
     { id: 4, titulo: "Tarta Cumpleaños", desc: "Es el cumpleaños de mi hija, y necesito una tarta para su cumpleaños. La tarta debe...", loc: "Sestao, Bizkaia", tiempo: 1, pago: 20, cat: "informatica", xp: 200, img: "../assets/img/trabajos/tarta.jpg" }
 ];
 
+// Variables globales para la gestión de filtros y páginas
 let filteredTareas = [...misTareasData];
 let currentPage = 1;
 const itemsPerPage = 4;
 
+// Función central para generar y mostrar la lista de tareas en base a los filtros actuales
 function displayTareas() {
     const container = document.getElementById('tareas-list');
     container.innerHTML = "";
@@ -44,13 +47,17 @@ function displayTareas() {
                     </div>
                 </div>
             </article>`;
+        // Añadir la tarjeta clonada al contenedor principal
         container.innerHTML += card;
     });
 
     const totalPages = Math.ceil(filteredTareas.length / itemsPerPage) || 1;
     document.getElementById('page-info').innerText = `${currentPage} - ${totalPages}`;
+    document.getElementById('prev-page').style.opacity = currentPage === 1 ? '0.3' : '1';
+    document.getElementById('next-page').style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
+// Evento disparado al pulsar el botón de filtrado en la barra lateral
 document.getElementById('update-btn').onclick = () => {
     const cat = document.getElementById('filter-category').value;
     const tMin = parseInt(document.getElementById('time-min').value) || 0;
@@ -62,7 +69,7 @@ document.getElementById('update-btn').onclick = () => {
     const tMaxRaw = document.getElementById('time-max').value;
     const pMinRaw = document.getElementById('pay-min').value;
     const pMaxRaw = document.getElementById('pay-max').value;
-    
+
     const isFiltered = cat !== "todas" || tMinRaw !== "1" || tMaxRaw !== "100" || pMinRaw !== "2" || pMaxRaw !== "1000";
     const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + "MIS TAREAS: Filtradas" : iconHtml + "MIS TAREAS: Todas";
@@ -94,6 +101,7 @@ document.getElementById('prev-page').onclick = () => {
     }
 };
 
+// Redirige a la ventana de edición específica para esa tarea
 function editarTarea(id) {
     window.location.href = "mi-tarea.html?id=" + id;
 }

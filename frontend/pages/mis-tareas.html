@@ -12,6 +12,7 @@
 
 <body>
 
+    <!-- ================= BARRA DE CABECERA ================= -->
     <header>
         <div class="logo">
             <a href="principal.html">
@@ -54,6 +55,7 @@
         </div>
     </header>
 
+    <!-- ================= OPCIONES DEL MENÚ LATERAL ================= -->
     <nav class="side-menu" id="sideMenu">
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
@@ -71,21 +73,27 @@
         </div>
     </nav>
 
+    <!-- ================= ZONA DE CONTENIDO Y RESULTADOS ================= -->
     <main id="container">
+        <!-- ÁREA CENTRAL: Muestra la lista de tus propias tareas extraídas de la base de datos -->
         <section id="content">
-            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> MIS TAREAS: Todas</h2>
+            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png"
+                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> MIS TAREAS: Todas</h2>
 
             <div id="tareas-list">
                 <!-- Se rellena por JavaScript -->
             </div>
 
             <div class="pagination">
-                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);"></button>
+                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<"
+                        style="width: 20px; transform: rotate(180deg);"></button>
                 <span id="page-info">1 - 12</span>
-                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;"></button>
+                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">"
+                        style="width: 20px;"></button>
             </div>
         </section>
 
+        <!-- PANEL DERECHO: Formulario de filtrado -->
         <aside id="sidebar">
             <div class="filter-box">
                 <h3>FILTRAR</h3>

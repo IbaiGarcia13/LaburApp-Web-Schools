@@ -4,15 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LaburApp - Postulaciones</title>
+    <title>LaburApp - Mi Trabajo</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/postulaciones.css">
+    <link rel="stylesheet" href="../assets/css/mi-trabajo.css">
 </head>
 
 <body>
 
-    <!-- ================= CABECERA SUPERIOR ================= -->
     <header>
         <div class="logo">
             <a href="principal.html">
@@ -55,7 +54,6 @@
         </div>
     </header>
 
-    <!-- ================= MENÚ LATERAL ================= -->
     <nav class="side-menu" id="sideMenu">
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
@@ -73,52 +71,66 @@
         </div>
     </nav>
 
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
-    <main id="container">
-
-        <!-- Título con icono, igual que el resto de páginas -->
-        <h2 class="section-title">
-            <img src="../assets/img/icons/icono-ajustes.png"
-                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt="">
-            POSTULACIONES
-        </h2>
-
-        <!-- Layout de dos columnas -->
-        <div class="postulaciones-layout">
-
-            <!-- COLUMNA IZQUIERDA: Trabajos donde me he postulado -->
-            <div class="col-trabajos">
-                <h3 class="col-header">TRABAJOS</h3>
-                <!-- Las tarjetas se generan dinámicamente por JS -->
-                <div id="jobs-list"></div>
+    <main class="main-content">
+        <section class="job-header-section">
+            <div class="job-image-wrapper">
+                <img src="../assets/img/principal1.png" alt="Cortar el césped" class="job-img">
             </div>
 
-            <!-- Separador visual vertical -->
-            <div class="col-divider"></div>
-
-            <!-- COLUMNA DERECHA: Usuarios postulados a mis tareas -->
-            <div class="col-usuarios">
-                <h3 class="col-header">USUARIOS</h3>
-                <!-- Las tarjetas se generan dinámicamente por JS -->
-                <div id="users-list"></div>
+            <div class="job-info-main">
+                <h1 class="job-title">Cortar el césped</h1>
+                <p class="job-description">
+                    Necesito a una persona que me corte el césped, se requiere de maquinaria y experiencia con esta
+                    maquinaria. Son 200 metros cuadrados de terreno, solo césped y no hay ningún árbol o arbusto.
+                </p>
+                <div class="contact-links">
+                    <div class="link-row">
+                        <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
+                        <span class="italic">Barakaldo, Bizkaia, Calle La Paz 21, 2ºF</span>
+                    </div>
+                </div>
+                <div class="message-container">
+                    <a href="chat.html" id="btn-chat">
+                        <img src="../assets/img/icons/icono-chat-1.png" alt="Mensaje" class="msg-icon">
+                    </a>
+                </div>
             </div>
 
-        </div>
+            <div class="job-stats-container">
+                <div class="stat-box-large">
+                    <span class="stat-label">Pago:</span> <span class="stat-value">30.75 €</span>
+                </div>
+                <div class="stat-box-large" style="opacity: 0.85;">
+                    <span class="stat-label">Experiencia:</span> <span class="stat-value">307 XP</span>
+                </div>
+            </div>
+        </section>
 
-        <!-- Paginación centrada debajo de las dos columnas -->
-        <div class="pagination">
-            <button id="prev-page" class="pag-btn">
-                <img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);">
-            </button>
-            <span id="page-info">1 - 3</span>
-            <button id="next-page" class="pag-btn">
-                <img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;">
-            </button>
-        </div>
+        <section class="info-section">
+            <h2 class="cat-title">Información</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-categoria.png"
+                            class="icon-img-small" alt="Cerebro"></span>
+                    <strong>Categoría:</strong> <span class="info-text">Jardinería (+1)</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-relog.png"
+                            class="icon-img-small" alt="Reloj"></span>
+                    <strong>Tiempo estimado:</strong> <span class="info-text">5h</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-fecha.png"
+                            class="icon-img-small" alt="Calendario"></span>
+                    <strong>Fecha límite:</strong> <span class="info-text">20/08/2026</span>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script src="../assets/js/general.js"></script>
-    <script src="../assets/js/postulaciones.js"></script>
+    <script src="../assets/js/mi-trabajo.js"></script>
 </body>
 <footer>
     <p>&copy; 2026 LaburApp - Todos los derechos reservados.</p>

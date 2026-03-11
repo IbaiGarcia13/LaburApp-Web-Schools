@@ -15,24 +15,30 @@
 </head>
 
 <body>
+    <!-- ================= CABECERA DE INICIO ================= -->
     <header>
         <img class="icon" src="./assets/img/logo/LaburApp2-sin-fondo.png" alt="LaburApp Icono">
         <img class="logo-text" src="./assets/img/logo/LaburApp3-sin-fondo.png" alt="Texto LABURAPP">
     </header>
     <main>
+        <!-- === SECCIÓN PROMOCIONAL DESCARTABLE / DESCARGAR APP === -->
         <section id="download_app">
             <img src="assets/img/Laburapp-ordenador.png" alt="Simbolo ordenador" class="ordenador">
             <div class="download-text">
                 <h2>¡Descarga LaburApp ahora!</h2>
                 <p>Descarga la aplicación y muevete de manera mas cómoda para ganar dinero fácil</p>
+                <!-- Botón de descarga visual -->
                 <button type="submit" id="descargar">
                     Descargar APP
                     <img src="assets/img/icons/icono-descargar.png" alt="descargar icon">
                 </button>
             </div>
         </section>
+        <!-- === SECCIÓN FORMULARIO DE ACCESO (LOGIN) === -->
+        <!-- Formulario principal para acceder al Dashboard general o "perfil" del trabajador/cliente -->
         <section id="login">
             <h2>Iniciar sesión</h2>
+            <!-- El id="formLogin" se vincula a login.js para interceptar el envío y validar localmente -->
             <form method="post" id="formLogin">
                 <label for="username">Correo:</label>
                 <input type="text" id="username" name="username" required><br><br>
@@ -44,6 +50,7 @@
                 <p id="mensajeError" class="error"></p>
             </form><br><br>
             <p>¿No tienes una cuenta? <a href="pages/register.html">Regístrate aquí</a></p><br>
+            <!-- Enlace opcional sin destino actual -->
             <a href="" id="olvidar">¿Olvidaste tu contraseña? </a>
         </section>
     </main>

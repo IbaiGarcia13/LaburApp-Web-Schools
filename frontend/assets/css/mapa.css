@@ -27,6 +27,12 @@
 }
 
 /* MAPA */
+/* ==========================================================================
+   ESTILOS DEL MAPA INTERACTIVO (Leaflet)
+   Controla el alto, disposición lateral de columnas, el z-index de los controles 
+   y el formulario flotante para añadir / visualizar pines de trabajo.
+   ========================================================================== */
+/* Div donde Leaflet renderiza el mapa interactivo */
 #map {
     height: 60vh;
     border-radius: 10px;
@@ -91,6 +97,7 @@
     font-size: 16px;
     cursor: pointer;
     transition: 0.2s;
+    width: 100%;
 }
 
 .btn-apply-filter:hover {
@@ -114,6 +121,7 @@
 .btn-giant:hover {
     background-color: #ccc;
     color: #333;
+    transform: scale(1.05);
 }
 
 .text-center {
@@ -182,7 +190,5 @@
 }
 
 .leaflet-popup-content {
-line-height: 22px;
+    line-height: 22px;
 }
-
-

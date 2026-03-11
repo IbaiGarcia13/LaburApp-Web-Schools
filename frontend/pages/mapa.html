@@ -12,7 +12,9 @@
 
 <body>
 
+    <!-- ================= CABECERA SUPERIOR ================= -->
     <header>
+        <!-- Logotipo a la izquierda. Al pulsarlo lleva al dashboard principal -->
         <div class="logo">
             <a href="principal.html">
                 <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
@@ -54,6 +56,7 @@
         </div>
     </header>
 
+    <!-- ================= MENÚ LATERAL (SIDEBAR) ================= -->
     <nav class="side-menu" id="sideMenu">
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
@@ -71,6 +74,7 @@
         </div>
     </nav>
 
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
     <main class="main-content" id="page-container">
         <h2 id="mapa-title" class="section-title" style="margin-bottom: 20px; color: white"><img
                 src="../assets/img/icons/icono-ajustes.png"
@@ -112,8 +116,8 @@
                         </select>
                     </label>
                     <div class="btn-group">
-                        <button id="save-job-btn" class="modal-btn confirm" style="width: 50%;">Guardar</button>
                         <button id="cancel-job-btn" class="modal-btn cancel" style="width: 50%;">Cancelar</button>
+                        <button id="save-job-btn" class="modal-btn confirm" style="width: 50%;">Guardar </button>
                     </div>
                 </div>
 
@@ -122,17 +126,22 @@
                     <h3 id="view-title"></h3>
                     <p id="view-desc" style="margin-bottom: 15px;"></p>
                     <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt="">
-                        <strong>Dirección:</strong> <span id="view-address"></span></p>
+                        <strong>Dirección:</strong> <span id="view-address"></span>
+                    </p>
                     <p><img src="../assets/img/icons/icono-fecha.png" class="icon-img-small" alt=""> <strong>Fecha
                             límite:</strong> <span id="view-deadline"></span></p>
                     <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" alt="">
-                        <strong>Pago:</strong> <span id="view-price"></span> €</p>
+                        <strong>Pago:</strong> <span id="view-price"></span> €
+                    </p>
                     <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt="">
-                        <strong>Categoría:</strong> <span id="view-category"></span></p>
+                        <strong>Categoría:</strong> <span id="view-category"></span>
+                    </p>
                     <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt="">
-                        <strong>Experiencia:</strong> <span id="view-xp"></span> XP</p>
+                        <strong>Experiencia:</strong> <span id="view-xp"></span> XP
+                    </p>
                     <div class="btn-group" style="margin-top: 15px;">
-                        <button id="view-all-btn" class="modal-btn" style="background: black; color: white; width: 48%;">Ver Todo</button>
+                        <button id="view-all-btn" class="modal-btn"
+                            style="background: black; color: white; width: 48%;">Ver Todo</button>
                         <button id="close-view-btn" class="modal-btn cancel" style="width: 48%;">Cerrar</button>
                     </div>
                 </div>

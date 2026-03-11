@@ -12,6 +12,7 @@
 
 <body>
 
+    <!-- ================= NAVEGACIÓN SUPERIOR ================= -->
     <header>
         <div class="logo">
             <a href="principal.html">
@@ -54,6 +55,7 @@
         </div>
     </header>
 
+    <!-- ================= MENÚ LATERAL SECUNDARIO ================= -->
     <nav class="side-menu" id="sideMenu">
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
@@ -71,10 +73,12 @@
         </div>
     </nav>
 
+    <!-- ================= CONTENEDOR PRINCIPAL: PANTALLA DE AJUSTES ================= -->
     <main class="main-content" id="container">
-        <h1 class="page-title"><img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> AJUSTES</h1>
+        <h1 class="page-title"><img src="../assets/img/icons/icono-ajustes.png"
+                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> AJUSTES</h1>
 
-        <!-- Datos personales -->
+        <!-- SECCIÓN 1: Formulario y datos registrados del usuario -->
         <section class="settings-card">
             <div class="card-header">
                 <h2 class="card-title">Datos personales</h2>
@@ -83,16 +87,18 @@
             <div class="card-body">
                 <div class="info-grid">
                     <p class="info"><strong>Nombre:</strong> <span id="displayNombre">Itxaso</span></p>
-                    <p class="info"><strong>Dirección:</strong> <span id="displayDireccion">Barakaldo, Bizkaia, C/ La Paz 41</span></p>
+                    <p class="info"><strong>Dirección:</strong> <span id="displayDireccion">Barakaldo, Bizkaia, C/ La
+                            Paz 41</span></p>
                     <p class="info"><strong>Apellidos:</strong> <span id="displayApellidos">Sesmero Manzano</span></p>
-                    <p class="info"><strong>Fecha de Nacimiento:</strong> <span id="displayFechaNac">13/07/2007</span></p>
+                    <p class="info"><strong>Fecha de Nacimiento:</strong> <span id="displayFechaNac">13/07/2007</span>
+                    </p>
                     <p class="info"><strong>Dni:</strong> <span id="displayDni">71999340L</span></p>
                     <p class="info"><strong>Teléfono:</strong> <span id="displayTelefono">688 60 13 46</span></p>
                 </div>
             </div>
         </section>
 
-        <!-- Cuenta -->
+        <!-- SECCIÓN 2: Opciones críticas de la cuenta (Cambiar Clave y Borrar) -->
         <section class="settings-card">
             <div class="card-header">
                 <h2 class="card-title">Cuenta</h2>
@@ -134,9 +140,9 @@
                 <ul class="payment-methods">
                     <li><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt="Favorito">
                         <strong>Tarjeta Bancaria:</strong> MasterCard - *4563
-                    </li>                        
+                    </li>
                     <p><strong>Otro:</strong> Pay Pal - ItxasoS_56</p>
-                    
+
                 </ul>
                 <div class="right-action">
                     <a href="#" id="btnAddPayment">Añadir Método de Pago</a>
@@ -144,10 +150,10 @@
             </div>
         </section>
 
-        <!-- Pagos -->
+        <!-- Historial de Pagos -->
         <section class="settings-card">
             <div class="card-header">
-                <h2 class="card-title">Pagos</h2>
+                <h2 class="card-title">Historial de Pagos</h2>
             </div>
             <div class="card-body">
                 <div class="payment-history">
@@ -190,24 +196,44 @@
     </main>
 
     <!-- Modales -->
-    <div id="paymentModal" class="modal">
+    <div id="paymentModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Añadir Método de Pago</h3>
             <div class="input-group">
-                <label>Número de Tarjeta:</label>
-                <input type="text" id="inputCardNumber" placeholder="XXXX XXXX XXXX XXXX">
+                <label>Tipo de Método:</label>
+                <select id="selectPaymentType"
+                    style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 10px; font-family: inherit;">
+                    <option value="tarjeta">Tarjeta Bancaria</option>
+                    <option value="plataforma">Plataforma de Pago</option>
+                </select>
             </div>
-            <div class="input-group">
-                <label>Fecha de Expiración:</label>
-                <input type="text" id="inputCardExpiry" placeholder="MM/AA">
+            <div id="tarjetaFields">
+                <div class="input-group">
+                    <label>Número de Tarjeta:</label>
+                    <input type="text" id="inputCardNumber" placeholder="XXXX XXXX XXXX XXXX">
+                </div>
+                <div class="input-group">
+                    <label>Fecha de Caducidad (MM/AA):</label>
+                    <input type="text" id="inputCardExpiry" placeholder="MM/AA">
+                </div>
+                <div class="input-group">
+                    <label>CVV:</label>
+                    <input type="text" id="inputCardCVV" placeholder="123">
+                </div>
             </div>
-            <div class="input-group">
-                <label>CVV:</label>
-                <input type="text" id="inputCardCVV" placeholder="123">
+            <div id="plataformaFields" style="display: none;">
+                <div class="input-group">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" id="inputPlataformaEmail" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="input-group">
+                    <label>Contraseña:</label>
+                    <input type="password" id="inputPlataformaPass" placeholder="********">
+                </div>
             </div>
-            <div class="modal-buttons">
-                <button id="btnSavePayment" class="btn-save">Guardar</button>
-                <button id="btnCancelPayment" class="btn-cancel">Cancelar</button>
+            <div class="modal-buttons" style="margin-top: 15px;">
+                <button id="btnCancelPayment" class="modal-btn cancel">Cancelar</button>
+                <button id="btnSavePayment" class="modal-btn confirm">Guardar</button>
             </div>
         </div>
     </div>
@@ -218,11 +244,11 @@
             <h3>Editar Datos Personales</h3>
             <div class="input-group">
                 <label>Nombre:</label>
-                <input type="text" id="inputSetNombre" class="modal-input" style="margin-bottom: 10px;">
+                <input type="text" id="inputSetNombre" class="modal-input" style="margin-bottom: 10px;" required>
             </div>
             <div class="input-group">
                 <label>Apellidos:</label>
-                <input type="text" id="inputSetApellidos" class="modal-input" style="margin-bottom: 10px;">
+                <input type="text" id="inputSetApellidos" class="modal-input" style="margin-bottom: 10px;" required>
             </div>
             <div class="input-group">
                 <label>Dirección:</label>
@@ -230,11 +256,11 @@
             </div>
             <div class="input-group">
                 <label>Fecha de Nacimiento:</label>
-                <input type="date" id="inputSetFechaNac" class="modal-input" style="margin-bottom: 10px;">
+                <input type="date" id="inputSetFechaNac" class="modal-input" style="margin-bottom: 10px;" required>
             </div>
             <div class="input-group">
                 <label>DNI:</label>
-                <input type="text" id="inputSetDni" class="modal-input" style="margin-bottom: 10px;">
+                <input type="text" id="inputSetDni" class="modal-input" style="margin-bottom: 10px;" required>
             </div>
             <div class="input-group">
                 <label>Teléfono:</label>

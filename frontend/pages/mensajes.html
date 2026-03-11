@@ -59,9 +59,11 @@
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a></li>
+            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a></li>
+            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
+            </li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
@@ -70,7 +72,28 @@
     </nav>
 
     <main id="container">
-        <!-- Contenido principal aquí -->
+
+        <!-- Título con icono igual que el resto de páginas -->
+        <h2 class="section-title">
+            <img src="../assets/img/icons/icono-ajustes.png"
+                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt="">
+            MENSAJES - USUARIOS
+        </h2>
+
+        <!-- Lista de conversaciones generada por JS -->
+        <div id="msgs-list"></div>
+
+        <!-- Paginación centrada -->
+        <div class="pagination">
+            <button id="prev-page" class="pag-btn">
+                <img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);">
+            </button>
+            <span id="page-info">1 - 2</span>
+            <button id="next-page" class="pag-btn">
+                <img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;">
+            </button>
+        </div>
+
     </main>
 
     <script src="../assets/js/general.js"></script>

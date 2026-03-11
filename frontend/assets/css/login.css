@@ -5,6 +5,11 @@
     user-select: none;
 }
 
+/* ==========================================================================
+   HOJA DE ESTILO: PANTALLA DE LOGIN Y DESCARGA
+   Contiene el diseño específico de la página inicial de acceso y el banner
+   de promoción para descargar la app.
+   ========================================================================== */
 body {
     text-align: center;
     background-color: rgb(180, 80, 80);

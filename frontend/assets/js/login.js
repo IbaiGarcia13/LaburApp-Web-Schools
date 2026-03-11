@@ -1,12 +1,15 @@
+// Esperamos a que la página se cargue totalmente antes de vincular eventos
 document.addEventListener("DOMContentLoaded", function () {
 
+    // Referencias a los contenedores y los dos campos clave del login
     const formulario = document.getElementById("formLogin");
     const usuarioInput = document.getElementById("username");
     const contraseñaInput = document.getElementById("password");
     const mensajeError = document.getElementById("mensajeError");
 
+    // Escuchador que intercepta la recarga de página al darle al botón "Iniciar Sesión"
     formulario.addEventListener("submit", async function (evento) {
-        evento.preventDefault();
+        evento.preventDefault(); // Evita que se recargue la web
 
         const usuario = usuarioInput.value.trim();
         const contraseña = contraseñaInput.value.trim();
@@ -17,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Lógica "Hardcodeada" rápida permitiendo hacer login local para pruebas
         if (usuario === "admin" && contraseña === "1234") {
             window.location.href = "pages/principal.html";
             return;

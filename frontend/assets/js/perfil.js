@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // (Ahora manejada globalmente en general.js)
 
     // --- LÓGICA DE CAMBIAR CONTRASEÑA ---
+    // Función que invoca un prompt global para solicitar la nueva contraseña y ofuscarla gráficamente
     const btnChangePass = document.getElementById('btnChangePass');
     const passLabel = document.getElementById('passLabel');
 
@@ -25,21 +26,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICA DEL MODAL DE EDICIÓN ---
+    // Referencias a la ventana superpuesta y botones de acción
     const modal = document.getElementById('editModal');
     const btnOpen = document.getElementById('btnOpenEdit');
     const btnClose = document.getElementById('modal-btn cancel');
     const btnSave = document.getElementById('modal-btn confirm');
 
-    // Elementos de la página a actualizar
+    // Elementos de la página a actualizar (donde se visualizan los datos en el perfil público/privado)
     const displayName = document.getElementById('displayName');
     const displayDescription = document.getElementById('displayDescription');
     const displayAddress = document.getElementById('displayAddress');
     const displayPic = document.getElementById('displayPic');
 
-    // Abrir Modal
+    // Abrir Modal de Edición
     btnOpen.onclick = () => {
-        modal.style.display = "flex";
-        // Cargar valores actuales en los inputs
+        modal.style.display = "flex"; // Forzamos la visualización en pantalla
+        // Pre-cargar los valores actuales de la web en los inputs correspondientes del formulario
         document.getElementById('inputName').value = displayName.textContent;
         document.getElementById('inputDescription').value = displayDescription.textContent.trim();
         const addressMatch = displayAddress.textContent;
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnClose.onclick = () => modal.style.display = "none";
 
     // Guardar Cambios
+    // Proceso en el cual leemos el contenido del modal y sobreescribimos la página actual de perfil simulando una base de datos 
     btnSave.onclick = () => {
         const newName = document.getElementById('inputName').value;
         const newDescription = document.getElementById('inputDescription').value;
@@ -81,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newAddress.trim() !== "") displayAddress.textContent = newAddress;
 
         // Actualizar Foto (Vista previa)
+        // Lee el archivo de imagen cargado en memoria y lo proyecta usando un FileReader en base64
         if (photoFile) {
             const reader = new FileReader();
             reader.onload = (e) => displayPic.src = e.target.result;

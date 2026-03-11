@@ -1,4 +1,9 @@
-/* --- RESET GENERAL --- */
+/* ==========================================================================
+   HOJA DE ESTILOS PRINCIPAL (GLOBAL)
+   Define la tipografía base, reset de márgenes, barra superior (header), barra lateral (sidebar) 
+   y ventanas modales globales de LaburApp.
+   ========================================================================== */
+/* --- RESET GENERAL DE ELEMENTOS --- */
 * {
     margin: 0;
     padding: 0;

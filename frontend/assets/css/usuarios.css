@@ -1,3 +1,8 @@
+/* ==========================================================================
+   ESTILOS DE LISTA DE USUARIOS
+   Personaliza el contenedor de la lista de usuarios, las tarjetas individuales
+   (foto, descripción y estadísticas de nivel) y la paginación.
+   ========================================================================== */
 #container {
     display: flex;
     max-width: 1250px;
@@ -198,10 +203,11 @@
 }
 
 #page-info {
-    border: 2px solid white;
-    color: white;
+    background: white;
+    color: #333;
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }

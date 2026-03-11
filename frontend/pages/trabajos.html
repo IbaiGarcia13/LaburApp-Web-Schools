@@ -12,6 +12,7 @@
 
 <body>
 
+    <!-- ================= BARRA SUPERIOR CONSTANTE ================= -->
     <header>
         <div class="logo">
             <a href="principal.html">
@@ -54,6 +55,7 @@
         </div>
     </header>
 
+    <!-- ================= MENÚ DE NAVEGACIÓN LATERAL ================= -->
     <nav class="side-menu" id="sideMenu">
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
@@ -71,20 +73,26 @@
         </div>
     </nav>
 
+    <!-- ================= CONTENEDOR PRINCIPAL ================= -->
     <main id="container">
+        <!-- SECCIÓN IZQUIERDA: Listado iterativo de trabajos -->
         <section id="content">
-            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> TRABAJOS: Todos</h2>
+            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png"
+                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> TRABAJOS: Todos</h2>
 
             <div id="jobs-list">
             </div>
 
             <div class="pagination">
-                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);"></button>
+                <button id="prev-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt="<"
+                        style="width: 20px; transform: rotate(180deg);"></button>
                 <span id="page-info">1 - 4</span>
-                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;"></button>
+                <button id="next-page" class="pag-btn"><img src="../assets/img/icons/icono-flecha.png" alt=">"
+                        style="width: 20px;"></button>
             </div>
         </section>
 
+        <!-- SECCIÓN DERECHA: Cuadro de filtrado por categoría y parámetros numéricos -->
         <aside id="sidebar">
             <div class="filter-box">
                 <h3>FILTRAR</h3>

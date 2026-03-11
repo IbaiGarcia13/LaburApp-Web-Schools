@@ -1,3 +1,4 @@
+// Base de datos simulada (mockup) con los trabajos disponibles
 const trabajosData = [
     { titulo: "Cortar el césped", desc: "Necesito a una persona que me corte el césped, se requiere maquinaria propia.", loc: "Barakaldo, Bizkaia", tiempo: 5, pago: 30, cat: "jardineria", xp: 300 },
     { titulo: "Sacar al perro", desc: "Requiero de una persona para sacar a mi perro durante 2 horas.", loc: "Bilbao, Bizkaia", tiempo: 2, pago: 20, cat: "mascotas", xp: 200 },
@@ -21,14 +22,17 @@ const trabajosData = [
     { titulo: "Limpieza de Sofá", desc: "Limpieza con vaporeta de sofá de 3 plazas.", loc: "Basauri, Bizkaia", tiempo: 2, pago: 35, cat: "limpieza", xp: 350 }
 ];
 
+// Variables de estado para los filtros y la paginación de la lista de trabajos
 let filteredJobs = [...trabajosData];
 let currentPage = 1;
 const itemsPerPage = 5;
 
+// Función principal que renderiza el listado de trabajos en la página actual
 function displayJobs() {
     const container = document.getElementById('jobs-list');
     container.innerHTML = "";
 
+    // Cálculos para saber qué trabajos extraer del array según la página actual
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const pageItems = filteredJobs.slice(start, end);
@@ -37,6 +41,7 @@ function displayJobs() {
         container.innerHTML = "<p style='color:white; text-align:center;'>No hay trabajos disponibles.</p>";
     }
 
+    // Crear e inyectar cada tarjeta de trabajo para la página activa
     pageItems.forEach((job, index) => {
         const mockId = start + index + 1; // Solo a los efectos de mock
         const card = `
@@ -59,8 +64,11 @@ function displayJobs() {
 
     const totalPages = Math.ceil(filteredJobs.length / itemsPerPage) || 1;
     document.getElementById('page-info').innerText = `${currentPage} - ${totalPages}`;
+    document.getElementById('prev-page').style.opacity = currentPage === 1 ? '0.3' : '1';
+    document.getElementById('next-page').style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
+// Evento del botón de filtrado: actualiza la lista basándose en los criterios elegidos
 document.getElementById('update-btn').onclick = () => {
     const cat = document.getElementById('filter-category').value;
     const tMin = parseInt(document.getElementById('time-min').value);
@@ -72,6 +80,7 @@ document.getElementById('update-btn').onclick = () => {
     const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + "TRABAJOS: Filtrados" : iconHtml + "TRABAJOS: Todos";
 
+    // Aplicar todos los filtros sobre el array de datos original
     filteredJobs = trabajosData.filter(j => {
         const matchCat = (cat === "todas" || j.cat === cat);
         const matchTime = j.tiempo >= tMin && j.tiempo <= tMax;
@@ -83,6 +92,7 @@ document.getElementById('update-btn').onclick = () => {
     displayJobs();
 };
 
+// Evento para avanzar de página de resultados
 document.getElementById('next-page').onclick = () => {
     if (currentPage < Math.ceil(filteredJobs.length / itemsPerPage)) {
         currentPage++;
@@ -91,6 +101,7 @@ document.getElementById('next-page').onclick = () => {
     }
 };
 
+// Evento para retroceder a la página anterior de resultados
 document.getElementById('prev-page').onclick = () => {
     if (currentPage > 1) {
         currentPage--;

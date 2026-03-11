@@ -1,3 +1,4 @@
+// Definición local (mockup) temporal de los datos de múltiples usuarios para rellenar la lista dinámicamente
 const usuariosData = [
     { nombre: "Juan García Méndez", desc: "Informático que hace páginas web y arregla ordenadores en su tiempo libre.", loc: "Barakaldo, Bizkaia", lvl: 6, val: 3.7, esp: "informatica" },
     { nombre: "María Isabel Gómez", desc: "Ama de casa con experiencia paseando perros y cuidando animales.", loc: "Castro Urdiales, Cantabria", lvl: 2, val: 4.2, esp: "mascotas" },
@@ -21,14 +22,18 @@ const usuariosData = [
     { nombre: "Manuel Garea", desc: "Limpieza de comunidades y portales.", loc: "Bilbao, Bizkaia", lvl: 3, val: 4.1, esp: "limpieza" }
 ];
 
+// Array global que mantendrá los usuarios actualmente mostrados después de ser filtrados
 let filteredUsers = [...usuariosData];
+// Variables para controlar la paginación de la lista
 let currentPage = 1;
 const itemsPerPage = 5;
 
+// Función principal para pintar las tarjetas de usuarios en la interfaz
 function displayUsers() {
     const container = document.getElementById('users-list');
     container.innerHTML = "";
 
+    // Calcular los índices de inicio y fin para saber qué elementos del array corresponden a la página actual
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const pageItems = filteredUsers.slice(start, end);
@@ -37,6 +42,7 @@ function displayUsers() {
         container.innerHTML = "<p style='color:white; text-align:center;'>No se encontraron usuarios.</p>";
     }
 
+    // Bucle para iterar y pintar cada uno de los elementos de la página actual
     pageItems.forEach((user, index) => {
         const mockId = start + index + 1;
         const card = `
@@ -56,10 +62,14 @@ function displayUsers() {
         container.innerHTML += card;
     });
 
+    // Actualizar el paginador de la interfaz, mostrando en qué página estamos respecto al total
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
     document.getElementById('page-info').innerText = `${currentPage} - ${totalPages}`;
+    document.getElementById('prev-page').style.opacity = currentPage === 1 ? '0.3' : '1';
+    document.getElementById('next-page').style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
+// Evento principal desencadenado al pulsar en el botón 'Aplicar Filtros' del menú de la izquierda
 document.getElementById('update-btn').onclick = () => {
     const cat = document.getElementById('filter-category').value;
     const lvl = parseInt(document.getElementById('filter-level').value);
@@ -70,6 +80,7 @@ document.getElementById('update-btn').onclick = () => {
     const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + "USUARIOS: Filtrados" : iconHtml + "USUARIOS: Todos";
 
+    // Reconstruimos el array de usuarios mostrados filtrando uno a uno mediante las restricciones añadidas en los inputs
     filteredUsers = usuariosData.filter(u => {
         const matchCat = (cat === "todas" || u.esp === cat);
         const matchLvl = u.lvl >= lvl;
@@ -81,6 +92,7 @@ document.getElementById('update-btn').onclick = () => {
     displayUsers();
 };
 
+// Evento para cambiar de página hacia adelante en el listado
 document.getElementById('next-page').onclick = () => {
     if (currentPage < Math.ceil(filteredUsers.length / itemsPerPage)) {
         currentPage++;
@@ -89,6 +101,7 @@ document.getElementById('next-page').onclick = () => {
     }
 };
 
+// Evento para retroceder de página en el listado
 document.getElementById('prev-page').onclick = () => {
     if (currentPage > 1) {
         currentPage--;

@@ -1,3 +1,9 @@
+/* ==========================================================================
+   HOJA DE ESTILO: MIS TAREAS
+   Derivada del diseño del tablón general, pero adapta los botones de edición
+   y borrado flotantes posicionados dentro de las tarjetas propias.
+   ========================================================================== */
+/* Reutilizamos gran parte del comportamiento base desde styles.css */
 #container {
     display: flex;
     max-width: 1250px;
@@ -211,6 +217,12 @@
     background-color: white;
 }
 
+/* --- MODAL ---*/
+.modal-content p {
+    text-align: center;
+}
+
+
 /* --- PAGINACIÓN --- */
 .pagination {
     margin: 40px 0 50px;
@@ -237,10 +249,11 @@
 }
 
 #page-info {
-    border: 2px solid white;
-    color: white;
+    background: white;
+    color: #333;
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }

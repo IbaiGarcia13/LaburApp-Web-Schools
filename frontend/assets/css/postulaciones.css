@@ -1,0 +1,291 @@
+/* ==========================================================================
+   HOJA DE ESTILO: POSTULACIONES
+   Dos columnas: Trabajos (izquierda) y Usuarios postulantes (derecha).
+   ========================================================================== */
+
+#container {
+    max-width: 1600px;
+    margin: 30px auto;
+    padding: 0 30px;
+}
+
+/* === TÍTULO PRINCIPAL === */
+.section-title {
+    color: white;
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* === LAYOUT PRINCIPAL: DOS COLUMNAS === */
+.postulaciones-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Columna izquierda (trabajos) */
+.col-trabajos {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Divisor visual entre columnas */
+.col-divider {
+    width: 2px;
+    background-color: rgba(255, 255, 255, 0.3);
+    align-self: stretch;
+    min-height: 400px;
+}
+
+/* Columna derecha (usuarios) - más estrecha */
+.col-usuarios {
+    flex: 0 0 370px;
+    min-width: 0;
+}
+
+/* Encabezados de columna */
+.col-header {
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* ==========================================
+   TARJETA DE TRABAJO (columna izquierda)
+   ========================================== */
+.job-card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+    width: 600px;
+    height: 175px;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 15px;
+}
+
+.job-card:hover {
+    transform: translateY(-3px);
+}
+
+.job-card-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.job-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.job-card-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+    color: #111;
+}
+
+.job-card-desc {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.job-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.job-card-meta img {
+    width: 12px;
+    height: 12px;
+}
+
+/* Estado de la postulación */
+.job-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.status-pendiente {
+    color: #e07000;
+}
+
+.status-aceptada {
+    color: #2a8a2a;
+}
+
+.status-cancelada {
+    color: #c0392b;
+}
+
+.job-card-pago {
+    font-size: 0.9rem;
+    color: #444;
+    margin-top: -15px;
+    margin-right: 20px;
+}
+
+/* ==========================================
+   TARJETA DE USUARIO (columna derecha)
+   ========================================== */
+.user-app-card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.2s ease;
+    position: relative;
+    width: 420px;
+    height: 175px;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 15px;
+}
+
+.user-app-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.user-app-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.user-app-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-app-name {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #111;
+    margin: 0 0 4px 0;
+    cursor: pointer;
+}
+
+.user-app-name:hover {
+    text-decoration: underline;
+}
+
+.user-app-task {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0 0 4px 0;
+}
+
+.user-app-task strong {
+    color: #111;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Botón de chat */
+.user-chat-btn {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.user-chat-btn:hover {
+    transform: scale(1.15);
+}
+
+.user-chat-btn img {
+    width: 28px;
+    height: 28px;
+}
+
+
+/* MODAL */
+.modal-content p {
+    text-align: center;
+}
+
+/* ==========================================
+   PAGINACIÓN
+   ========================================== */
+.pagination {
+    margin: 30px 0 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.pag-btn {
+    background: transparent;
+    border: none;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.pag-btn:hover {
+    transform: scale(1.2);
+}
+
+#page-info {
+    background: white;
+    color: #333;
+    padding: 10px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
