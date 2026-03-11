@@ -1,54 +1,44 @@
 import { db } from './firebase-config.js';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const messagesContainer = document.getElementById('messages');
-const chatForm = document.getElementById('chat-form');
-const messageInput = document.getElementById('message-input');
+const listaMensajes = document.getElementById('contenedor-chat'); // El ID de tu div de mensajes
+const formulario = document.getElementById('form-mensaje');        // El ID de tu <form>
+const inputTexto = document.getElementById('input-chat');          // El ID de tu <input>
 
-// 1. ESCUCHAR MENSAJES (Tiempo Real)
+// --- A: ESCUCHAR MENSAJES ---
 const q = query(collection(db, "mensajes"), orderBy("fecha", "asc"));
 
 onSnapshot(q, (snapshot) => {
-    if (messagesContainer) {
-        messagesContainer.innerHTML = ''; // Limpiamos para no duplicar
+    if (listaMensajes) {
+        listaMensajes.innerHTML = ''; // Limpiamos para no duplicar
         snapshot.forEach((doc) => {
             const data = doc.data();
-            const p = document.createElement('p');
-            p.textContent = `${data.texto}`;
-            messagesContainer.appendChild(p);
+            const div = document.createElement('div');
+            div.classList.add('burbuja-mensaje');
+            div.textContent = data.texto;
+            listaMensajes.appendChild(div);
         });
+        // Scroll automático al último mensaje
+        listaMensajes.scrollTop = listaMensajes.scrollHeight;
     }
 });
 
-// 2. ENVIAR MENSAJES
-if (chatForm) {
-    chatForm.addEventListener('submit', async (e) => {
+// --- B: ENVIAR MENSAJES ---
+if (formulario) {
+    formulario.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const texto = messageInput.value;
+        const texto = inputTexto.value.trim();
 
-        try {
-            await addDoc(collection(db, "mensajes"), {
-                texto: texto,
-                fecha: serverTimestamp()
-            });
-            messageInput.value = ''; // Limpiar input
-        } catch (error) {
-            console.error("Error al enviar:", error);
+        if (texto !== "") {
+            try {
+                await addDoc(collection(db, "mensajes"), {
+                    texto: texto,
+                    fecha: serverTimestamp() // Usa la hora de Google, no la del PC
+                });
+                inputTexto.value = ''; // Limpiar el campo
+            } catch (error) {
+                console.error("Error al enviar:", error);
+            }
         }
     });
 }
-
-// PRUEBA DE FUEGO: Guardar un mensaje automático al cargar
-async function testFirestore() {
-    try {
-        await addDoc(collection(db, "mensajes"), {
-            texto: "¡Hola desde la web!",
-            fecha: new Date()
-        });
-        console.log("✅ ¡Conexión con Firestore lograda!");
-    } catch (e) {
-        console.error("❌ Error de conexión: ", e);
-    }
-}
-
-testFirestore();
