@@ -33,3 +33,21 @@ chatForm.addEventListener('submit', async (e) => {
         console.error("Error al enviar:", error);
     }
 });
+
+import { db } from './firebase-config.js';
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// PRUEBA DE FUEGO: Guardar un mensaje automático al cargar
+async function testFirestore() {
+    try {
+        await addDoc(collection(db, "mensajes"), {
+            texto: "¡Hola desde la web!",
+            fecha: new Date()
+        });
+        console.log("✅ ¡Conexión con Firestore lograda!");
+    } catch (e) {
+        console.error("❌ Error de conexión: ", e);
+    }
+}
+
+testFirestore();
