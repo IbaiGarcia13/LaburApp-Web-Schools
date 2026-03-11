@@ -34,9 +34,6 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
-import { db } from '../js/firebase-config.js';
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 // PRUEBA DE FUEGO: Guardar un mensaje automático al cargar
 async function testFirestore() {
     try {
