@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             desc: u.bio || "Sin biografía.",
             loc: u.direccion_principal || "No especificada",
             lvl: u.nivel || 1,
-            val: u.valoracion_media || 0,
+            val: u.valoracion_media !== undefined ? u.valoracion_media : 2.5,
             esp: u.especialidad || "General"
         }));
         filteredUsers = [...usuariosData];

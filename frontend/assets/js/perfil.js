@@ -41,16 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSave = document.getElementById('modal-btn confirm');
 
     const catInfo = {
-        'gastronomia': { nombre: 'Gastronomía', color: 'd-yellow' },
-        'informatica': { nombre: 'Informática', color: 'd-blue' },
-        'limpieza': { nombre: 'Limpieza', color: 'd-purple' },
-        'mascotas': { nombre: 'Mascotas', color: 'd-green-dark' },
-        'carpinteria': { nombre: 'Carpintería', color: 'd-brown' },
-        'otros': { nombre: 'Otros', color: 'd-black' },
-        'jardineria': { nombre: 'Jardinería', color: 'd-green-light' },
-        'cuidado_personal': { nombre: 'Cuidado Personal', color: 'd-pink' },
-        'evento': { nombre: 'Evento', color: 'd-red' },
-        'diseno': { nombre: 'Diseño', color: 'd-teal' }
+        'gastronomia': { nombre: 'Gastronomía', color: 'cat-dot-gastronomia' },
+        'informatica': { nombre: 'Informática', color: 'cat-dot-informatica' },
+        'limpieza': { nombre: 'Limpieza', color: 'cat-dot-limpieza' },
+        'mascotas': { nombre: 'Mascotas', color: 'cat-dot-mascotas' },
+        'carpinteria': { nombre: 'Carpintería', color: 'cat-dot-carpinteria' },
+        'otros': { nombre: 'Otros', color: 'cat-dot-otros' },
+        'jardineria': { nombre: 'Jardinería', color: 'cat-dot-jardineria' },
+        'cuidado_personal': { nombre: 'Cuidado Personal', color: 'cat-dot-cuidado_personal' },
+        'evento': { nombre: 'Evento', color: 'cat-dot-evento' },
+        'diseno': { nombre: 'Diseño', color: 'cat-dot-diseno' },
+        'transporte': { nombre: 'Transporte', color: 'cat-dot-transporte' },
+        'mudanza': { nombre: 'Mudanza', color: 'cat-dot-mudanza' },
+        'construccion': { nombre: 'Construcción', color: 'cat-dot-construccion' }
     };
 
     // Cargar los datos desde Firebase al abrir la app o iniciar sesión
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // --- 2. VALORACIÓN, ESPECIALIDAD Y DINERO ---
                     if (statItems.length >= 3) {
-                        const valMedia = perfil.valoracion_media && perfil.valoracion_media > 0 ? perfil.valoracion_media : 3.0;
+                        const valMedia = perfil.valoracion_media !== undefined ? perfil.valoracion_media : 2.5;
                         statItems[0].textContent = valMedia.toFixed(1);
 
                         let maxPts = -1;

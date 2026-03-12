@@ -1,3 +1,5 @@
+@import "paleta-colores.css";
+
 .main-container {
     max-width: 1200px;
     margin: 40px auto;
@@ -6,7 +8,7 @@
 }
 
 .main-title {
-    color: white;
+    color: var(--neutral-white);
     margin-bottom: 40px;
 }
 
@@ -59,67 +61,67 @@
 
 /* CARD NINGUNA */
 .card-none {
-    background: white;
-    color: #888;
+    background: var(--neutral-white);
+    color: var(--gray-5);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .card-none h3 {
-    color: #ddd;
+    color: var(--gray-2);
 }
 
 .card-none .price-text {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #ddd;
+    color: var(--gray-2);
     margin-top: auto;
 }
 
 
 /* CARD CURRANTE (Azul Neón) */
 .card-currante {
-    background: #002350;
-    color: #fff;
-    border: 3px solid #0056b3;
+    background: var(--blue-3);
+    color: var(--neutral-white);
+    border: 3px solid var(--blue-2);
     box-shadow: 0 0 20px rgba(0, 86, 179, 0.6), inset 0 0 10px rgba(0, 86, 179, 0.4);
 }
 
 .card-currante h3 {
-    color: #b76bff;
+    color: var(--purple-1);
 }
 
 .card-currante .price-val {
     font-size: 3rem;
     font-weight: bold;
-    color: #00d2ff;
+    color: var(--blue-1);
 }
 
 .card-currante .sub-type {
-    color: #0056b3;
+    color: var(--blue-2);
     font-size: 0.9rem;
     font-weight: bold;
 }
 
 /* CARD JEFE */
 .card-jefe {
-    background: #002350;
-    color: #fff;
-    border: 3px solid #00bfff;
+    background: var(--blue-3);
+    color: var(--neutral-white);
+    border: 3px solid var(--blue-2);
     box-shadow: 0 0 20px rgba(0, 191, 255, 0.6), inset 0 0 10px rgba(0, 191, 255, 0.4);
 }
 
 .card-jefe h3 {
-    color: #6befff;
+    color: var(--blue-1);
 }
 
 .card-jefe .price-val {
     font-size: 3rem;
     font-weight: bold;
-    color: #6befff;
+    color: var(--blue-4);
 }
 
 .card-jefe .sub-type {
-    color: #00bfff;
+    color: var(--blue-1);
     font-size: 0.9rem;
     font-weight: bold;
 }

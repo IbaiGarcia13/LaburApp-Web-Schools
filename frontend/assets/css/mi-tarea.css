@@ -1,9 +1,11 @@
+@import "paleta-colores.css";
+
 /* Mi Tarea UI */
 .main-content {
     max-width: 1100px;
     margin: 40px auto;
     padding: 0 20px;
-    color: black;
+    color: var(--neutral-black);
 }
 
 .job-header-section {
@@ -69,7 +71,7 @@
 }
 
 .job-stats-container {
-    border-left: 3px solid white;
+    border-left: 3px solid var(--neutral-white);
     padding: 15px 25px;
     min-width: 300px;
     display: flex;
@@ -79,7 +81,7 @@
 }
 
 .stat-box-large {
-    background: white;
+    background: var(--neutral-white);
     padding: 20px 25px;
     border-radius: 15px;
     text-align: center;
@@ -94,19 +96,19 @@
 
 .stat-label {
     font-size: 28px;
-    color: #b5b5b5;
+    color: var(--gray-4);
 }
 
 .stat-value {
     font-size: 28px;
     font-weight: bold;
-    color: #999;
+    color: var(--gray-5);
 }
 
 /* Información section */
 .info-section {
-    background-color: white;
-    color: #333;
+    background-color: var(--neutral-white);
+    color: var(--gray-9);
     border-radius: 15px;
     padding: 30px;
     margin-bottom: 0;
@@ -117,13 +119,13 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--gray-1);
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
 
 .cat-title {
-    color: #d0d0d0;
+    color: var(--gray-3);
     margin: 0;
     font-size: 24px;
     font-weight: bold;
@@ -141,7 +143,7 @@
     align-items: center;
     gap: 10px;
     font-size: 16px;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .info-icon {
@@ -149,7 +151,7 @@
 }
 
 .info-text {
-    color: #a0a0a0;
+    color: var(--gray-4);
 }
 
 /* Edit Icons */
@@ -181,24 +183,24 @@
 /* Estilos del Modal (Ventana emergente) */
 .modal-content .input-group {
     margin-bottom: 25px;
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
 }
 
 .modal-content .input-group label {
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
 }
 
 .modal-content .input-group input {
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-3);
     border-radius: 6px;
     font-size: 1rem;
 }
@@ -214,14 +216,14 @@
 .input-group label {
     margin-bottom: 3px;
     font-size: 14px;
-    color: black;
+    color: var(--neutral-black);
 }
 
 .input-group input,
 .input-group select,
 .input-group textarea {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-3);
     border-radius: 8px;
     font-family: inherit;
     font-size: 1rem;
@@ -244,14 +246,14 @@
 }
 
 .applicant-card {
-    background: white;
+    background: var(--neutral-white);
     padding: 20px;
     border-radius: 15px;
     display: flex;
     align-items: center;
     gap: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #efefef;
+    border: 1px solid var(--gray-1);
     transition: transform 0.2s;
 }
 
@@ -264,7 +266,7 @@
     height: 60px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #f0f0f0;
+    border: 2px solid var(--gray-1);
 }
 
 .applicant-info {
@@ -275,7 +277,7 @@
     font-weight: bold;
     font-size: 1.1rem;
     margin-bottom: 5px;
-    color: #333;
+    color: var(--gray-9);
     display: block;
 }
 
@@ -299,30 +301,30 @@
 }
 
 .btn-accept {
-    background-color: #28a745;
-    color: white;
+    background-color: var(--green-1);
+    color: var(--neutral-white);
 }
 
 .btn-accept:hover {
-    background-color: #218838;
+    background-color: var(--green-2);
 }
 
 .btn-reject {
-    background-color: #dc3545;
-    color: white;
+    background-color: var(--red-2);
+    color: var(--neutral-white);
 }
 
 .btn-reject:hover {
-    background-color: #c82333;
+    background-color: var(--red-3);
 }
 
 .btn-chat-small {
-    background-color: #333;
-    color: white;
+    background-color: var(--gray-11);
+    color: var(--neutral-white);
 }
 
 .btn-chat-small:hover {
-    background-color: #000;
+    background-color: var(--neutral-black);
 }
 
 .app-btn img {

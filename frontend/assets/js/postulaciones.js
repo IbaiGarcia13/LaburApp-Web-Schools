@@ -134,7 +134,7 @@ async function renderUsuarios() {
         // Click en chat
         card.querySelector('.user-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = `chat.html?id=${app.id_trabajo}`;
+            window.location.href = `chat.html?id=${app.id_trabajo}&userId=${user.uid}`;
         });
     }
 }

@@ -1,3 +1,4 @@
+@import "paleta-colores.css";
 /* ==========================================================================
    HOJA DE ESTILO: MENSAJES
    Lista de conversaciones activas con usuarios, cards grandes con foto,
@@ -12,7 +13,7 @@
 
 /* Título principal — alineado a la izquierda igual que el resto de páginas */
 .section-title {
-    color: white;
+    color: var(--neutral-white);
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 25px;
@@ -23,7 +24,7 @@
    TARJETA DE CONVERSACIÓN
    ========================================== */
 .msg-card {
-    background: white;
+    background: var(--neutral-white);
     border-radius: 15px;
     padding: 30px;
     display: flex;
@@ -43,7 +44,7 @@
 }
 
 .msg-card:hover {
-transform: translateY(-5px);
+    transform: translateY(-5px);
 }
 
 /* Foto del usuario */
@@ -64,19 +65,19 @@ transform: translateY(-5px);
 .msg-name {
     font-size: 1.3rem;
     font-weight: bold;
-    color: #111;
+    color: var(--gray-11);
     margin: 0 0 12px 0;
 }
 
 .msg-label {
     font-size: 0.9rem;
-    color: #888;
+    color: var(--gray-5);
     margin: 0 0 6px 0;
 }
 
 .msg-job-link {
     font-size: 1rem;
-    color: #111;
+    color: var(--gray-11);
     text-decoration: underline;
     cursor: pointer;
     background: none;
@@ -86,7 +87,7 @@ transform: translateY(-5px);
 }
 
 .msg-job-link:hover {
-    color: #555;
+    color: var(--gray-7);
 }
 
 /* Icono de chat en esquina inferior derecha */
@@ -140,7 +141,7 @@ transform: translateY(-5px);
 
 #page-info {
     background: white;
-    color: #333;
+    color: var(--gray-9);
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;

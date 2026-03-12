@@ -1,4 +1,6 @@
 /* Perfil */
+@import "paleta-colores.css";
+
 /* ==========================================================================
    ESTILOS DE VISUALIZACIÓN DE PERFIL PÚBLICO
    Define la cuadrícula de información, la barra de progreso de experiencia XP,
@@ -82,7 +84,7 @@
 
 /* Stats Box */
 .stats-card {
-    border-left: 3px solid white;
+    border-left: 3px solid var(--neutral-white);
     padding: 15px 25px;
     min-width: 300px;
 }
@@ -95,8 +97,8 @@
 }
 
 .level-box {
-    background: white;
-    color: #888;
+    background: var(--neutral-white);
+    color: var(--gray-5);
     padding: 8px 15px;
     border-radius: 12px;
     text-align: center;
@@ -131,14 +133,14 @@
 
 .xp-bar {
     height: 15px;
-    background: white;
+    background: var(--neutral-white);
     overflow: hidden;
 }
 
 .xp-fill {
     width: 85%;
     height: 100%;
-    background-color: #d12a2a;
+    background-color: var(--red-1);
 }
 
 .stat-item {
@@ -148,8 +150,8 @@
 
 /* Categorías */
 .categories-container {
-    background-color: white;
-    color: #333;
+    background-color: var(--neutral-white);
+    color: var(--gray-9);
     border-radius: 15px;
     padding: 30px;
     margin-bottom: 40px;
@@ -157,10 +159,10 @@
 }
 
 .card-title {
-    color: #d0d0d0;
+    color: var(--gray-3);
     margin: 0 0 20px 0;
     font-size: 24px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-1);
     padding-bottom: 10px;
 }
 
@@ -175,7 +177,7 @@
     align-items: center;
     gap: 10px;
     font-size: 15px;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .dot {
@@ -184,45 +186,57 @@
     border-radius: 50%;
 }
 
-/* Colores exactos de los círculos */
-.d-yellow {
-    background-color: #f1c40f;
+/* Colores por categoría (usando paleta-colores.css) */
+.cat-dot-carpinteria {
+    background-color: var(--cat-1);
 }
 
-.d-blue {
-    background-color: #2e5bff;
+.cat-dot-construccion {
+    background-color: var(--cat-2);
 }
 
-.d-purple {
-    background-color: #9b59b6;
+.cat-dot-cuidado_personal {
+    background-color: var(--cat-3);
 }
 
-.d-green-dark {
-    background-color: #27ae60;
+.cat-dot-diseno {
+    background-color: var(--cat-4);
 }
 
-.d-brown {
-    background-color: #a04000;
+.cat-dot-evento {
+    background-color: var(--cat-5);
 }
 
-.d-black {
-    background-color: #000000;
+.cat-dot-gastronomia {
+    background-color: var(--cat-6);
 }
 
-.d-green-light {
-    background-color: #2ecc71;
+.cat-dot-informatica {
+    background-color: var(--cat-7);
 }
 
-.d-pink {
-    background-color: #f5b7b1;
+.cat-dot-jardineria {
+    background-color: var(--cat-8);
 }
 
-.d-red {
-    background-color: #ff3333;
+.cat-dot-limpieza {
+    background-color: var(--cat-9);
 }
 
-.d-teal {
-    background-color: #7fb3d5;
+.cat-dot-mascotas {
+    background-color: var(--cat-10);
+}
+
+.cat-dot-mudanza {
+    background-color: var(--cat-11);
+}
+
+.cat-dot-transporte {
+    background-color: var(--cat-12);
+}
+
+.cat-dot-otros {
+    background-color: var(--cat-13);
 }
 
 /* Espacio Anuncio */
@@ -230,7 +244,6 @@
     height: 120px;
     width: 100%;
     margin-top: 20px;
-    /* Se deja vacío como pediste */
 }
 
 /* Botón Editar superior */
@@ -240,9 +253,9 @@
 }
 
 .btn-edit {
-    background-color: white;
-    color: #888;
-    border: 1px solid #ddd;
+    background-color: var(--neutral-white);
+    color: var(--gray-5);
+    border: 1px solid var(--gray-2);
     padding: 8px 25px;
     border-radius: 8px;
     cursor: pointer;
@@ -251,8 +264,8 @@
 
 /* Tarjetas de Información (Cuenta y Suscripciones) */
 .info-card {
-    background-color: white;
-    color: #333;
+    background-color: var(--neutral-white);
+    color: var(--gray-9);
     border-radius: 15px;
     padding: 25px 30px;
     margin-bottom: 30px;
@@ -262,11 +275,11 @@
 .card-body p {
     margin: 15px 0;
     font-size: 15px;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .card-body strong {
-    color: #666;
+    color: var(--gray-6);
 }
 
 /* Acciones de la tarjeta cuenta */
@@ -281,7 +294,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #d12a2a;
+    color: var(--red-1);
     font-weight: bold;
     cursor: pointer;
 }
@@ -291,7 +304,7 @@
 }
 
 .change-pass-action a {
-    color: #888;
+    color: var(--gray-5);
     text-decoration: underline;
     font-size: 14px;
 }
@@ -314,8 +327,8 @@
 
 /* Tarjetas de Información */
 .info-card {
-    background-color: white;
-    color: #333;
+    background-color: var(--neutral-white);
+    color: var(--gray-9);
     border-radius: 15px;
     padding: 25px 30px;
     margin-bottom: 30px;
@@ -325,7 +338,7 @@
 .card-body p {
     margin: 15px 0;
     font-size: 15px;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .card-actions {
@@ -339,13 +352,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #d12a2a;
+    color: var(--red-1);
     font-weight: bold;
     cursor: pointer;
 }
 
 .change-pass-action a {
-    color: #888;
+    color: var(--gray-5);
     text-decoration: underline;
     font-size: 14px;
 }
@@ -353,24 +366,24 @@
 /* Estilos del Modal (Ventana emergente) */
 .modal-content .input-group {
     margin-bottom: 25px;
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
 }
 
 .modal-content .input-group label {
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
 }
 
 .modal-content .input-group input {
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-3);
     border-radius: 6px;
     font-size: 1rem;
 }
@@ -386,13 +399,13 @@
 .input-group label {
     margin-bottom: 3px;
     font-size: 14px;
-    color: black;
+    color: var(--neutral-black);
 }
 
 .input-group input,
 .input-group textarea {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-3);
     border-radius: 8px;
     font-family: inherit;
     font-size: 1rem;
@@ -403,8 +416,8 @@
 }
 
 .modal-content {
-    background: white;
-    color: black;
+    background: var(--neutral-white);
+    color: var(--neutral-black);
     padding: 35px;
     border-radius: 15px;
     text-align: center;
@@ -423,12 +436,12 @@
 
 /* Añade esto para que el enlace no cambie de color */
 #displayPDF {
-    color: black;
+    color: var(--neutral-black);
     text-decoration: underline;
     cursor: pointer;
 }
 
 #displayPDF:hover {
-    color: #ccc;
+    color: var(--gray-3);
     /* Un ligero cambio al pasar el ratón */
 }

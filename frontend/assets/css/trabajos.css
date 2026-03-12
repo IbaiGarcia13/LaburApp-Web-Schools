@@ -1,3 +1,5 @@
+@import "paleta-colores.css";
+
 /* ==========================================================================
    ESTILOS DE LISTA DE TRABAJOS (TABLÓN)
    Establece el diseño en tarjetas horizontales para los trabajos disponibles,
@@ -21,7 +23,7 @@
 }
 
 .section-title {
-    color: white;
+    color: var(--neutral-white);
     margin-bottom: 25px;
     font-size: 1.5rem;
     font-weight: bold;
@@ -29,7 +31,7 @@
 
 /* --- TARJETAS DE TRABAJO (Imágenes 200px) --- */
 .job-card {
-    background: white;
+    background: var(--neutral-white);
     border-radius: 15px;
     padding: 30px;
     display: flex;
@@ -70,7 +72,7 @@
 .job-info h3 {
     font-size: 1.4rem;
     margin-bottom: 12px;
-    color: #111;
+    color: var(--gray-11);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -78,10 +80,9 @@
 
 .job-desc {
     font-size: 1rem;
-    color: #444;
+    color: var(--gray-8);
     line-height: 1.6;
     margin-bottom: 15px;
-
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
@@ -91,7 +92,7 @@
 
 .job-details p {
     font-size: 0.9rem;
-    color: #111;
+    color: var(--gray-11);
     margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
@@ -120,11 +121,10 @@
 }
 
 .filter-box {
-    background-color: black;
-    color: white;
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
     padding: 30px;
     border-radius: 20px;
-    /*border: 2px solid white;*/
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     position: sticky;
     top: 100px;
@@ -170,7 +170,7 @@
 .input-unit span {
     display: block;
     font-size: 0.75rem;
-    color: #bbb;
+    color: var(--gray-4);
     margin-bottom: 4px;
 }
 
@@ -179,7 +179,7 @@
     padding: 15px;
     margin-top: 15px;
     border-radius: 10px;
-    background-color: #ddd;
+    background-color: var(--gray-2);
     font-weight: bold;
     cursor: pointer;
     border: none;
@@ -187,7 +187,7 @@
 }
 
 #update-btn:hover {
-    background-color: white;
+    background-color: var(--neutral-white);
 }
 
 /* --- PAGINACIÓN --- */
@@ -216,7 +216,7 @@
 }
 
 #page-info {
-    background: white;
+    background: var(--neutral-white);
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;

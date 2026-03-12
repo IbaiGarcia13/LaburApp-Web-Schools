@@ -279,6 +279,7 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
     if (!user) throw new Error("Debes iniciar sesión.");
     if (puntuacion < 1 || puntuacion > 5) throw new Error("Puntuación inválida.");
 
+    // 1. Guardar la valoración en la subcolección
     await addDoc(collection(db, "usuarios", uidReceptor, "valoraciones_recibidas"), {
         puntuacion: puntuacion,
         comentario: comentario || "",
@@ -287,7 +288,24 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
         id_usuario_emisor: user.uid
     });
 
-    // Aquí se debería llamar a una Cloud Function para recalcular "valoracion_media" del usuario
+    // 2. Recalcular la VALORACIÓN MEDIA del usuario receptor
+    const userRef = doc(db, "usuarios", uidReceptor);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+        const userData = userSnap.data();
+        let oldMedia = userData.valoracion_media !== undefined ? userData.valoracion_media : 2.5;
+        let oldCount = userData.num_valoraciones !== undefined ? userData.num_valoraciones : 1;
+
+        const newCount = oldCount + 1;
+        const newMedia = (oldMedia * oldCount + puntuacion) / newCount;
+
+        await updateDoc(userRef, {
+            valoracion_media: Number(newMedia.toFixed(2)),
+            num_valoraciones: newCount
+        });
+    }
+
     return true;
 }
 
@@ -346,14 +364,10 @@ export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto") {
     // El receptor es el publicador si yo soy el trabajador, o viceversa
     let idReceptor = null;
     if (user.uid === trabajo.id_publicador) {
-        idReceptor = trabajo.id_trabajador;
+        idReceptor = trabajo.id_trabajador || null;
     } else if (user.uid === trabajo.id_trabajador) {
         idReceptor = trabajo.id_publicador;
-    } else {
-        throw new Error("No estás participando en este trabajo.");
     }
-
-    if (!idReceptor) throw new Error("Aún no hay otro participante en el chat.");
 
     const mensajesRef = collection(db, "trabajos", idTrabajo, "mensajes");
     await addDoc(mensajesRef, {
@@ -410,3 +424,38 @@ export async function obtenerConversacionesActivas(uid) {
 
     return filtrados;
 }
+
+// --- 8. CHAT DIRECTO (Sin Trabajo) ---
+
+export function generarIdChatDirecto(uid1, uid2) {
+    return [uid1, uid2].sort().join("_");
+}
+
+export async function enviarMensajeDirecto(uidOtro, texto, tipo = "texto") {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Debes iniciar sesión.");
+
+    const idChat = generarIdChatDirecto(user.uid, uidOtro);
+
+    // Guardamos que existe la conversación para ambos usuarios para poder listarlas luego
+    await setDoc(doc(db, "usuarios", user.uid, "chats_directos", uidOtro), {
+        id_otro_usuario: uidOtro,
+        ultimo_mensaje: serverTimestamp()
+    }, { merge: true });
+
+    await setDoc(doc(db, "usuarios", uidOtro, "chats_directos", user.uid), {
+        id_otro_usuario: user.uid,
+        ultimo_mensaje: serverTimestamp()
+    }, { merge: true });
+
+    const mensajesRef = collection(db, "chats", idChat, "mensajes");
+    await addDoc(mensajesRef, {
+        contenido: texto,
+        leido: false,
+        tipo_contenido: tipo,
+        id_emisor: user.uid,
+        id_receptor: uidOtro,
+        fecha_envio: serverTimestamp()
+    });
+}
+

@@ -1,3 +1,4 @@
+@import "paleta-colores.css";
 /* ==========================================================================
    HOJA DE ESTILO: POSTULACIONES
    Dos columnas: Trabajos (izquierda) y Usuarios postulantes (derecha).
@@ -11,7 +12,7 @@
 
 /* === TÍTULO PRINCIPAL === */
 .section-title {
-    color: white;
+    color: var(--neutral-white);
     margin-bottom: 30px;
     font-size: 1.5rem;
     font-weight: bold;
@@ -34,7 +35,7 @@
 /* Divisor visual entre columnas */
 .col-divider {
     width: 2px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--gray-1);
     align-self: stretch;
     min-height: 400px;
 }
@@ -47,7 +48,7 @@
 
 /* Encabezados de columna */
 .col-header {
-    color: white;
+    color: var(--neutral-white);
     font-size: 1rem;
     font-weight: bold;
     letter-spacing: 2px;
@@ -59,7 +60,7 @@
    TARJETA DE TRABAJO (columna izquierda)
    ========================================== */
 .job-card {
-    background: white;
+    background: var(--neutral-white);
     border-radius: 12px;
     padding: 15px;
     display: flex;
@@ -99,12 +100,12 @@
     font-size: 1rem;
     font-weight: bold;
     margin: 0 0 5px 0;
-    color: #111;
+    color: var(--gray-11);
 }
 
 .job-card-desc {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--gray-6);
     margin: 0 0 5px 0;
     white-space: nowrap;
     overflow: hidden;
@@ -116,7 +117,7 @@
     flex-direction: column;
     gap: 3px;
     font-size: 0.75rem;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .job-card-meta span {
@@ -146,20 +147,20 @@
 }
 
 .status-pendiente {
-    color: #e07000;
+    color: var(--orange-1);
 }
 
 .status-aceptada {
-    color: #2a8a2a;
+    color: var(--green-1);
 }
 
 .status-cancelada {
-    color: #c0392b;
+    color: var(--red-2);
 }
 
 .job-card-pago {
     font-size: 0.9rem;
-    color: #444;
+    color: var(--gray-8);
     margin-top: -15px;
     margin-right: 20px;
 }
@@ -168,7 +169,7 @@
    TARJETA DE USUARIO (columna derecha)
    ========================================== */
 .user-app-card {
-    background: white;
+    background: var(--neutral-white);
     border-radius: 12px;
     padding: 15px;
     display: flex;
@@ -205,7 +206,7 @@
 .user-app-name {
     font-size: 1rem;
     font-weight: bold;
-    color: #111;
+    color: var(--gray-11);
     margin: 0 0 4px 0;
     cursor: pointer;
 }
@@ -216,12 +217,12 @@
 
 .user-app-task {
     font-size: 0.8rem;
-    color: #888;
+    color: var(--gray-5);
     margin: 0 0 4px 0;
 }
 
 .user-app-task strong {
-    color: #111;
+    color: var(--gray-11);
     text-decoration: underline;
     cursor: pointer;
 }
@@ -281,8 +282,8 @@
 }
 
 #page-info {
-    background: white;
-    color: #333;
+    background: var(--neutral-white);
+    color: var(--gray-9);
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;

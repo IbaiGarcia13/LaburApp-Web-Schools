@@ -3,6 +3,8 @@
    Define la tipografía base, reset de márgenes, barra superior (header), barra lateral (sidebar) 
    y ventanas modales globales de LaburApp.
    ========================================================================== */
+@import "paleta-colores.css";
+
 /* --- RESET GENERAL DE ELEMENTOS --- */
 * {
     margin: 0;
@@ -12,7 +14,7 @@
 }
 
 body {
-    background-color: rgb(180, 80, 80);
+    background-color: var(--primary);
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
@@ -26,8 +28,8 @@ main.main-content {
 
 /* --- HEADER  --- */
 header {
-    background-color: black;
-    color: white;
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -69,7 +71,7 @@ header nav ul {
 }
 
 header nav a {
-    color: white;
+    color: var(--neutral-white);
     text-decoration: none;
     padding: 0 20px;
     height: 100%;
@@ -81,8 +83,8 @@ header nav a {
 }
 
 header nav a:hover {
-    background-color: white;
-    color: black;
+    background-color: var(--neutral-white);
+    color: var(--neutral-black);
 }
 
 .header-icons {
@@ -115,12 +117,12 @@ header nav a:hover {
 .hamburger span {
     width: 100%;
     height: 3px;
-    background: white;
+    background: var(--neutral-white);
     border-radius: 2px;
 }
 
 .hamburger.active {
-    background-color: rgba(128, 128, 128, 0.4);
+    background-color: var(--gray-5);
     padding: 10px;
     margin: -10px;
     border-radius: 5px;
@@ -128,7 +130,7 @@ header nav a:hover {
 }
 
 .hamburger.active span {
-    background: #ccc;
+    background: var(--gray-3);
 }
 
 
@@ -138,14 +140,14 @@ header nav a:hover {
     top: 75px;
     right: 54px;
     width: 240px;
-    background: white;
+    background: var(--neutral-white);
     border-radius: 15px;
     padding: 25px;
     display: none;
     flex-direction: column;
     align-items: center;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    color: black;
+    color: var(--neutral-black);
     z-index: 2000;
 }
 
@@ -160,7 +162,7 @@ header nav a:hover {
     right: 28px;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 10px solid white;
+    border-bottom: 10px solid var(--neutral-white);
 }
 
 .dropdown-avatar {
@@ -183,13 +185,13 @@ header nav a:hover {
 }
 
 .dropdown-email {
-    color: #888;
+    color: var(--gray-5);
     font-size: 0.9rem;
     margin-bottom: 20px;
 }
 
 .dropdown-footer {
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--gray-1);
     width: 100%;
     padding-top: 15px;
     display: flex;
@@ -199,7 +201,7 @@ header nav a:hover {
 }
 
 .dropdown-footer a {
-    color: #d9534f;
+    color: var(--red-1);
     text-decoration: none;
     font-weight: bold;
     font-size: 1rem;
@@ -213,7 +215,7 @@ header nav a:hover {
     right: -320px;
     width: 250px;
     height: calc(100vh - 70px);
-    background: white;
+    background: var(--neutral-white);
     transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 999;
     padding: 30px 0;
@@ -240,12 +242,12 @@ header nav a:hover {
 }
 
 .side-menu li:hover {
-    background: #f5f5f5;
+    background: var(--gray-1);
 }
 
 .side-menu li.active {
-    background: #eee;
-    border-left: 5px solid black;
+    background: var(--gray-1);
+    border-left: 5px solid var(--neutral-black);
 }
 
 .side-menu li img {
@@ -255,7 +257,7 @@ header nav a:hover {
 }
 
 .side-menu li a {
-    color: #333;
+    color: var(--gray-9);
     text-decoration: none;
     font-weight: 600;
     font-size: 1.05rem;
@@ -286,7 +288,7 @@ header nav a:hover {
 }
 
 .side-menu-footer a {
-    color: #d9534f;
+    color: var(--red-1);
     text-decoration: none;
     font-weight: bold;
     font-size: 1.1rem;
@@ -299,10 +301,10 @@ header nav a:hover {
 /* -- FOOTER --- */
 footer {
     font-size: 14px;
-    color: white;
+    color: var(--neutral-white);
     padding: 15px;
     text-align: center;
-    background-color: black;
+    background-color: var(--neutral-black);
 }
 
 .icon-img-small {
@@ -328,8 +330,8 @@ footer {
 }
 
 .modal-content {
-    background: white;
-    color: black;
+    background: var(--neutral-white);
+    color: var(--neutral-black);
     padding: 30px;
     border-radius: 15px;
     text-align: center;
@@ -344,7 +346,7 @@ footer {
 
 .modal-content p {
     margin-bottom: 25px;
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
 }
@@ -353,7 +355,7 @@ footer {
     width: 100%;
     padding: 10px;
     margin-bottom: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-3);
     border-radius: 6px;
     font-size: 1rem;
 }
@@ -379,30 +381,30 @@ footer {
 }
 
 .modal-btn.confirm {
-    background: #000000;
-    color: white;
+    background: var(--gray-11);
+    color: var(--neutral-white);
 }
 
 .modal-btn.confirm:hover {
-    background: #0d0d0d;
+    background: var(--neutral-black);
 }
 
 .modal-btn.delete {
-    background: #cc0000;
+    background: var(--red-2);
     color: white;
 }
 
 .modal-btn.delete:hover {
-    background: #a30000;
+    background: var(--red-3);
 }
 
 .modal-btn.cancel {
-    background: #e0e0e0;
-    color: black;
+    background: var(--gray-2);
+    color: var(--neutral-black);
 }
 
 .modal-btn.cancel:hover {
-    background: #ccc;
+    background: var(--gray-3);
 }
 
 .hidden {

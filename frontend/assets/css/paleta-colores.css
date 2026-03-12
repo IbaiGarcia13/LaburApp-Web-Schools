@@ -1,0 +1,66 @@
+:root {
+
+  /* PRINCIPAL */
+  --primary: #b45050;
+
+  /* NEUTROS */
+  --neutral-white: #fff;
+  --neutral-black: #000;
+
+  /* GRISES */
+  --gray-1:  #f0f0f0; /* #efefef  -   */
+
+  --gray-2: #DDD; /* #e0e0e0  -   */
+
+  --gray-3: #CCC; /* #d0d0d0  -   */
+
+  --gray-4: #BBB; /* #A0A0A0  - #b5b5b5  */
+
+  --gray-5: #888; /* #999999  -   */
+
+  --gray-6: #666;
+
+  --gray-7: #555;
+
+  --gray-8: #444;
+
+  --gray-9: #333;
+
+  --gray-10: #222; /* NO USO */
+
+  --gray-11: #111;
+
+  /* CATEGORÍAS */
+  --cat-1: #A52A2A;
+  --cat-2: #808080;
+  --cat-3: #FFC0CB;
+  --cat-4: #5F9EA0;
+  --cat-5: #FF0000;
+  --cat-6: #FFD700;
+  --cat-7: #0000FF;
+  --cat-8: #008000;
+  --cat-9: #800080;
+  --cat-10: #006400;
+  --cat-11: #8B0000;
+  --cat-12: #FFA500;
+  --cat-13: #000000;
+
+
+  /* OTROS */
+  --red-1: #c1272d;
+
+  --red-2: #cc0000;
+  --red-3: #a30000;
+
+  --green-1: #28a745;
+  --green-2: #218838;
+
+  --orange-1: #e07000;
+
+  --blue-1: #00d2ff;
+  --blue-2: #0056b3;
+  --blue-3: #002350;
+  --blue-4: #6befff;
+
+  --purple-1: #b76bff;
+}

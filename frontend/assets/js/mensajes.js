@@ -85,7 +85,7 @@ async function renderMensajes() {
         // Botón chat → chat.html
         card.querySelector('.msg-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = `chat.html?id=${job.id}`;
+            window.location.href = `chat.html?id=${job.id}&userId=${otherId}`;
         });
     }
 

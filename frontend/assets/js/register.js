@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, setDoc, query, where, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const formRegister = document.getElementById("formRegister");
 const fase1 = document.getElementById("fase1");
@@ -120,6 +120,20 @@ if (formRegister) {
             return;
         }
 
+        // --- VALIDACIÓN DE EDAD (Mínimo 16 años) ---
+        const birthDate = new Date(dNac);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 16) {
+            errorMsg.textContent = "Debes tener al menos 16 años para registrarte.";
+            return;
+        }
+
         // Format date to DD-MM-YYYY if it comes from date input as YYYY-MM-DD
         let formattedDate = dNac;
         if (dNac.includes("-") && dNac.split("-")[0].length === 4) {
@@ -128,6 +142,14 @@ if (formRegister) {
         }
 
         try {
+            // --- VALIDACIÓN DE DNI ÚNICO ---
+            const q = query(collection(db, "usuarios"), where("dni", "==", dni));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                errorMsg.textContent = "Ya existe un usuario registrado con este DNI.";
+                return;
+            }
+
             // 4.1. Crear usuario en Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
@@ -144,7 +166,8 @@ if (formRegister) {
                 nivel: 1,
                 experiencia_total: 0,
                 experiencia_nivel_actual: 0,
-                valoracion_media: 0,
+                valoracion_media: 2.5,
+                num_valoraciones: 1, // La valoración inicial de 2.5 cuenta como la primera
                 dinero_ganado_total: 0,
                 id_suscripcion_trabajador: "ninguna",
                 id_suscripcion_cliente: "ninguna"

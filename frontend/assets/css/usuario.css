@@ -1,3 +1,5 @@
+@import "paleta-colores.css";
+
 /* Perfil */
 .main-content {
     max-width: 1100px;
@@ -82,7 +84,7 @@
 
 /* Stats Box */
 .stats-card {
-    border-left: 3px solid white;
+    border-left: 3px solid var(--neutral-white);
     padding: 15px 25px;
     min-width: 300px;
 }
@@ -95,8 +97,8 @@
 }
 
 .level-box {
-    background: white;
-    color: #888;
+    background: var(--neutral-white);
+    color: var(--gray-5);
     padding: 8px 15px;
     border-radius: 12px;
     text-align: center;
@@ -131,14 +133,14 @@
 
 .xp-bar {
     height: 15px;
-    background: white;
+    background: var(--neutral-white);
     overflow: hidden;
 }
 
 .xp-fill {
     width: 85%;
     height: 100%;
-    background-color: #d12a2a;
+    background-color: var(--red-1);
 }
 
 .stat-item {
@@ -148,8 +150,8 @@
 
 /* Categorías */
 .categories-container {
-    background-color: white;
-    color: #333;
+    background-color: var(--neutral-white);
+    color: var(--gray-9);
     border-radius: 15px;
     padding: 30px;
     margin-bottom: 40px;
@@ -157,10 +159,10 @@
 }
 
 .cat-title {
-    color: #d0d0d0;
+    color: var(--gray-3);
     margin: 0 0 20px 0;
     font-size: 24px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-1);
     padding-bottom: 10px;
 }
 
@@ -175,7 +177,7 @@
     align-items: center;
     gap: 10px;
     font-size: 15px;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .dot {
@@ -184,62 +186,63 @@
     border-radius: 50%;
 }
 
-.d-yellow {
-    background-color: gold;
+/* Colores por categoría (usando paleta-colores.css) */
+.cat-dot-carpinteria {
+    background-color: var(--cat-1);
 }
 
-.d-blue {
-    background-color: blue;
+.cat-dot-construccion {
+    background-color: var(--cat-2);
 }
 
-.d-purple {
-    background-color: purple;
+.cat-dot-cuidado_personal {
+    background-color: var(--cat-3);
 }
 
-.d-green-dark {
-    background-color: darkgreen;
+.cat-dot-diseno {
+    background-color: var(--cat-4);
 }
 
-.d-brown {
-    background-color: brown;
+.cat-dot-evento {
+    background-color: var(--cat-5);
 }
 
-.d-gray {
-    background-color: gray;
+.cat-dot-gastronomia {
+    background-color: var(--cat-6);
 }
 
-.d-darkred {
-    background-color: darkred;
+.cat-dot-informatica {
+    background-color: var(--cat-7);
 }
 
-.d-orange {
-    background-color: orange;
+.cat-dot-jardineria {
+    background-color: var(--cat-8);
 }
 
-.d-black {
-    background-color: #000000;
+.cat-dot-limpieza {
+    background-color: var(--cat-9);
 }
 
-.d-green-light {
-    background-color: #2ecc71;
+.cat-dot-mascotas {
+    background-color: var(--cat-10);
 }
 
-.d-pink {
-    background-color: #f5b7b1;
+.cat-dot-mudanza {
+    background-color: var(--cat-11);
 }
 
-.d-red {
-    background-color: #ff3333;
+.cat-dot-transporte {
+    background-color: var(--cat-12);
 }
 
-.d-teal {
-    background-color: #7fb3d5;
+.cat-dot-otros {
+    background-color: var(--cat-13);
 }
 
 /* MODAL */
 .modal-content p {
     margin-bottom: 25px;
-    color: #555;
+    color: var(--gray-7);
     font-size: 1rem;
     text-align: center;
 }
@@ -250,5 +253,4 @@
     height: 120px;
     width: 100%;
     margin-top: 20px;
-    /* Se deja vacío como pediste */
 }

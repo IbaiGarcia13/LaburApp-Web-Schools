@@ -12,16 +12,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const catInfo = {
-        'gastronomia': { nombre: 'Gastronomía', color: 'd-yellow' },
-        'informatica': { nombre: 'Informática', color: 'd-blue' },
-        'limpieza': { nombre: 'Limpieza', color: 'd-purple' },
-        'mascotas': { nombre: 'Mascotas', color: 'd-green-dark' },
-        'carpinteria': { nombre: 'Carpintería', color: 'd-brown' },
-        'otros': { nombre: 'Otros', color: 'd-black' },
-        'jardineria': { nombre: 'Jardinería', color: 'd-green-light' },
-        'cuidado_personal': { nombre: 'Cuidado Personal', color: 'd-pink' },
-        'evento': { nombre: 'Evento', color: 'd-red' },
-        'diseno': { nombre: 'Diseño', color: 'd-teal' }
+        'gastronomia': { nombre: 'Gastronomía', color: 'cat-dot-gastronomia' },
+        'informatica': { nombre: 'Informática', color: 'cat-dot-informatica' },
+        'limpieza': { nombre: 'Limpieza', color: 'cat-dot-limpieza' },
+        'mascotas': { nombre: 'Mascotas', color: 'cat-dot-mascotas' },
+        'carpinteria': { nombre: 'Carpintería', color: 'cat-dot-carpinteria' },
+        'otros': { nombre: 'Otros', color: 'cat-dot-otros' },
+        'jardineria': { nombre: 'Jardinería', color: 'cat-dot-jardineria' },
+        'cuidado_personal': { nombre: 'Cuidado Personal', color: 'cat-dot-cuidado_personal' },
+        'evento': { nombre: 'Evento', color: 'cat-dot-evento' },
+        'diseno': { nombre: 'Diseño', color: 'cat-dot-diseno' },
+        'transporte': { nombre: 'Transporte', color: 'cat-dot-transporte' },
+        'mudanza': { nombre: 'Mudanza', color: 'cat-dot-mudanza' },
+        'construccion': { nombre: 'Construcción', color: 'cat-dot-construccion' }
     };
 
     loadUserData(userId);
@@ -77,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const stats = document.querySelectorAll('.stat-item strong');
         if (stats.length >= 3) {
-            stats[0].textContent = (user.valoracion_media || 0).toFixed(1);
+            stats[0].textContent = (user.valoracion_media !== undefined ? user.valoracion_media : 2.5).toFixed(1);
 
             let maxPts = -1;
             let bestCatId = null;
@@ -104,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.innerHTML = "";
             ptsCat.forEach(c => {
                 if (c.puntos > 0) {
-                    const info = catInfo[c.id_categoria] || { nombre: c.id_categoria, color: 'd-black' };
+                    const info = catInfo[c.id_categoria] || { nombre: c.id_categoria, color: 'cat-dot-otros' };
                     const div = document.createElement('div');
                     div.className = 'cat-item';
                     div.innerHTML = `<span class="dot ${info.color}"></span> <strong>${info.nombre}:</strong> ${c.puntos} puntos`;
@@ -121,15 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnChat) {
         btnChat.addEventListener('click', (e) => {
             e.preventDefault();
-            showCustomConfirm(
-                "Chatear con usuario",
-                "¿Quieres chatear con este usuario?",
-                () => {
-                    window.location.href = `chat.html?id_receptor=${userId}`;
-                },
-                "Aceptar",
-                "Cancelar"
-            );
+            // Eliminamos la confirmación molesta y redirigimos directamente al chat
+            window.location.href = `chat.html?userId=${userId}`;
         });
     }
 });

@@ -1,3 +1,5 @@
+@import "paleta-colores.css";
+
 #page-container {
     width: 100%;
     max-width: 1200px;
@@ -36,17 +38,16 @@
 #map {
     height: 60vh;
     border-radius: 10px;
-    border: 3px solid white;
-    background-color: #ddd;
+    border: 3px solid var(--neutral-white);
+    background-color: var(--gray-2);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* CAJA OSCURA (FILTROS) */
 .dark-box {
-    background-color: black;
-    color: white;
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
     border-radius: 20px;
-    /*border: 2px solid white;*/
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     padding: 30px 25px;
 }
@@ -65,7 +66,7 @@
     border-radius: 8px;
     border: none;
     outline: none;
-    color: black;
+    color: var(--neutral-black);
     font-size: 14px;
     margin-bottom: 15px;
     margin-top: 15px;
@@ -75,7 +76,7 @@
 .dark-box select {
     appearance: none;
     -webkit-appearance: none;
-    background: white url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+    background: var(--neutral-white) url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
 }
 
 .input-row {
@@ -88,8 +89,8 @@
 }
 
 .btn-apply-filter {
-    background-color: #ddd;
-    color: black;
+    background-color: var(--gray-2);
+    color: var(--neutral-black);
     font-weight: bold;
     border: none;
     padding: 12px 30px;
@@ -101,12 +102,12 @@
 }
 
 .btn-apply-filter:hover {
-    background-color: #bbb;
+    background-color: var(--gray-4);
 }
 
 .btn-giant {
-    background-color: #ddd;
-    color: #666;
+    background-color: var(--gray-2);
+    color: var(--gray-6);
     font-weight: bold;
     border: none;
     padding: 25px;
@@ -119,8 +120,8 @@
 }
 
 .btn-giant:hover {
-    background-color: #ccc;
-    color: #333;
+    background-color: var(--gray-3);
+    color: var(--gray-9);
     transform: scale(1.05);
 }
 
@@ -131,8 +132,8 @@
 /* FORMULARIO Y VISTA INCRUSTADO (IZQUIERDA) */
 #marker-form-box,
 #marker-view-box {
-    background: white;
-    color: black;
+    background: var(--neutral-white);
+    color: var(--neutral-black);
     padding: 25px 30px;
     border-radius: 10px;
     border: none;
@@ -164,9 +165,9 @@
     padding: 10px;
     margin-top: 5px;
     border-radius: 6px;
-    border: 1px solid #ccc;
-    background: white;
-    color: black;
+    border: 1px solid var(--gray-3);
+    background: var(--neutral-white);
+    color: var(--neutral-black);
     box-sizing: border-box;
 }
 

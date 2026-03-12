@@ -89,15 +89,29 @@ async function loadRealJobs() {
 
 /* ===== COLORES ===== */
 function getColor(cat) {
-    const colors = {
-        "carpinteria": "brown", "construccion": "gray", "cuidado_personal": "pink",
-        "diseno": "cadetblue", "evento": "red", "gastronomia": "gold", "informatica": "blue",
-        "jardineria": "green", "limpieza": "purple", "mascotas": "darkgreen",
-        "mudanza": "darkred", "transporte": "orange", "otros": "black"
+    const rootStyle = getComputedStyle(document.documentElement);
+
+    const categoryMap = {
+        "carpinteria": "--cat-1",
+        "construccion": "--cat-2",
+        "cuidado_personal": "--cat-3",
+        "diseno": "--cat-4",
+        "evento": "--cat-5",
+        "gastronomia": "--cat-6",
+        "informatica": "--cat-7",
+        "jardineria": "--cat-8",
+        "limpieza": "--cat-9",
+        "mascotas": "--cat-10",
+        "mudanza": "--cat-11",
+        "transporte": "--cat-12",
+        "otros": "--cat-13"
     };
-    // Normalizar a minúsculas para coincidir con la DB
+
     const key = cat ? cat.toLowerCase() : "otros";
-    return colors[key] || "black";
+    const varName = categoryMap[key] || "--cat-13";
+
+    // Obtener el valor de la variable CSS y limpiar espacios
+    return rootStyle.getPropertyValue(varName).trim() || "#000000";
 }
 
 /* CREAR MARCADOR */

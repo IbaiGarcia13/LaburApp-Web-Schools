@@ -74,11 +74,34 @@
     <main class="main-content chat-page">
         <div class="chat-wrapper">
             <div class="chat-header">
-                <img src="../assets/img/avatar-defecto.png" alt="Otro Usuario" class="chat-other-avatar"
-                    id="otherAvatar">
-                <div class="chat-header-info">
-                    <h3 id="otherName">Cargando...</h3>
+                <div class="chat-header-left">
+                    <a href="mensajes.html" class="btn-back" id="btnBack">
+                        <img src="../assets/img/icons/icono-flecha.png" alt="Volver">
+                    </a>
+                    <a href="#" class="chat-profile-link" id="headerProfileLinkImg">
+                        <img src="../assets/img/avatar-defecto.png" alt="Otro Usuario" class="chat-other-avatar"
+                            id="otherAvatar">
+                    </a>
+                    <a href="#" class="chat-profile-link" id="headerProfileLinkText">
+                        <h3 id="otherName">Cargando...</h3>
+                    </a>
+                </div>
+                <div class="chat-header-right">
                     <p id="jobTitle">Trabajo: Cargando...</p>
+                    <div class="report-wrapper">
+                        <img src="../assets/img/icons/icono-denunciar.png" alt="Denunciar" class="icon-report"
+                            id="btnReport">
+                        <div class="report-modal hidden" id="reportModal">
+                            <a href="#" class="chat-profile-link" id="modalProfileLinkImg">
+                                <img src="../assets/img/avatar-defecto.png" alt="Avatar Denuncia"
+                                    class="report-modal-avatar" id="reportModalAvatar">
+                            </a>
+                            <a href="#" class="chat-profile-link" id="modalProfileLinkText">
+                                <h4 id="reportModalName">Cargando...</h4>
+                            </a>
+                            <button class="btn-submit-report" id="btnSubmitReport">DENUNCIAR</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -87,13 +110,44 @@
             </div>
 
             <form id="chat-form" class="chat-input-area">
-                <input type="text" id="message-input" placeholder="Escribe un mensaje..." required autocomplete="off">
-                <button type="submit" id="btn-send">
-                    <img src="../assets/img/icons/icono-chat-1.png" alt="Enviar">
-                </button>
+                <div id="image-preview-container" class="hidden">
+                    <img id="image-preview" src="" alt="Vista previa">
+                    <button type="button" id="btn-remove-preview">&times;</button>
+                </div>
+                <div class="chat-input-row">
+                    <input type="text" id="message-input" placeholder="Escribe aquí tu mensaje..." autocomplete="off">
+                    <div class="chat-input-actions">
+                        <button type="button" class="btn-action-icon" id="btnImage">
+                            <img src="../assets/img/icons/icono-imagen.png" alt="Imagen">
+                        </button>
+                        <button type="button" class="btn-action-icon" id="btnCamera">
+                            <img src="../assets/img/icons/icono-foto.png" alt="Cámara">
+                        </button>
+                        <button type="submit" id="btn-send" class="btn-send-icon">
+                            <img src="../assets/img/icons/icono-flecha.png" alt="Enviar">
+                        </button>
+                    </div>
+                </div>
+                <!-- Input oculto para selección de imagen desde el explorador -->
+                <input type="file" id="input-file-gallery" accept="image/*" style="display:none">
             </form>
         </div>
     </main>
+
+
+    <!-- Modal: Cámara -->
+    <div class="modal-overlay hidden" id="modalCamera">
+        <div class="modal-content">
+            <h3>Hacer una foto</h3>
+            <video id="cameraStream" autoplay playsinline
+                style="width:100%; border-radius:10px; max-height:300px; object-fit:cover; margin-bottom: 15px;"></video>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="btnCancelCamera">Cancelar</button>
+                <button class="modal-btn confirm" id="btnCapture">📸 Capturar</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="../assets/js/general.js"></script>
     <script type="module" src="../assets/js/chat.js"></script>

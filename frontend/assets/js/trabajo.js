@@ -87,16 +87,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
             e.preventDefault();
-            showCustomConfirm(
-                "Aviso",
-                "¿Quieres chatear con el usuario que ha publicado el trabajo?",
-                () => {
-                    window.location.href = `chat.html?id=${trabajoId}`;
-                },
-                "Aceptar",
-                "Cancelar",
-                "confirm"
-            );
+            if (currentTrabajo && currentTrabajo.id_publicador) {
+                // Redirigir directamente al chat con el publicador
+                window.location.href = `chat.html?id=${trabajoId}&userId=${currentTrabajo.id_publicador}`;
+            }
         });
     }
 });

@@ -5,6 +5,8 @@
     user-select: none;
 }
 
+@import "paleta-colores.css";
+
 /* ==========================================================================
    HOJA DE ESTILO: PANTALLA DE LOGIN Y DESCARGA
    Contiene el diseño específico de la página inicial de acceso y el banner
@@ -12,7 +14,7 @@
    ========================================================================== */
 body {
     text-align: center;
-    background-color: rgb(180, 80, 80);
+    background-color: var(--primary);
     font-family: Arial, sans-serif;
 }
 
@@ -44,7 +46,7 @@ header img.logo-text {
 
 h1 {
     font-size: 40px;
-    color: black;
+    color: var(--neutral-black);
 }
 
 /* ---------------- MAIN ---------------- */
@@ -62,13 +64,13 @@ h2 {
 }
 
 a {
-    color: black;
+    color: var(--neutral-black);
     text-decoration: none;
     font-size: 16px;
 }
 
 a:hover {
-    color: rgb(255, 0, 0);
+    color: var(--red-1);
 }
 
 /* CAJAS */
@@ -78,10 +80,10 @@ a:hover {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: white;
+    background-color: var(--neutral-white);
     padding: 25px;
     border-radius: 30px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--gray-3);
     margin-bottom: 20px;
     width: 100%;
     max-width: 500px;
@@ -94,20 +96,20 @@ a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: white;
+    background-color: var(--neutral-white);
     padding: 25px;
     border-radius: 30px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--gray-3);
     margin-bottom: 20px;
     width: 100%;
     max-width: 500px;
 }
 
 #olvidar:hover {
-    background-color: rgb(208, 208, 208);
+    background-color: var(--gray-3);
     border-radius: 10px;
     padding: 10px;
-    color: white;
+    color: var(--neutral-white);
 }
 
 /* IMAGEN */
@@ -132,8 +134,8 @@ input {
 
 button {
     padding: 10px 20px;
-    color: white;
-    background-color: black;
+    color: var(--neutral-white);
+    background-color: var(--neutral-black);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -158,13 +160,13 @@ button {
 }
 
 button:hover {
-    background-color: rgb(101, 101, 101);
+    background-color: var(--gray-6);
 }
 
 /* FOOTER */
 
 footer {
     font-size: 14px;
-    color: black;
+    color: var(--neutral-black);
     padding: 15px;
 }

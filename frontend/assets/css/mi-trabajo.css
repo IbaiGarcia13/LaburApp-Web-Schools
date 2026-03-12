@@ -1,9 +1,11 @@
+@import "paleta-colores.css";
+
 /* Mi Trabajo UI */
 .main-content {
     max-width: 1100px;
     margin: 40px auto;
     padding: 0 20px;
-    color: black;
+    color: var(--neutral-black);
 }
 
 .job-header-section {
@@ -63,7 +65,7 @@
 }
 
 .job-stats-container {
-    border-left: 3px solid white;
+    border-left: 3px solid var(--neutral-white);
     padding: 15px 25px;
     min-width: 300px;
     display: flex;
@@ -73,7 +75,7 @@
 }
 
 .stat-box-large {
-    background: white;
+    background: var(--neutral-white);
     padding: 20px 25px;
     border-radius: 15px;
     text-align: center;
@@ -86,13 +88,13 @@
 
 .stat-label {
     font-size: 28px;
-    color: #b5b5b5;
+    color: var(--gray-4);
 }
 
 .stat-value {
     font-size: 28px;
     font-weight: bold;
-    color: #999;
+    color: var(--gray-5);
 }
 
 .modal-content p {
@@ -101,8 +103,8 @@
 
 /* Información section */
 .info-section {
-    background-color: white;
-    color: #333;
+    background-color: var(--neutral-white);
+    color: var(--gray-9);
     border-radius: 15px;
     padding: 30px;
     margin-bottom: 0;
@@ -110,10 +112,10 @@
 }
 
 .cat-title {
-    color: #d0d0d0;
+    color: var(--gray-3);
     margin: 0 0 20px 0;
     font-size: 24px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid var(--gray-1);
     padding-bottom: 15px;
     font-weight: bold;
 }
@@ -130,7 +132,7 @@
     align-items: center;
     gap: 10px;
     font-size: 16px;
-    color: #888;
+    color: var(--gray-5);
 }
 
 .info-icon {
@@ -138,7 +140,7 @@
 }
 
 .info-text {
-    color: #a0a0a0;
+    color: var(--gray-4);
 }
 
 /* Container Chat */
