@@ -183,6 +183,16 @@
     font-size: 13px;
 }
 
+.positive-amount {
+    color: #2ecc71 !important;
+    /* Verde */
+}
+
+.negative-amount {
+    color: #e74c3c !important;
+    /* Rojo */
+}
+
 /* DELETE ACCOUNT */
 .delete-account-container {
     width: 100%;

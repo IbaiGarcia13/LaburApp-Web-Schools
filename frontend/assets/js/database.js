@@ -40,6 +40,21 @@ export async function actualizarPerfilUsuario(uid, datosNuevos) {
     return true;
 }
 
+/**
+ * Actualiza la suscripción del usuario (trabajador o cliente)
+ * @param {string} uid 
+ * @param {string} tipo - 'trabajador' o 'cliente'
+ * @param {string} idSuscripcion - El nombre de la suscripción (ej: 'currante', 'jefe')
+ */
+export async function actualizarSuscripcionUsuario(uid, tipo, idSuscripcion) {
+    const docRef = doc(db, "usuarios", uid);
+    const campo = tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
+    await updateDoc(docRef, {
+        [campo]: idSuscripcion.toLowerCase()
+    });
+    return true;
+}
+
 export async function obtenerTodosLosUsuarios() {
     const q = query(collection(db, "usuarios"));
     const snapshot = await getDocs(q);
@@ -274,6 +289,20 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
     // 4. Sumar 1 punto a la categoría correspondiente
     await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);
 
+    // 5. Registrar pagos en el historial
+    if (trabajoSnap.exists()) {
+        const data = trabajoSnap.data();
+        const pagoC = data.pago_cliente || 0;
+        const pagoT = data.pago_trabajador || 0;
+        const titulo = data.titulo || "Trabajo";
+
+        // Al publicador (empleador) le sale negativo
+        await registrarPagoHistorial(data.id_publicador, "Saldo LaburApp", -Math.abs(pagoC), `Pago por trabajo: ${titulo}`);
+
+        // Al trabajador le sale positivo
+        await registrarPagoHistorial(uidTrabajador, "Saldo LaburApp", Math.abs(pagoT), `Cobro por trabajo: ${titulo}`);
+    }
+
     return true;
 }
 
@@ -409,10 +438,11 @@ export async function obtenerMetodosPago(uid) {
     return metodos;
 }
 
-export async function registrarPagoHistorial(uid, idMetodo, monto) {
+export async function registrarPagoHistorial(uid, idMetodo, monto, detallePago = 'Transacción de LaburApp') {
     await addDoc(collection(db, "usuarios", uid, "historial_pagos"), {
         monto: monto,
         id_metodo: idMetodo,
+        detalle_pago: detallePago,
         fecha_emision: serverTimestamp()
     });
     return true;
@@ -535,5 +565,45 @@ export async function enviarMensajeDirecto(uidOtro, texto, tipo = "texto") {
         id_receptor: uidOtro,
         fecha_envio: serverTimestamp()
     });
+}
+
+// --- 9. CHATS DIRECTOS ACTIVOS (Para listar en mensajes.html) ---
+
+/**
+ * Obtiene la lista de chats directos del usuario (sin trabajo de por medio).
+ * Lee la subcolección usuarios/{uid}/chats_directos.
+ */
+export async function obtenerChatsDirectos(uid) {
+    const q = query(collection(db, "usuarios", uid, "chats_directos"));
+    const snapshot = await getDocs(q);
+    const chats = [];
+    snapshot.forEach(docSnap => {
+        chats.push({
+            id_otro_usuario: docSnap.id,
+            ...docSnap.data()
+        });
+    });
+    return chats;
+}
+
+/**
+ * Comprueba si hay mensajes no leídos dirigidos al usuario (uid) en una colección de mensajes.
+ * @param {CollectionReference} mensajesRef - referencia a la subcolección de mensajes
+ * @param {string} uid - UID del usuario actual (receptor)
+ */
+export async function tieneNoLeidosEnChat(mensajesRef, uid) {
+    const q = query(mensajesRef, where("leido", "==", false), where("id_receptor", "==", uid), limit(1));
+    const snap = await getDocs(q);
+    return !snap.empty;
+}
+
+/**
+ * Devuelve el último mensaje de una colección de mensajes.
+ */
+export async function obtenerUltimoMensaje(mensajesRef) {
+    const q = query(mensajesRef, orderBy("fecha_envio", "desc"), limit(1));
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 

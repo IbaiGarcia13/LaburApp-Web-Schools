@@ -8,7 +8,7 @@
 /* Reutilizamos gran parte del comportamiento base desde styles.css */
 #container {
     display: flex;
-    max-width: 1250px;
+    max-width: 1300px;
     margin: 30px auto;
     gap: 30px;
     padding: 0 20px;
@@ -47,8 +47,7 @@
     position: relative;
     height: 260px;
     width: 100%;
-    max-width: 900px;
-    min-width: 650px;
+    min-width: 900px;
     box-sizing: border-box;
     overflow: hidden;
     cursor: pointer;
@@ -145,8 +144,8 @@
 }
 
 #sidebar {
-    flex: 0 1 320px;
-    min-width: 200px;
+    width: 320px;
+    flex-shrink: 0;
 }
 
 .filter-box {

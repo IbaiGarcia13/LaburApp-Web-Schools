@@ -1,22 +1,35 @@
 @import "paleta-colores.css";
 /* ==========================================================================
    HOJA DE ESTILO: MENSAJES
-   Lista de conversaciones activas con usuarios, cards grandes con foto,
-   nombre, trabajo asociado e icono de chat.
+   Diseño con sidebar de filtros idéntico al de trabajos.css/usuarios.css,
+   y tarjetas de conversación con chips de nivel/valoración/especialidad.
    ========================================================================== */
 
 #container {
-    max-width: 900px;
-    margin: 30px 200px auto;
+    display: flex;
+    max-width: 1340px;
+    margin: 30px auto;
+    gap: 30px;
     padding: 0 20px;
+    justify-content: center;
 }
 
-/* Título principal — alineado a la izquierda igual que el resto de páginas */
+#content {
+    flex: 1 1 900px;
+    max-width: 900px;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Título principal */
 .section-title {
+    width: 100%;
     color: var(--neutral-white);
+    margin-bottom: 25px;
     font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 25px;
     text-align: left;
 }
 
@@ -29,22 +42,37 @@
     padding: 30px;
     display: flex;
     gap: 30px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px auto;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     align-items: flex-start;
     position: relative;
     cursor: pointer;
-    transition: transform 0.2s ease;
-    height: 260px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
-    max-width: 900px;
-    min-width: 600px;
+    min-width: 900px;
+    height: 260px;
     box-sizing: border-box;
     overflow: hidden;
 }
 
 .msg-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+}
+
+/* Indicador de mensaje no leído (punto rojo arriba a la derecha) */
+.msg-card.unread::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 12px;
+    height: 12px;
+    background: #e74c3c;
+    /* Rojo vibrante */
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
 }
 
 /* Foto del usuario */
@@ -54,29 +82,43 @@
     object-fit: cover;
     border-radius: 12px;
     flex-shrink: 0;
+    cursor: pointer;
 }
 
 /* Bloque de info */
 .msg-info {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .msg-name {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: bold;
     color: var(--gray-11);
     margin: 0 0 12px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
 }
 
 .msg-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--gray-5);
-    margin: 0 0 6px 0;
+    margin: 0;
+}
+
+.msg-task-context {
+    font-size: 0.8rem;
+    color: var(--gray-5);
+    margin: 0 0 4px 0;
 }
 
 .msg-job-link {
-    font-size: 1rem;
+    font-size: 0.85rem;
     color: var(--gray-11);
     text-decoration: underline;
     cursor: pointer;
@@ -84,17 +126,59 @@
     border: none;
     padding: 0;
     font-family: inherit;
+    text-align: left;
+    font-weight: bold;
 }
 
 .msg-job-link:hover {
+    color: var(--primary);
+}
+
+/* Chips de nivel, valoración, especialidad */
+.msg-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.msg-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--gray-1);
+    border: 1.5px solid var(--gray-2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
     color: var(--gray-7);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.msg-chip.chip-nivel {
+    border-color: #c0a060;
+    color: #7a5f20;
+    background: #fdf8ee;
+}
+
+.msg-chip.chip-rating {
+    border-color: #e8b800;
+    color: #6b5200;
+    background: #fffceb;
+}
+
+.msg-chip.chip-spec {
+    border-color: var(--primary);
+    color: var(--red-3);
+    background: #fff3f3;
 }
 
 /* Icono de chat en esquina inferior derecha */
 .msg-chat-btn {
     position: absolute;
-    right: 20px;
-    bottom: 18px;
+    right: 15px;
+    bottom: 15px;
     background: none;
     border: none;
     cursor: pointer;
@@ -109,14 +193,100 @@
 .msg-chat-btn img {
     width: 38px;
     height: 38px;
-    opacity: 0.5;
+    opacity: 0.8;
+}
+
+/* Estado vacío */
+.msgs-empty {
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+    font-style: italic;
+    font-size: 1.05rem;
+    opacity: 0.9;
+    width: 100%;
+}
+
+/* ==========================================
+   SIDEBAR Y FILTROS  (idéntico a trabajos/usuarios)
+   ========================================== */
+#sidebar {
+    flex: 0 0 370px;
+    min-width: 200px;
+}
+
+.filter-box {
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
+    padding: 25px 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 100px;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.filter-box select,
+.filter-box input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+}
+
+/* Alineación Desde/Hasta */
+.input-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.input-half {
+    flex: 1;
+}
+
+.input-half span {
+    display: block;
+    font-size: 11px;
+    font-weight: normal;
+    color: var(--gray-4);
+    margin-bottom: 4px;
+}
+
+#update-btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 10px;
+    background-color: var(--gray-2);
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+}
+
+#update-btn:hover {
+    background-color: var(--neutral-white);
 }
 
 /* ==========================================
    PAGINACIÓN
    ========================================== */
 .pagination {
-    margin: 30px 0 50px;
+    width: 100%;
+    max-width: 900px;
+    margin: 40px auto 50px auto;
     display: flex;
     justify-content: center;
     align-items: center;

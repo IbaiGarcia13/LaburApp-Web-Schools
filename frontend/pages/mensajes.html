@@ -73,26 +73,72 @@
 
     <main id="container">
 
-        <!-- Título con icono igual que el resto de páginas -->
-        <h2 class="section-title">
-            <img src="../assets/img/icons/icono-ajustes.png"
-                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt="">
-            MENSAJES - USUARIOS
-        </h2>
+        <!-- SECCIÓN IZQUIERDA: Lista de conversaciones -->
+        <section id="content">
+            <h2 class="section-title">
+                <img src="../assets/img/icons/icono-mensajes.png"
+                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt="">
+                MENSAJES - USUARIOS
+            </h2>
 
-        <!-- Lista de conversaciones generada por JS -->
-        <div id="msgs-list"></div>
+            <!-- Lista generada por JS -->
+            <div id="msgs-list"></div>
 
-        <!-- Paginación centrada -->
-        <div class="pagination">
-            <button id="prev-page" class="pag-btn">
-                <img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);">
-            </button>
-            <span id="page-info">1 - 2</span>
-            <button id="next-page" class="pag-btn">
-                <img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;">
-            </button>
-        </div>
+            <!-- Paginación -->
+            <div class="pagination">
+                <button id="prev-page" class="pag-btn">
+                    <img src="../assets/img/icons/icono-flecha.png" alt="<"
+                        style="width: 20px; transform: rotate(180deg);">
+                </button>
+                <span id="page-info">1 - 1</span>
+                <button id="next-page" class="pag-btn">
+                    <img src="../assets/img/icons/icono-flecha.png" alt=">" style="width: 20px;">
+                </button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DERECHA: Filtros -->
+        <aside id="sidebar">
+            <div class="filter-box">
+                <h2 style="text-align: center; margin-bottom: 25px; letter-spacing: 2px;">FILTRAR</h2>
+                <form id="filter-form">
+
+                    <div class="filter-group">
+                        <label>Estado de lectura:</label>
+                        <select id="filter-leido">
+                            <option value="todos">Todos</option>
+                            <option value="leidos">Leídos</option>
+                            <option value="no-leidos">No leídos</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>De trabajo:</label>
+                        <select id="filter-trabajo">
+                            <option value="todos">Todos</option>
+                            <option value="si">Sí</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Fecha del chat:</label>
+                        <div class="input-row">
+                            <div class="input-half">
+                                <span>Desde</span>
+                                <input type="date" id="filter-fecha-desde">
+                            </div>
+                            <div class="input-half">
+                                <span>Hasta</span>
+                                <input type="date" id="filter-fecha-hasta">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="update-btn">ACTUALIZAR</button>
+                </form>
+            </div>
+        </aside>
 
     </main>
 

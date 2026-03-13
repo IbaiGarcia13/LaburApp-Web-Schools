@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajos, crearTrabajo } from './database.js';
+import { obtenerTrabajos, crearTrabajo, obtenerMetodosPago } from './database.js';
 
 // Variables globales para almacenar trabajos, marcadores en el mapa y controlar el modo de creación
 let allTrabajosDB = [], myMarkers = [], tempMarker = null, creatingMode = false;
@@ -72,17 +72,22 @@ async function loadRealJobs() {
             <div style="font-family: inherit; min-width: 180px;">
                 <h3 style="margin: 0 0 8px; color: #333; font-size: 16px;">${t.titulo}</h3>
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
-                    <img src="../assets/img/iconos-categorias/${t.id_categoria ? t.id_categoria.toLowerCase() : 'otros'}.png" style="width:14px;" onerror="this.src='../assets/img/iconos-categorias/otros.png'">
+                    <img src="../assets/img/icons/icono-categoria-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;">
                     <span style="font-size: 13px; color: #666;"><b>${t.id_categoria ? t.id_categoria.charAt(0).toUpperCase() + t.id_categoria.slice(1) : 'Otros'}</b></span>
                 </div>
-                <p style="margin: 0 0 5px; font-size: 13px; color: #666;">
-                    <img src="../assets/img/icons/icono-dinero.png" style="width:14px; vertical-align:middle;"> <b>${Number(t.pago_cliente).toFixed(2)} €</b>
-                </p>
-                <p style="margin: 0 0 10px; font-size: 13px; color: #666;">
-                    <img src="../assets/img/icons/icono-xp.png" style="width:14px; vertical-align:middle;"> <b>${xp} XP</b>
-                </p>
-    <button class="popup-btn" data-id="${t.id}" style="cursor:pointer; background: black; color: white; border: none; padding: 2px 8px; border-radius: 4px; margin-top: 5px;">Más</button>
-                </div>`;
+
+                <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+                        <img src="../assets/img/icons/icono-dinero-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;"> 
+                        <span style="font-size: 13px; color: #666;"><b>${Number(t.pago_cliente).toFixed(2)} €</b></span>
+                </div>
+
+                <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+                        <img src="../assets/img/icons/icono-xp-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;"> 
+                        <span style="font-size: 13px; color: #666;"><b>${xp} XP</b></span>
+                </div>
+
+                <button class="popup-btn" data-id="${t.id}" style="cursor:pointer; background: black; color: white; border: none; padding: 2px 8px; border-radius: 4px; margin-top: 5px;">Más</button>
+            </div>`;
 
                 marker.bindPopup(popupContent);
 
@@ -160,6 +165,18 @@ document.getElementById("save-job-btn").addEventListener("click", async () => {
     if (!user) {
         showCustomAlert("Acceso Denegado", "Debes estar logueado para crear un trabajo.");
         return;
+    }
+
+    // Doble verificación de seguridad
+    try {
+        const metodos = await obtenerMetodosPago(user.uid);
+        if (metodos.length === 0) {
+            showCustomAlert("Método de Pago Requerido", "Para publicar un trabajo debes tener al menos un método de pago guardado.");
+            window.location.href = "ajustes.html";
+            return;
+        }
+    } catch (error) {
+        console.error("Error al verificar métodos de pago:", error);
     }
 
     const t = document.getElementById("job-title").value,
@@ -250,10 +267,31 @@ document.getElementById("close-view-btn").addEventListener("click", () => docume
 /* BOTÓN AÑADIR MARCADOR */
 const btnAdd = document.getElementById("create-marker-btn");
 if (btnAdd) {
-    btnAdd.addEventListener("click", () => {
-        creatingMode = true;
-        tempMarker = null;
-        showCustomAlert("Añadir Marcador", "Haz click en un lugar del mapa para ubicar tu nuevo trabajo.", "Entendido");
+    btnAdd.addEventListener("click", async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            showCustomAlert("Acceso Restringido", "Debes iniciar sesión para publicar un trabajo.");
+            return;
+        }
+
+        try {
+            // Verificar si el usuario tiene métodos de pago antes de dejarle añadir un marcador
+            const metodos = await obtenerMetodosPago(user.uid);
+            if (metodos.length === 0) {
+                showCustomAlert("Atención", "Antes de publicar trabajos en el mapa, necesitas añadir un método de pago en los ajustes.", "Ir a Ajustes");
+                setTimeout(() => {
+                    window.location.href = "ajustes.html";
+                }, 2000);
+                return;
+            }
+
+            creatingMode = true;
+            tempMarker = null;
+            showCustomAlert("Añadir Marcador", "Haz click en un lugar del mapa para ubicar tu nuevo trabajo.", "Entendido");
+        } catch (error) {
+            console.error("Error al verificar métodos de pago:", error);
+            showCustomAlert("Error", "No pudimos verificar tu información de pago. Inténtalo de nuevo.");
+        }
     });
 }
 

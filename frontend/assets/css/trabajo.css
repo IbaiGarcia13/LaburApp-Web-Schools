@@ -6,6 +6,9 @@
     margin: 40px auto;
     padding: 0 20px;
     color: var(--neutral-black);
+    width: 100%;
+    min-width: 900px;
+    max-width: 1000px;
 }
 
 .job-header-section {
@@ -66,7 +69,7 @@
 
 .job-stats-container {
     border-left: 3px solid var(--neutral-white);
-    padding: 15px 25px;
+    padding: 15px 0px 15px 25px;
     min-width: 300px;
     display: flex;
     flex-direction: column;
@@ -158,4 +161,38 @@
 
 .msg-icon:hover {
     transform: scale(1.1);
+}
+
+/* Acciones del trabajo */
+.job-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn-postular {
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
+    padding: 15px 40px;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: none;
+    /* Controlado por JS */
+}
+
+.btn-postular:hover {
+    background-color: var(--gray-11);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-postular:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }

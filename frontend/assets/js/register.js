@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc, query, where, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, setDoc, query, where, getDocs, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const formRegister = document.getElementById("formRegister");
 const fase1 = document.getElementById("fase1");
@@ -90,7 +90,15 @@ function isDniValid(dni) {
 if (formRegister) {
     formRegister.addEventListener("submit", async (e) => {
         e.preventDefault();
+        console.log("Iniciando proceso de registro...");
         errorMsg.textContent = "";
+        successMsg.textContent = "";
+
+        const btnReg = document.getElementById("btnRegistrarse");
+        if (btnReg) {
+            btnReg.disabled = true;
+            btnReg.textContent = "Registrando...";
+        }
 
         const email = emailInput.value.trim();
         const password = passwordInput.value;
@@ -102,6 +110,10 @@ if (formRegister) {
         // Validaciones de la fase 2
         if (!nombre || !apellidos || !dni || !dNac) {
             errorMsg.textContent = "Todos los campos de datos personales (incluyendo Fecha Nac.) son obligatorios.";
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
             return;
         }
 
@@ -129,8 +141,13 @@ if (formRegister) {
             age--;
         }
 
+        console.log("Validando datos personales...");
         if (age < 16) {
             errorMsg.textContent = "Debes tener al menos 16 años para registrarte.";
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
             return;
         }
 
@@ -142,7 +159,7 @@ if (formRegister) {
         }
 
         try {
-            // --- VALIDACIÓN DE DNI ÚNICO ---
+            console.log("Verificando DNI único...");
             const q = query(collection(db, "usuarios"), where("dni", "==", dni));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
@@ -162,7 +179,8 @@ if (formRegister) {
                 apellidos: apellidos,
                 dni: dni,
                 email: email,
-                fecha_ingreso: formattedDate,
+                fecha_nacimiento: formattedDate,  // Fecha de nacimiento introducida por el usuario
+                fecha_ingreso: serverTimestamp(),  // Fecha real de registro en la plataforma
                 nivel: 1,
                 experiencia_total: 0,
                 experiencia_nivel_actual: 0,
@@ -184,10 +202,16 @@ if (formRegister) {
 
         } catch (error) {
             console.error("Error al registrar:", error);
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
             if (error.code === 'auth/email-already-in-use') {
                 errorMsg.textContent = "Este correo ya está registrado.";
             } else if (error.code === 'auth/invalid-email') {
                 errorMsg.textContent = "El correo no tiene un formato válido.";
+            } else if (error.code === 'auth/weak-password') {
+                errorMsg.textContent = "La contraseña es muy débil (mínimo 6 caracteres).";
             } else {
                 errorMsg.textContent = "Error al registrar el usuario: " + error.message;
             }

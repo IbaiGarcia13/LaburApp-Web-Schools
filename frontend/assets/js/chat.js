@@ -1,5 +1,5 @@
 import { db, auth, storage } from './firebase-config.js';
-import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 import { enviarMensajeTrabajo, obtenerTrabajoPorId, obtenerUsuarioPorId, enviarMensajeDirecto, generarIdChatDirecto } from './database.js';
 
@@ -112,6 +112,15 @@ function startMessageListener(myUid, otherUid) {
     const q = query(mensajesRef, orderBy("fecha_envio", "asc"));
 
     onSnapshot(q, (snapshot) => {
+        // Marcar como leídos los mensajes del otro usuario que aún no están leídos
+        snapshot.docs.forEach((msgDoc) => {
+            const data = msgDoc.data();
+            if (data.id_emisor !== myUid && data.leido === false) {
+                updateDoc(doc(mensajesRef.firestore, mensajesRef.path, msgDoc.id), { leido: true })
+                    .catch(err => console.warn('Error marcando leído:', err));
+            }
+        });
+
         listaMensajes.innerHTML = '';
         snapshot.forEach((msgDoc) => {
             const data = msgDoc.data();
@@ -167,14 +176,12 @@ function startMessageListener(myUid, otherUid) {
             wrapperDiv.appendChild(bubbleDiv);
             groupDiv.appendChild(wrapperDiv);
 
+            // Indicador de estado solo en mensajes propios
             if (isOwn) {
+                const isRead = data.leido === true;
                 const statusDiv = document.createElement('div');
-                statusDiv.className = 'msg-status';
-                if (data.leido === undefined) {
-                    statusDiv.textContent = 'No leído';
-                } else {
-                    statusDiv.textContent = data.leido ? 'Leído' : 'No leído';
-                }
+                statusDiv.className = `msg-status ${isRead ? 'msg-status--read' : 'msg-status--unread'}`;
+                statusDiv.textContent = isRead ? '✓✓ Leído' : '✓ No leído';
                 groupDiv.appendChild(statusDiv);
             }
 

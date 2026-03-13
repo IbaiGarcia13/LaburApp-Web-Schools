@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (displayNombre) displayNombre.textContent = perfil.nombre || "";
                     if (displayApellidos) displayApellidos.textContent = perfil.apellidos || "";
                     if (displayDireccion) displayDireccion.textContent = perfil.direccion_principal || "No especificada";
-                    if (displayFechaNac) displayFechaNac.textContent = perfil.fecha_ingreso || "";
+                    if (displayFechaNac) displayFechaNac.textContent = perfil.fecha_nacimiento || "";
                     if (displayDni) displayDni.textContent = perfil.dni || "";
                     if (displayTelefono) displayTelefono.textContent = perfil.telefono || "No especificado";
 
@@ -117,10 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         let html = '<div class="payment-history">';
                         historial.forEach(p => {
                             const fecha = p.fecha_emision?.toDate ? p.fecha_emision.toDate().toLocaleDateString() : "Reciente";
-                            const montoClase = p.monto < 0 ? 'negative-amount' : ''; // Para estilo visual si se desea
+                            const montoVal = Number(p.monto);
+                            const sign = montoVal > 0 ? "+" : "";
+                            const montoClase = montoVal < 0 ? 'negative-amount' : (montoVal > 0 ? 'positive-amount' : '');
+
                             html += `
                                 <div class="payment-row">
-                                    <p><strong class="${montoClase}">Pago: ${p.monto}€</strong></p>
+                                    <p><strong>Pago:</strong> <strong class="${montoClase}">${sign}${p.monto}€</strong></p>
                                     <p><strong>Fecha Emisión:</strong> ${fecha}</p>
                                     <p><strong>Detalle:</strong> ${p.detalle_pago || 'Transacción de LaburApp'}</p>
                                 </div>
@@ -251,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     nombre: nom,
                     apellidos: ape,
                     nombre_completo: nom + " " + ape,
-                    fecha_ingreso: formattedFnac,
+                    fecha_nacimiento: formattedFnac,
                     dni: dni,
                     direccion_principal: dir,
                     telefono: tel

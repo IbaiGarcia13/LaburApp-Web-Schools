@@ -7,7 +7,7 @@
    ========================================================================== */
 #container {
     display: flex;
-    max-width: 1250px;
+    max-width: 1300px;
     margin: 30px auto;
     gap: 30px;
     padding: 0 20px;
@@ -45,8 +45,7 @@
     transition: transform 0.2s ease;
     height: 260px;
     width: 100%;
-    max-width: 900px;
-    min-width: 650px;
+    min-width: 900px;
     box-sizing: border-box;
     overflow: hidden;
     cursor: pointer;
@@ -69,7 +68,6 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    /* Necesario para que el truncamiento de texto funcione en flexbox */
 }
 
 .job-info h3 {
@@ -118,8 +116,8 @@
 
 
 #sidebar {
-    flex: 0 1 320px;
-    min-width: 200px;
+    width: 320px;
+    flex-shrink: 0;
 }
 
 .filter-box {
@@ -223,8 +221,10 @@
 
 #page-info {
     background: var(--neutral-white);
+    color: var(--gray-9);
     padding: 10px 30px;
     border-radius: 25px;
     font-weight: bold;
+    font-size: 1rem;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }

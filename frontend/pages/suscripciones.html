@@ -71,65 +71,91 @@
         </div>
     </nav>
 
-    <main id="container">
-        <main class="main-container">
-            <h2 class="main-title"><img src="../assets/img/icons/icono-ajustes.png"
-                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> SUSCRIPCIONES</h2>
+    <main id="container" class="main-content">
+        <h2 class="main-title"><img src="../assets/img/icons/icono-suscripciones.png"
+                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> SUSCRIPCIONES</h2>
 
-            <div class="subscriptions-grid">
+        <div class="subscriptions-grid">
 
-                <div class="sub-card card-none">
-                    <div class="card-top">
-                        <h3>NINGUNA</h3>
-                        <ul class="sub-features">
-                            <li>Subir máximo 1 Tarea/Día</li>
-                            <li>Comisión del 10%</li>
-                            <li>Experiencia = Pago x 10</li>
-                        </ul>
-                    </div>
-                    <div class="card-bottom">
-                        <p class="price-text">GRATIS</p>
-                    </div>
+            <div class="sub-card card-none" id="sub-none">
+                <div class="card-top">
+                    <h3>NINGUNA</h3>
+                    <ul class="sub-features">
+                        <li>Subir máximo 1 Tarea/Día</li>
+                        <li>Comisión del 10%</li>
+                        <li>Experiencia = Pago x 10</li>
+                    </ul>
                 </div>
-
-                <div class="sub-card card-currante">
-                    <div class="card-top">
-                        <h3>CURRANTE</h3>
-                        <ul class="sub-features">
-                            <li>X2 de Experiencia</li>
-                            <li>Recomendación de Perfil</li>
-                            <li>Sin Anuncios</li>
-                        </ul>
-                    </div>
-                    <div class="card-bottom">
-                        <p class="price-val">1€</p>
-                        <p class="sub-type">Suscripcion Trabajador</p>
-                    </div>
+                <div class="card-bottom">
+                    <p class="price-text">GRATIS</p>
                 </div>
-
-                <div class="sub-card card-jefe">
-                    <div class="card-top">
-                        <h3>JEFE</h3>
-                        <ul class="sub-features">
-                            <li>Subir máximo 3 Tareas/Día</li>
-                            <li>Comisión del 5%</li>
-                            <li>Recomendación de Tareas</li>
-                            <li>Sin anuncios</li>
-                        </ul>
-                    </div>
-                    <div class="card-bottom">
-                        <p class="price-val">2€</p>
-                        <p class="sub-type">Suscripcion Cliente</p>
-                    </div>
-                </div>
-
             </div>
 
-            <div class="ad-placeholder"></div>
-        </main>
+            <div class="sub-card card-currante" id="sub-currante" data-type="trabajador" data-id="currante"
+                data-price="1">
+                <div class="card-top">
+                    <h3>CURRANTE</h3>
+                    <ul class="sub-features">
+                        <li>X2 de Experiencia</li>
+                        <li>Recomendación de Perfil</li>
+                        <li>Sin Anuncios</li>
+                    </ul>
+                </div>
+                <div class="card-bottom">
+                    <p class="price-val">1€</p>
+                    <p class="sub-type">Suscripcion Trabajador</p>
+                </div>
+            </div>
 
-        <script type="module" src="../assets/js/general.js"></script>
-        <script type="module" src="../assets/js/suscripciones.js"></script>
+            <div class="sub-card card-jefe" id="sub-jefe" data-type="cliente" data-id="jefe" data-price="2">
+                <div class="card-top">
+                    <h3>JEFE</h3>
+                    <ul class="sub-features">
+                        <li>Subir máximo 3 Tareas/Día</li>
+                        <li>Comisión del 5%</li>
+                        <li>Recomendación de Tareas</li>
+                        <li>Sin anuncios</li>
+                    </ul>
+                </div>
+                <div class="card-bottom">
+                    <p class="price-val">2€</p>
+                    <p class="sub-type">Suscripcion Cliente</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ad-placeholder"></div>
+
+        <!-- Modal de Pago para Suscripción -->
+        <div id="subscriptionModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3 id="modalSubTitle">Adquirir Suscripción</h3>
+                <p id="modalSubDesc">Selecciona tu método de pago para activar esta suscripción.</p>
+
+                <div class="input-group" style="margin-top: 20px;">
+                    <label>Método de Pago:</label>
+                    <select id="selectSavedPayment"
+                        style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit;">
+                        <!-- Opciones cargadas dinámicamente -->
+                    </select>
+                </div>
+
+                <div id="noPaymentWarning" class="hidden" style="color: #d9534f; margin-top: 10px; font-size: 14px;">
+                    No tienes métodos de pago guardados. Ve a <a href="ajustes.html"
+                        style="color: inherit; text-decoration: underline;">Ajustes</a> para añadir uno.
+                </div>
+
+                <div class="modal-buttons" style="margin-top: 25px;">
+                    <button id="btnCancelSub" class="modal-btn cancel">Cancelar</button>
+                    <button id="btnConfirmPurchase" class="modal-btn confirm">Confirmar Pago</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="../assets/js/general.js"></script>
+    <script type="module" src="../assets/js/suscripciones.js"></script>
 </body>
 <footer>
     <p>&copy; 2026 LaburApp - Todos los derechos reservados.</p>

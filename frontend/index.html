@@ -12,28 +12,18 @@
     <title>LaburApp - Inicio de Sesión</title>
     <link rel="shortcut icon" href="assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/paleta-colores.css">
 </head>
 
 <body>
     <!-- ================= CABECERA DE INICIO ================= -->
-    <header>
+    <header class="header-login">
         <img class="icon" src="./assets/img/logo/LaburApp2-sin-fondo.png" alt="LaburApp Icono">
         <img class="logo-text" src="./assets/img/logo/LaburApp3-sin-fondo.png" alt="Texto LABURAPP">
     </header>
     <main>
         <!-- === SECCIÓN PROMOCIONAL DESCARTABLE / DESCARGAR APP === -->
-        <section id="download_app">
-            <img src="assets/img/Laburapp-ordenador.png" alt="Simbolo ordenador" class="ordenador">
-            <div class="download-text">
-                <h2>¡Descarga LaburApp ahora!</h2>
-                <p>Descarga la aplicación y muevete de manera mas cómoda para ganar dinero fácil</p>
-                <!-- Botón de descarga visual -->
-                <button type="submit" id="descargar">
-                    Descargar APP
-                    <img src="assets/img/icons/icono-descargar.png" alt="descargar icon">
-                </button>
-            </div>
-        </section>
+      
         <!-- === SECCIÓN FORMULARIO DE ACCESO (LOGIN) === -->
         <!-- Formulario principal para acceder al Dashboard general o "perfil" del trabajador/cliente -->
         <section id="login">
@@ -54,9 +44,23 @@
                 <button href="/frontend/pages/principal.html" type="submit">Iniciar sesión</button>
                 <p id="mensajeError" class="error"></p>
             </form><br><br>
-            <p>¿No tienes una cuenta? <a href="pages/register.html">Regístrate aquí</a></p><br>
-            <!-- Enlace opcional sin destino actual -->
-            <a href="" id="olvidar">¿Olvidaste tu contraseña? </a>
+            <p style="margin-top: -40px;">¿No tienes una cuenta? <a href="pages/register.html">Regístrate aquí</a></p>
+        </section>
+
+          <section id="download_app">
+            <div class="download-text">
+                <img src="assets/img/app-descargar.png" alt="app descargar" class="ordenador">
+                <div>
+                    <h2>¡DESCARGA LABURAPP!</h2>
+                    <p>Descárgate nuestra app de LaburApp para Android o IOs gratis y empieza a disfrutar de la comodidad de llevarnos contigo a todas partes y poder ganar dinero desde cualquier lugar.</p>
+                </div>
+            </div>
+            <div class="download-button">
+                <button type="submit" id="descargar">
+                    DESCARGAR APP
+                    <img src="assets/img/icons/icono-descargar.png" alt="descargar icon">
+                </button>
+            </div>
         </section>
     </main>
     <script type="module" src="assets/js/login.js"></script>

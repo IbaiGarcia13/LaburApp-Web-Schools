@@ -22,7 +22,6 @@
 }
 
 .right-column {
-    flex: 1 1 300px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -37,8 +36,8 @@
    ========================================================================== */
 /* Div donde Leaflet renderiza el mapa interactivo */
 #map {
-    height: 60vh;
-    border-radius: 10px;
+    height: 440px;
+    border-radius: 20px;
     border: 3px solid var(--neutral-white);
     background-color: var(--gray-2);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -51,6 +50,8 @@
     border-radius: 20px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     padding: 25px 20px;
+    width: 100%;
+    max-width: 350px;
 }
 
 .dark-box label {
@@ -136,7 +137,7 @@
     background: var(--neutral-white);
     color: var(--neutral-black);
     padding: 25px 30px;
-    border-radius: 10px;
+    border-radius: 20px;
     border: none;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
