@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion } from './database.js';
+import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion, completarTrabajo, dejarValoracion } from './database.js';
 import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,6 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadApplicants(id);
                 } else {
                     document.getElementById('applicantsSection').style.display = 'none';
+                }
+
+                // Mostrar botón de completar solo si hay trabajador asignado y no está completada
+                const btnCompletar = document.getElementById('btnCompletar');
+                if (btnCompletar) {
+                    if (tarea.estado === "Aceptado" && tarea.id_trabajador) {
+                        btnCompletar.style.display = 'inline-flex';
+                    } else {
+                        btnCompletar.style.display = 'none';
+                    }
                 }
             } else {
                 console.error("Tarea no encontrada");
@@ -141,6 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
             displayDate.textContent = f.toLocaleDateString();
         } else {
             displayDate.textContent = "Sin fecha";
+        }
+
+        // Actualizar badge de estado
+        const badgeEl = document.getElementById('displayEstado');
+        if (badgeEl) {
+            const estado = tarea.estado || 'Pendiente';
+            badgeEl.textContent = estado;
+            badgeEl.className = `estado-badge ${estado.toLowerCase()}`;
         }
 
         const imgEl = document.querySelector('.job-img');
@@ -288,19 +306,111 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const modalValoracion = document.getElementById('modalValoracion');
+    const btnCancelValoracion = document.getElementById('btnCancelValoracion');
+
     // Cerrar al clicar fuera
     window.onclick = (event) => {
         if (event.target == modalMain) modalMain.classList.add('hidden');
         if (event.target == modalPay) modalPay.classList.add('hidden');
         if (event.target == modalInfo) modalInfo.classList.add('hidden');
+        if (event.target == modalValoracion) modalValoracion.classList.add('hidden');
     };
 
-    // Botón de Chat (Re-utilizando la lógica de redirección con ID)
+    // Botón de Chat
     const btnChat = document.getElementById("btn-chat");
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
             e.preventDefault();
             window.location.href = `chat.html?id=${tareaId}`;
         });
+    }
+
+    // Botón de Completar Tarea: Abre el modal de valoración
+    const btnCompletar = document.getElementById('btnCompletar');
+    if (btnCompletar) {
+        btnCompletar.addEventListener('click', () => {
+            if (!currentTarea || !currentTarea.id_trabajador) return;
+            resetValoracionModal();
+            modalValoracion.classList.remove('hidden');
+        });
+    }
+
+    // LÓGICA DEL MODAL DE VALORACIÓN
+    let currentRating = 0;
+    const stars = document.querySelectorAll('.star-rating .star');
+    const hint = document.getElementById('starHint');
+    const btnConfirmarValoracion = document.getElementById('btnConfirmarValoracion');
+    const inputComentario = document.getElementById('inputComentario');
+
+    function resetValoracionModal() {
+        currentRating = 0;
+        stars.forEach(s => s.classList.remove('selected'));
+        hint.textContent = "Selecciona una puntuación";
+        inputComentario.value = "";
+        btnConfirmarValoracion.disabled = true;
+    }
+
+    if (btnCancelValoracion) {
+        btnCancelValoracion.onclick = () => modalValoracion.classList.add('hidden');
+    }
+
+    stars.forEach(star => {
+        star.onclick = function () {
+            currentRating = parseInt(this.getAttribute('data-val'));
+            stars.forEach(s => s.classList.remove('selected'));
+            this.classList.add('selected');
+
+            // Actualizar texto descriptivo
+            const hints = ["Pésimo", "Malo", "Regular", "Bueno", "Excelente"];
+            hint.textContent = `${currentRating} Estrella(s) - ${hints[currentRating - 1]}`;
+
+            // Habilitar botón de enviar
+            btnConfirmarValoracion.disabled = false;
+        };
+    });
+
+    if (btnConfirmarValoracion) {
+        btnConfirmarValoracion.onclick = () => {
+            if (currentRating < 1 || !currentTarea || !currentTarea.id_trabajador) return;
+
+            showCustomConfirm(
+                "¿Finalizar y Valorar?",
+                "Esta acción no se puede deshacer.",
+                async () => {
+                    try {
+                        btnConfirmarValoracion.disabled = true;
+                        btnConfirmarValoracion.textContent = "Procesando...";
+
+                        const comentario = inputComentario.value.trim();
+
+                        // 1. Guardar la valoración
+                        await dejarValoracion(currentTarea.id_trabajador, tareaId, currentRating, comentario);
+
+                        // 2. Marcar la tarea como completada e incrementar XP/tareas
+                        await completarTrabajo(tareaId, currentTarea.id_trabajador);
+
+                        showCustomAlert("¡Completada!", "La tarea ha sido finalizada y la valoración enviada.");
+
+                        modalValoracion.classList.add('hidden');
+                        if (btnCompletar) btnCompletar.style.display = 'none';
+
+                        // Actualizar badge
+                        const badgeEl = document.getElementById('displayEstado');
+                        if (badgeEl) {
+                            badgeEl.textContent = 'Completada';
+                            badgeEl.className = 'estado-badge completada';
+                        }
+                    } catch (e) {
+                        console.error("Error al completar/valorar:", e);
+                        showCustomAlert("Error", "Ocurrió un error al procesar la solicitud.");
+                        btnConfirmarValoracion.disabled = false;
+                        btnConfirmarValoracion.textContent = "Enviar y Completar";
+                    }
+                },
+                "Confirmar",
+                "Cancelar"
+            );
+        };
     }
 });

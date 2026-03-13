@@ -21,6 +21,21 @@ body {
     flex-direction: column;
 }
 
+/* Ocultar scrollbar en Chrome, Safari y Opera */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ocultar scrollbar en IE, Edge y Firefox */
+html,
+body {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
 main#container,
 main.main-content {
     flex: 1;

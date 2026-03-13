@@ -135,6 +135,17 @@
             </div>
         </section>
 
+        <!-- ESTADO Y BOTÓN DE COMPLETAR -->
+        <section class="complete-section" id="completeSection"
+            style="margin-top: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <span id="displayEstado" class="estado-badge">Cargando...</span>
+            <button id="btnCompletar"
+                style="display: none; align-items: center; gap: 8px; background: linear-gradient(135deg, #27ae60, #1e8449); color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 3px 10px rgba(39,174,96,0.35); transition: opacity 0.2s;"
+                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                ✓ Marcar como Completada
+            </button>
+        </section>
+
         <!-- SECCIÓN DE POSTULANTES -->
         <section class="applicants-section" id="applicantsSection" style="margin-top: 30px; display: none;">
             <h2 class="cat-title" style="margin-bottom: 20px;">Candidatos Postulados</h2>
@@ -233,6 +244,37 @@
             <div class="modal-buttons">
                 <button id="btnCancelInfo" class="modal-btn cancel">Cancelar</button>
                 <button id="btnSaveInfo" class="modal-btn confirm">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Valoración -->
+    <div id="modalValoracion" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Valorar al Trabajador</h3>
+            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 20px;">Antes de marcar la tarea como
+                completada, puntúa el trabajo realizado.</p>
+
+            <div class="star-rating-wrapper">
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-val="5">&#9733;</span>
+                    <span class="star" data-val="4">&#9733;</span>
+                    <span class="star" data-val="3">&#9733;</span>
+                    <span class="star" data-val="2">&#9733;</span>
+                    <span class="star" data-val="1">&#9733;</span>
+                </div>
+                <p class="star-hint" id="starHint">Selecciona una puntuación</p>
+            </div>
+
+            <div class="input-group">
+                <label>Comentario (opcional):</label>
+                <textarea id="inputComentario" rows="4"
+                    placeholder="Describe tu experiencia con este trabajador..."></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="btnCancelValoracion" class="modal-btn cancel">Cancelar</button>
+                <button id="btnConfirmarValoracion" class="modal-btn confirm" disabled>Enviar y Completar</button>
             </div>
         </div>
     </div>

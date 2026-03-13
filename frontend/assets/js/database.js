@@ -11,7 +11,8 @@ import {
     where,
     getDocs,
     deleteDoc,
-    orderBy
+    orderBy,
+    increment
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 /**
@@ -243,6 +244,39 @@ export async function rechazarPostulacion(idTrabajo, uidTrabajador) {
     return true;
 }
 
+/**
+ * Marca un trabajo como Completada e incrementa tareas_realizadas del trabajador.
+ * Solo debe llamarse cuando el publicador da el trabajo por finalizado.
+ */
+export async function completarTrabajo(idTrabajo, uidTrabajador) {
+    const trabajoRef = doc(db, "trabajos", idTrabajo);
+
+    // 1. Obtener datos del trabajo para saber su categoría
+    const trabajoSnap = await getDoc(trabajoRef);
+    let idCategoria = "otros"; // Por defecto si no tiene
+    if (trabajoSnap.exists()) {
+        const data = trabajoSnap.data();
+        if (data.categoria) idCategoria = data.categoria;
+    }
+
+    // 2. Cambiar el estado del trabajo a Completada
+    await updateDoc(trabajoRef, {
+        estado: "Completada",
+        fecha_completada: serverTimestamp()
+    });
+
+    // 3. Incrementar atómicamente tareas_realizadas en el perfil del trabajador
+    const trabajadorRef = doc(db, "usuarios", uidTrabajador);
+    await updateDoc(trabajadorRef, {
+        tareas_realizadas: increment(1)
+    });
+
+    // 4. Sumar 1 punto a la categoría correspondiente
+    await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);
+
+    return true;
+}
+
 // --- 4. CATEGORÍAS (Puntos Usuario - Subcolección) ---
 
 export async function obtenerPuntosCategoria(uid, idCategoria) {
@@ -307,6 +341,50 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
     }
 
     return true;
+}
+
+/**
+ * Obtiene todas las valoraciones recibidas por un usuario,
+ * con los datos del emisor (foto, nombre) para mostrarlas en su perfil.
+ */
+export async function obtenerValoracionesRecibidas(uid) {
+    const q = query(
+        collection(db, "usuarios", uid, "valoraciones_recibidas"),
+        orderBy("fecha", "desc")
+    );
+    const snapshot = await getDocs(q);
+    const valoraciones = [];
+
+    for (const docSnap of snapshot.docs) {
+        const v = { id: docSnap.id, ...docSnap.data() };
+
+        // Buscar datos del emisor para mostrar foto y nombre
+        if (v.id_usuario_emisor) {
+            try {
+                const emisorRef = doc(db, "usuarios", v.id_usuario_emisor);
+                const emisorSnap = await getDoc(emisorRef);
+                if (emisorSnap.exists()) {
+                    const e = emisorSnap.data();
+                    v.emisor_nombre = e.nombre_completo || ((e.nombre || '') + ' ' + (e.apellidos || '')).trim();
+                    v.emisor_foto = e.foto_perfil || null;
+                }
+            } catch (_) { /* Si falla, continuamos sin datos del emisor */ }
+        }
+
+        // Buscar título del trabajo valorado
+        if (v.id_trabajo) {
+            try {
+                const trabajoRef = doc(db, "trabajos", v.id_trabajo);
+                const trabajoSnap = await getDoc(trabajoRef);
+                if (trabajoSnap.exists()) {
+                    v.titulo_trabajo = trabajoSnap.data().titulo;
+                }
+            } catch (_) { }
+        }
+
+        valoraciones.push(v);
+    }
+    return valoraciones;
 }
 
 // --- 6. MÉTODOS Y E HISTORIAL DE PAGO (Subcolecciones Usuario) ---

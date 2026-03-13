@@ -6,6 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // -- LÓGICA DE USUARIO EN CABECERA --
     auth.onAuthStateChanged(async (user) => {
         if (user) {
+            // Comprobar si han pasado más de 7 días (si se usó "Recordarme")
+            const loginTimestamp = localStorage.getItem("loginTimestamp");
+            if (loginTimestamp) {
+                const sieteDiasEnMs = 7 * 24 * 60 * 60 * 1000;
+                if (Date.now() - parseInt(loginTimestamp) > sieteDiasEnMs) {
+                    console.log("Sesión expirada (7 días). Cerrando sesión...");
+                    localStorage.removeItem("loginTimestamp");
+                    auth.signOut().then(() => {
+                        // Al estar en una subpágina, volvemos a la raíz
+                        window.location.href = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
+                    });
+                    return;
+                }
+            }
+
             const perfil = await obtenerPerfilUsuario(user.uid);
             if (perfil) {
                 const avatarUrl = perfil.foto_perfil || (window.location.pathname.includes('/pages/') ? '../assets/img/avatar-defecto.png' : 'frontend/assets/img/avatar-defecto.png');
@@ -77,7 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     "Cerrar Sesión",
                     "¿Estás seguro de que quieres cerrar sesión?",
                     () => {
-                        window.location.href = link.getAttribute('href');
+                        localStorage.removeItem("loginTimestamp");
+                        auth.signOut().then(() => {
+                            window.location.href = link.getAttribute('href');
+                        }).catch((error) => {
+                            console.error("Error al cerrar sesión:", error);
+                            window.location.href = link.getAttribute('href');
+                        });
                     },
                     "Cerrar Sesión",
                     "Cancelar",

@@ -332,3 +332,71 @@
     height: 14px;
     filter: brightness(0) invert(1);
 }
+
+/* --- BADGE DE ESTADO DE TAREA --- */
+.estado-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: var(--gray-2);
+    color: var(--gray-7);
+}
+
+.estado-badge.pendiente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.estado-badge.aceptado {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.estado-badge.completada {
+    background: #d1e7dd;
+    color: #0a3622;
+}
+
+.estado-badge.cancelada,
+.estado-badge.cancelado {
+    background: #f8d7da;
+    color: #842029;
+}
+
+/* --- ESTRELLAS DE VALORACIÓN --- */
+.star-rating-wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: 40px;
+    direction: rtl;
+    /* Para el hover right-to-left */
+}
+
+.star-rating .star {
+    color: var(--gray-3);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating .star:hover,
+.star-rating .star:hover~.star,
+.star-rating .star.selected,
+.star-rating .star.selected~.star {
+    color: #FFD700;
+    /* Dorado */
+}
+
+.star-hint {
+    font-size: 14px;
+    color: var(--gray-5);
+    margin-top: 10px;
+}

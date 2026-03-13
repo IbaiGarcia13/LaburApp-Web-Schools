@@ -8,26 +8,36 @@
    de métodos de pago y el espaciado de las diversas "tarjetas" de opciones.
    ========================================================================== */
 .main-content {
+    width: 100%;
     max-width: 1100px;
     margin: 40px auto;
     padding: 0 20px;
     color: var(--neutral-white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .page-title {
+    width: 100%;
+    max-width: 900px;
     color: var(--neutral-white);
     font-size: 24px;
-    margin-bottom: 30px;
+    margin: 40px auto 30px auto;
     font-weight: bold;
+    text-align: left;
 }
 
 /* CARDS */
 .settings-card {
+    width: 100%;
+    max-width: 900px;
+    min-width: 600px;
     background-color: var(--neutral-white);
     color: var(--gray-9);
     border-radius: 15px;
     padding: 25px 30px;
-    margin-bottom: 30px;
+    margin: 0 auto 30px auto;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -87,7 +97,7 @@
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px 30px;
+    gap: 20px 30px;
     margin-bottom: 15px;
 }
 
@@ -175,8 +185,9 @@
 
 /* DELETE ACCOUNT */
 .delete-account-container {
-    margin-top: 30px;
-    margin-bottom: 60px;
+    width: 100%;
+    max-width: 900px;
+    margin: 30px auto 60px auto;
 }
 
 .delete-action {

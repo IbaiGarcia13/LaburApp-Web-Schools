@@ -1,12 +1,23 @@
 @import "paleta-colores.css";
 
 /* Chat Container */
+body {
+    /* Forzamos que la página principal (fondo oscuro) no pueda ser scrolleada nunca. */
+    overflow: hidden !important;
+    height: 100vh;
+    margin: 0;
+}
+
 .chat-page {
-    height: calc(100vh - 80px);
+    height: calc(100vh - 70px) !important;
+    /* Exactamente la ventana menos el header */
     background-color: var(--primary);
     display: flex;
     justify-content: center;
     padding: 0;
+    margin: 0;
+    overflow: hidden;
+    /* Evitar scroll en la pagina principal */
 }
 
 .chat-wrapper {
@@ -15,6 +26,9 @@
     display: flex;
     flex-direction: column;
     background: transparent;
+    position: relative;
+    overflow: hidden;
+    /* Que ni el contenido de adentro cause doble scroll */
 }
 
 /* Chat Header */
@@ -26,6 +40,7 @@
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .chat-header-left {
@@ -238,11 +253,16 @@
 
 /* Input Area */
 .chat-input-area {
-    padding: 20px 10%;
-    background: transparent;
+    padding: 15px 10%;
+    background: var(--neutral-white);
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
+    margin-top: auto;
+    flex-shrink: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    z-index: 10;
 }
 
 .chat-input-row {

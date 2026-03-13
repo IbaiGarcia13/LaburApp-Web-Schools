@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerUsuarioPorId, obtenerTodosPuntosCategorias } from './database.js';
+import { obtenerUsuarioPorId, obtenerTodosPuntosCategorias, obtenerValoracionesRecibidas } from './database.js';
 
 // Lógica cargada al visualizar el perfil de un usuario externo
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,9 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const user = await obtenerUsuarioPorId(uid);
             const ptsCat = await obtenerTodosPuntosCategorias(uid);
+            const valoraciones = await obtenerValoracionesRecibidas(uid);
 
             if (user) {
                 renderUser(user, ptsCat);
+                renderValoraciones(valoraciones);
             } else {
                 console.error("Usuario no encontrado");
             }
@@ -118,6 +120,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 grid.innerHTML = "<p>Sin puntuaciones en categorías.</p>";
             }
         }
+    }
+
+    function renderValoraciones(valoraciones) {
+        const list = document.getElementById('reviewsList');
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        if (!valoraciones || valoraciones.length === 0) {
+            list.innerHTML = "<p style='color: var(--gray-5);'>Este usuario aún no tiene valoraciones.</p>";
+            return;
+        }
+
+        valoraciones.forEach(val => {
+            const div = document.createElement('div');
+            div.className = 'review-card';
+
+            const foto = val.emisor_foto || "../assets/img/avatar-defecto.png";
+            const nombre = val.emisor_nombre || "Usuario Anónimo";
+            const puntos = val.puntuacion || 0;
+            const comentario = val.comentario || "<i style='color:#999'>Sin comentario.</i>";
+
+            // Generar estrellas visuales
+            let estrellasHTML = "";
+            for (let i = 1; i <= 5; i++) {
+                if (i <= puntos) {
+                    estrellasHTML += `<span style="color: #FFD700; font-size: 18px;">&#9733;</span>`;
+                } else {
+                    estrellasHTML += `<span style="color: var(--gray-3); font-size: 18px;">&#9733;</span>`;
+                }
+            }
+
+            let fechaStr = "";
+            if (val.fecha) {
+                const date = val.fecha.toDate ? val.fecha.toDate() : new Date(val.fecha);
+                fechaStr = date.toLocaleDateString();
+            }
+
+            div.innerHTML = `
+                <div class="review-header">
+                    <a href="usuario.html?id=${val.id_usuario_emisor}" style="text-decoration:none; display:flex; align-items:center; gap:12px; color:inherit;">
+                        <img src="${foto}" alt="${nombre}" class="review-avatar" style="margin:0;">
+                    </a>
+                    <div class="review-user-info">
+                        <a href="usuario.html?id=${val.id_usuario_emisor}" style="text-decoration:none; color:inherit;">
+                            <strong>${nombre}</strong>
+                        </a>
+                        <div class="review-stars-date">
+                            <span class="stars">${estrellasHTML}</span>
+                            <span class="review-date">${fechaStr}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-body">
+                    ${val.titulo_trabajo ? `<span style="display:block; font-size: 12px; color: var(--gray-4); margin-bottom: 5px;">Trabajo: <b>${val.titulo_trabajo}</b></span>` : ''}
+                    <p>${comentario}</p>
+                </div>
+            `;
+            list.appendChild(div);
+        });
     }
 
     const btnChat = document.getElementById('btn-chat');

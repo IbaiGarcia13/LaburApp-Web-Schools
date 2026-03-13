@@ -12,24 +12,35 @@ let userMarker = null, userCircle = null;
 let userLat = 0, userLng = 0;
 
 /* ===== UBICACIÓN REAL USUARIO ===== */
+// Cargar trabajos inmediatamente, sin esperar a la geolocalización
+loadRealJobs();
+
+// Forzar redibujado del mapa para evitar cuadros grises/azules
+setTimeout(() => {
+    map.invalidateSize();
+}, 500);
+
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
         userLat = pos.coords.latitude;
         userLng = pos.coords.longitude;
 
+        if (userMarker) map.removeLayer(userMarker);
         userMarker = L.marker([userLat, userLng], { icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png', iconSize: [25, 25] }) })
             .addTo(map).bindPopup("Tú estás aquí").openPopup();
         map.setView([userLat, userLng], 13);
 
         updateVisibleMarkers();
-        loadRealJobs();
+        aplicarFiltros(); // Re-aplicar para filtrar por distancia si ya tenemos ubicación
     }, () => {
-        userLat = 43.2630; userLng = -2.9349; // Bilbao por defecto
+        // Fallback Bilbao
+        userLat = 43.2630; userLng = -2.9349;
+        if (userMarker) map.removeLayer(userMarker);
         userMarker = L.marker([userLat, userLng], { icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png', iconSize: [25, 25] }) })
             .addTo(map).bindPopup("Ubicación por defecto: Bilbao").openPopup();
         map.setView([userLat, userLng], 13);
         updateVisibleMarkers();
-        loadRealJobs();
+        aplicarFiltros();
     });
 }
 
@@ -60,6 +71,10 @@ async function loadRealJobs() {
                 const popupContent = `
             <div style="font-family: inherit; min-width: 180px;">
                 <h3 style="margin: 0 0 8px; color: #333; font-size: 16px;">${t.titulo}</h3>
+                <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+                    <img src="../assets/img/iconos-categorias/${t.id_categoria ? t.id_categoria.toLowerCase() : 'otros'}.png" style="width:14px;" onerror="this.src='../assets/img/iconos-categorias/otros.png'">
+                    <span style="font-size: 13px; color: #666;"><b>${t.id_categoria ? t.id_categoria.charAt(0).toUpperCase() + t.id_categoria.slice(1) : 'Otros'}</b></span>
+                </div>
                 <p style="margin: 0 0 5px; font-size: 13px; color: #666;">
                     <img src="../assets/img/icons/icono-dinero.png" style="width:14px; vertical-align:middle;"> <b>${Number(t.pago_cliente).toFixed(2)} €</b>
                 </p>
@@ -89,40 +104,53 @@ async function loadRealJobs() {
 
 /* ===== COLORES ===== */
 function getColor(cat) {
-    const rootStyle = getComputedStyle(document.documentElement);
-
     const categoryMap = {
-        "carpinteria": "--cat-1",
-        "construccion": "--cat-2",
-        "cuidado_personal": "--cat-3",
-        "diseno": "--cat-4",
-        "evento": "--cat-5",
-        "gastronomia": "--cat-6",
-        "informatica": "--cat-7",
-        "jardineria": "--cat-8",
-        "limpieza": "--cat-9",
-        "mascotas": "--cat-10",
-        "mudanza": "--cat-11",
-        "transporte": "--cat-12",
-        "otros": "--cat-13"
+        "carpinteria": "#A52A2A",
+        "construccion": "#808080",
+        "construccion/reforma": "#808080",
+        "cuidado personal": "#FFC0CB",
+        "cuidado_personal": "#FFC0CB",
+        "diseno": "#5F9EA0",
+        "evento": "#FF0000",
+        "gastronomia": "#FFD700",
+        "informatica": "#0000FF",
+        "jardineria": "#008000",
+        "limpieza": "#800080",
+        "mascotas": "#006400",
+        "mudanza": "#8B0000",
+        "mudanza/traslado": "#8B0000",
+        "transporte": "#FFA500",
+        "otros": "#000000"
     };
 
-    const key = cat ? cat.toLowerCase() : "otros";
-    const varName = categoryMap[key] || "--cat-13";
+    if (!cat) return categoryMap["otros"];
 
-    // Obtener el valor de la variable CSS y limpiar espacios
-    return rootStyle.getPropertyValue(varName).trim() || "#000000";
+    // Normalizar: quitar tildes, comillas y pasar a minúscula limpia
+    let key = cat.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .trim();
+
+    return categoryMap[key] || categoryMap[key.replace(" ", "_")] || categoryMap["otros"];
 }
 
 /* CREAR MARCADOR */
 function crearMarcador(latlng) {
     if (tempMarker) map.removeLayer(tempMarker);
-    tempMarker = L.circleMarker(latlng, { radius: 8, color: "black", fillColor: "black", fillOpacity: 0.9 }).addTo(map);
+    const initialColor = getColor(document.getElementById("job-category").value);
+    tempMarker = L.circleMarker(latlng, { radius: 8, color: initialColor, fillColor: initialColor, fillOpacity: 0.9 }).addTo(map);
 
     document.getElementById("marker-view-box").classList.add("hidden");
     document.getElementById("marker-form-box").classList.remove("hidden");
     document.getElementById("marker-form-box").scrollIntoView({ behavior: "smooth" });
 }
+
+// Cuando cambia la categoría en el formulario de creación, actualizamos el color del marcador temporal
+document.getElementById("job-category").addEventListener("change", (e) => {
+    if (tempMarker) {
+        const newColor = getColor(e.target.value);
+        tempMarker.setStyle({ color: newColor, fillColor: newColor });
+    }
+});
 
 map.on("click", e => { if (creatingMode) { creatingMode = false; crearMarcador(e.latlng); } });
 
@@ -263,7 +291,8 @@ function aplicarFiltros() {
         const pagoFiltro = t.pago_cliente || 0;
 
         const matchCat = cat === "" || (t.id_categoria && t.id_categoria.toLowerCase() === cat);
-        const matchRange = dist <= range;
+        // Si no tenemos ubicación (userLat === 0), ignoramos el filtro de rango para mostrar todos los trabajos
+        const matchRange = userLat === 0 || dist <= range;
         const matchPrice = pagoFiltro >= priceMin && pagoFiltro <= priceMax;
 
         if (matchCat && matchRange && matchPrice) {

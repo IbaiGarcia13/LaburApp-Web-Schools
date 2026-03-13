@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 document.addEventListener('DOMContentLoaded', () => {
 
     const statNivel = document.getElementById('stat-nivel');
-    const statXp = document.getElementById('stat-xp');
+    const statTareas = document.getElementById('stat-tareas');
     const statDinero = document.getElementById('stat-dinero');
     const dashboardStats = document.getElementById('dashboardStats');
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // 3. Rellenar los datos en formato visual
                     if (statNivel) statNivel.textContent = perfil.nivel || 1;
-                    if (statXp) statXp.textContent = (perfil.experiencia_total || 0).toLocaleString() + " XP";
+                    if (statTareas) statTareas.textContent = (perfil.tareas_realizadas || 0).toLocaleString();
 
                     // Formatear el dinero como moneda (Euros)
                     const dinero = perfil.dinero_ganado_total || 0;

@@ -247,6 +247,74 @@
     text-align: center;
 }
 
+/* --- SECCIÓN DE VALORACIONES --- */
+.reviews-section {
+    margin-top: 40px;
+    color: var(--gray-9);
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.review-card {
+    background: var(--neutral-white);
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    /* Cola de la burbuja */
+    padding: 16px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    max-width: 80%;
+    /* Para que no ocupe todo el ancho, como un mensaje */
+    align-self: flex-start;
+    /* Se alinea a la izquierda */
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--gray-2);
+}
+
+.review-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.review-user-info strong {
+    font-size: 15px;
+    color: var(--gray-9);
+    margin-bottom: 2px;
+}
+
+.review-stars-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-date {
+    font-size: 12px;
+    color: var(--gray-4);
+}
+
+.review-body p {
+    font-size: 14.5px;
+    color: var(--gray-7);
+    line-height: 1.4;
+    margin: 0;
+}
 
 /* Espacio Anuncio */
 .ad-placeholder {
