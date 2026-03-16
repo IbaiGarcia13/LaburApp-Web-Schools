@@ -1,4 +1,4 @@
-import { obtenerTrabajoPorId } from './database.js';
+import { obtenerTrabajoPorId, actualizarTrabajo } from './database.js';
 
 document.addEventListener("DOMContentLoaded", async function () {
     // 1. Obtener el ID del trabajo desde la URL
@@ -33,9 +33,38 @@ document.addEventListener("DOMContentLoaded", async function () {
                 "Chat",
                 "¿Quieres hablar con la persona que publicó esta oferta?",
                 () => {
-                    window.location.href = `chat.html?id=${trabajoId}`;
+                    const otherId = trabajo?.id_publicador || "";
+                    window.location.href = `chat.html?id=${trabajoId}&userId=${otherId}`;
                 },
                 "Chatear",
+                "Cancelar",
+                "confirm"
+            );
+        });
+    }
+
+    // 4. Lógica del botón de Empezar
+    const btnEmpezar = document.getElementById("btn-empezar");
+    if (btnEmpezar) {
+        btnEmpezar.addEventListener("click", async function () {
+            showCustomConfirm(
+                "Empezar Trabajo",
+                "¿Confirmas que vas a empezar este trabajo ahora mismo?",
+                async () => {
+                    try {
+                        btnEmpezar.disabled = true;
+                        btnEmpezar.innerText = "ACTUALIZANDO...";
+                        await actualizarTrabajo(trabajoId, { estado: "En curso" });
+                        showCustomAlert("¡A darle!", "El trabajo ahora está en curso. ¡Mucha suerte!");
+                        location.reload(); // Recarga para actualizar UI y estado
+                    } catch (err) {
+                        console.error("Error al empezar trabajo:", err);
+                        showCustomAlert("Error", "No se pudo actualizar el estado del trabajo.");
+                        btnEmpezar.disabled = false;
+                        btnEmpezar.innerText = "EMPEZAR";
+                    }
+                },
+                "Empezar",
                 "Cancelar",
                 "confirm"
             );
@@ -64,8 +93,8 @@ function renderTrabajo(trabajo) {
     // Pagos y XP
     const statValues = document.querySelectorAll('.stat-value');
     if (statValues.length >= 2) {
-        // EL TRABAJADOR VE PAGO_TRABAJADOR
-        const pago = trabajo.pago_trabajador || (trabajo.pago_cliente * 0.9);
+        // EL TRABAJADOR VE PAGO_CLIENTE (precio original)
+        const pago = trabajo.pago_cliente || 0;
         statValues[0].innerText = `${Number(pago).toFixed(2)} €`;
         statValues[1].innerText = `${trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10)} XP`;
     }
@@ -87,5 +116,28 @@ function renderTrabajo(trabajo) {
             fechaStr = f.toLocaleDateString();
         }
         infoTexts[2].innerText = fechaStr;
+    }
+
+    // Mostrar botón Empezar solo si está Aceptado
+    const btnEmpezar = document.getElementById("btn-empezar");
+    if (btnEmpezar) {
+        if (trabajo.estado === "Aceptada") {
+            btnEmpezar.style.display = "block";
+        } else {
+            btnEmpezar.style.display = "none";
+        }
+    }
+
+    // Actualizar badge de estado
+    const badgeEl = document.getElementById('displayEstado');
+    if (badgeEl) {
+        let estado = trabajo.estado || 'Pendiente';
+        // Normalización para visualización
+        if (estado === "Aceptado") estado = "Aceptada";
+        if (estado.toLowerCase() === "finalizado") estado = "Completada";
+
+        badgeEl.textContent = estado;
+        // La clase CSS debe coincidir con el texto para soportar selectores como .en.curso
+        badgeEl.className = `estado-badge ${estado.toLowerCase()}`;
     }
 }

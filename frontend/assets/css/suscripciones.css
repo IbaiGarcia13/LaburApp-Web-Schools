@@ -20,6 +20,8 @@
     width: 35px;
     vertical-align: middle;
     margin-right: 10px;
+    filter: invert(1);
+    margin-top: -10px;
 }
 
 .subscriptions-grid {

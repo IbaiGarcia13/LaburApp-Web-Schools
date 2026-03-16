@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTarea = tarea;
                 renderTarea(tarea);
 
+                // Ocultar botones de edición si está en curso o completada
+                if (tarea.estado === "En curso" || tarea.estado === "Completada") {
+                    const editBtns = document.querySelectorAll('.icon-edit, .icon-edit-small');
+                    editBtns.forEach(btn => btn.style.display = 'none');
+                }
+
                 // Si la tarea está pendiente, cargamos candidatos
                 if (tarea.estado && tarea.estado.toLowerCase() === "pendiente") {
                     loadApplicants(id);
@@ -49,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Mostrar botón de completar solo si hay trabajador asignado y no está completada
                 const btnCompletar = document.getElementById('btnCompletar');
                 if (btnCompletar) {
-                    if (tarea.estado === "Aceptado" && tarea.id_trabajador) {
+                    if (tarea.estado === "En curso" && tarea.id_trabajador) {
                         btnCompletar.style.display = 'inline-flex';
                     } else {
                         btnCompletar.style.display = 'none';
@@ -99,9 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="applicant-info">
                 <span class="applicant-name">${user.nombre}</span>
                 <div class="applicant-actions">
-                    <button class="app-btn btn-accept" title="Aceptar"><img src="../assets/img/icons/icono-check.png" alt=""> Aceptar</button>
-                    <button class="app-btn btn-reject" title="Rechazar"><img src="../assets/img/icons/icono-eliminar.png" alt=""> Rechazar</button>
-                    <button class="app-btn btn-chat-small" title="Chat"><img src="../assets/img/icons/icono-chat-2.png" alt=""> Chat</button>
+                    <button class="app-btn btn-accept" title="Aceptar"><img src="../assets/img/icons/icono-si-blanco.png" alt=""></button>
+                    <button class="app-btn btn-reject" title="Rechazar"><img src="../assets/img/icons/icono-no-blanco.png" alt=""></button>
+                    <button class="app-btn btn-chat-small" title="Chat"><img src="../assets/img/icons/icono-chat-2.png" alt=""></button>
                 </div>
             </div>
         `;
@@ -126,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         card.querySelector('.btn-chat-small').onclick = () => {
-            window.location.href = `chat.html?id=${tareaId}`;
+            window.location.href = `chat.html?id=${tareaId}&userId=${user.uid}`;
         };
 
         list.appendChild(card);
@@ -155,7 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Actualizar badge de estado
         const badgeEl = document.getElementById('displayEstado');
         if (badgeEl) {
-            const estado = tarea.estado || 'Pendiente';
+            let estado = tarea.estado || 'Pendiente';
+            if (estado === "Aceptado") estado = "Aceptada";
             badgeEl.textContent = estado;
             badgeEl.className = `estado-badge ${estado.toLowerCase()}`;
         }
@@ -320,7 +327,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
             e.preventDefault();
-            window.location.href = `chat.html?id=${tareaId}`;
+            const otherId = currentTarea?.id_trabajador || "";
+            window.location.href = `chat.html?id=${tareaId}&userId=${otherId}`;
         });
     }
 

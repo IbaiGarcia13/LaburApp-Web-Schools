@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mis Tareas</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
@@ -77,8 +82,8 @@
     <main id="container">
         <!-- ÁREA CENTRAL: Muestra la lista de tus propias tareas extraídas de la base de datos -->
         <section id="content">
-            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png"
-                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> MIS TAREAS: Todas</h2>
+            <h2 class="section-title"><img src="../assets/img/icons/icono-mis-tareas-blanco.png" alt=""> MIS TAREAS:
+                Todas</h2>
 
             <div id="tareas-list">
                 <!-- Se rellena por JavaScript -->
@@ -115,6 +120,18 @@
                             <option value="mudanza">Mudanza/Traslado</option>
                             <option value="otros">Otros</option>
                             <option value="transporte">Transporte</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Estado:</label>
+                        <select id="filter-status">
+                            <option value="todas">Todas</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="aceptada">Aceptada</option>
+                            <option value="en curso">En curso</option>
+                            <option value="cancelada">Cancelada</option>
+                            <option value="completada">Completada</option>
                         </select>
                     </div>
 

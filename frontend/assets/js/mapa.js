@@ -12,8 +12,10 @@ let userMarker = null, userCircle = null;
 let userLat = 0, userLng = 0;
 
 /* ===== UBICACIÓN REAL USUARIO ===== */
-// Cargar trabajos inmediatamente, sin esperar a la geolocalización
-loadRealJobs();
+// Cargar trabajos cuando el usuario esté listo (para poder filtrar sus propios trabajos)
+auth.onAuthStateChanged(user => {
+    loadRealJobs();
+});
 
 // Forzar redibujado del mapa para evitar cuadros grises/azules
 setTimeout(() => {
@@ -55,6 +57,12 @@ async function loadRealJobs() {
 
         allTrabajosDB = await obtenerTrabajos(); // Obtenemos todos los pendientes
 
+        // Filtrar para no mostrar mis propios trabajos
+        const user = auth.currentUser;
+        if (user) {
+            allTrabajosDB = allTrabajosDB.filter(t => t.id_publicador !== user.uid);
+        }
+
         allTrabajosDB.forEach(t => {
             if (t.latitud && t.longitud) {
                 const color = getColor(t.id_categoria);
@@ -73,7 +81,7 @@ async function loadRealJobs() {
                 <h3 style="margin: 0 0 8px; color: #333; font-size: 16px;">${t.titulo}</h3>
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
                     <img src="../assets/img/icons/icono-categoria-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;">
-                    <span style="font-size: 13px; color: #666;"><b>${t.id_categoria ? t.id_categoria.charAt(0).toUpperCase() + t.id_categoria.slice(1) : 'Otros'}</b></span>
+                    <span style="font-size: 13px; color: #666;"><b>${getStandardName(t.id_categoria)}</b></span>
                 </div>
 
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
@@ -107,13 +115,30 @@ async function loadRealJobs() {
     }
 }
 
+function getStandardName(catId) {
+    const names = {
+        'carpinteria': 'Carpintería',
+        'construccion': 'Construcción/Reforma',
+        'cuidado_personal': 'Cuidado personal',
+        'diseno': 'Diseño',
+        'evento': 'Evento',
+        'gastronomia': 'Gastronomía',
+        'informatica': 'Informática',
+        'jardineria': 'Jardinería',
+        'limpieza': 'Limpieza',
+        'mascotas': 'Mascotas',
+        'mudanza': 'Mudanza/Traslado',
+        'transporte': 'Transporte',
+        'otros': 'Otros'
+    };
+    return names[catId] || catId || 'Otros';
+}
+
 /* ===== COLORES ===== */
 function getColor(cat) {
     const categoryMap = {
         "carpinteria": "#A52A2A",
         "construccion": "#808080",
-        "construccion/reforma": "#808080",
-        "cuidado personal": "#FFC0CB",
         "cuidado_personal": "#FFC0CB",
         "diseno": "#5F9EA0",
         "evento": "#FF0000",
@@ -123,7 +148,6 @@ function getColor(cat) {
         "limpieza": "#800080",
         "mascotas": "#006400",
         "mudanza": "#8B0000",
-        "mudanza/traslado": "#8B0000",
         "transporte": "#FFA500",
         "otros": "#000000"
     };
@@ -247,7 +271,7 @@ function verMasReal(jobId) {
     const pagoDisplay = t.pago_cliente || 0;
 
     document.getElementById("view-price").innerText = Number(pagoDisplay).toFixed(2);
-    document.getElementById("view-category").innerText = t.id_categoria ? t.id_categoria.charAt(0).toUpperCase() + t.id_categoria.slice(1) : "Otros";
+    document.getElementById("view-category").innerText = getStandardName(t.id_categoria);
     document.getElementById("view-xp").innerText = xp;
 
     const btnVerTodo = document.getElementById("view-all-btn");
@@ -311,7 +335,7 @@ function aplicarFiltros() {
     // Actualizar título
     const isFiltered = cat !== "" || range !== 1 || priceMin !== 2 || priceMax !== 1000;
     const title = document.getElementById('mapa-title');
-    const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
+    const iconHtml = '<img src="../assets/img/icons/icono-mapa-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     if (title) {
         title.innerHTML = isFiltered ? iconHtml + "MAPA: Filtrado" : iconHtml + "MAPA: Todos";
     }

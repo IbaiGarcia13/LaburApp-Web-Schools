@@ -100,12 +100,12 @@
 }
 
 .stat-label {
-    font-size: 28px;
+    font-size: 1.5rem;
     color: var(--gray-4);
 }
 
 .stat-value {
-    font-size: 28px;
+    font-size: 1.5rem;
     font-weight: bold;
     color: var(--gray-5);
 }
@@ -260,6 +260,9 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--gray-1);
     transition: transform 0.2s;
+    overflow: hidden;
+    width: 100%;
+    max-width: 275px;
 }
 
 .applicant-card:hover {
@@ -290,19 +293,26 @@
     display: flex;
     gap: 10px;
     margin-top: 10px;
+    flex-wrap: wrap;
+    /* Allow buttons to wrap if they don't fit */
 }
 
 .app-btn {
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 10px;
+    /* More uniform square-ish padding for icons */
+    border-radius: 10px;
     border: none;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: bold;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 5px;
     transition: 0.2s;
+    min-width: 44px;
+    /* Default size for icon buttons */
+    min-height: 44px;
 }
 
 .btn-accept {
@@ -333,42 +343,50 @@
 }
 
 .app-btn img {
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    /* Slightly larger for better visibility */
+    height: 20px;
     filter: brightness(0) invert(1);
+    display: block;
 }
 
 /* --- BADGE DE ESTADO DE TAREA --- */
 .estado-badge {
     display: inline-block;
     padding: 6px 16px;
-    border-radius: 20px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.5px;
     background: var(--gray-2);
     color: var(--gray-7);
+    text-transform: uppercase;
 }
 
 .estado-badge.pendiente {
-    background: #fff3cd;
-    color: #856404;
+    background: var(--orange-1);
+    color: var(--neutral-white);
 }
 
-.estado-badge.aceptado {
-    background: #cfe2ff;
-    color: #084298;
+.estado-badge.aceptada {
+    background: var(--green-2);
+    color: var(--neutral-white);
 }
 
 .estado-badge.completada {
-    background: #d1e7dd;
-    color: #0a3622;
+    background: var(--neutral-black);
+    color: var(--neutral-white);
+}
+
+.estado-badge.en.curso {
+    background: var(--blue-2);
+    color: var(--neutral-white);
 }
 
 .estado-badge.cancelada,
 .estado-badge.cancelado {
-    background: #f8d7da;
-    color: #842029;
+    background: var(--red-2);
+    color: var(--neutral-white);
 }
 
 /* --- ESTRELLAS DE VALORACIÓN --- */

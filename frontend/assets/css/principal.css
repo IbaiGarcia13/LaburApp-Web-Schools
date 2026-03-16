@@ -133,6 +133,10 @@
     object-fit: cover;
 }
 
+.info-row {
+    flex-direction: row-reverse;
+}
+
 .info-row.reverse {
     flex-direction: row;
 }

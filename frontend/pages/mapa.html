@@ -3,6 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mapa</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -33,11 +39,11 @@
             </nav>
 
             <div class="header-icons">
-                <img src="../assets/img/Ibai.jpg" alt="Perfil" class="profile-toggle" id="profileBtn">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="perfil.html">
-                        <img src="../assets/img/Ibai.jpg" alt="Avatar" class="dropdown-avatar">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
                     </a>
                     <p class="dropdown-name">Ibai García</p>
                     <p class="dropdown-email">ibai@mail.com</p>
@@ -76,9 +82,8 @@
 
     <!-- ================= CONTENIDO PRINCIPAL ================= -->
     <main class="main-content" id="page-container">
-        <h2 id="mapa-title" class="section-title" style="margin-bottom: 20px; color: white"><img
-                src="../assets/img/icons/icono-ajustes.png"
-                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> MAPA: Todos</h2>
+        <h2 id="mapa-title" class="section-title"><img src="../assets/img/icons/icono-mapa-blanco.png" alt=""> MAPA:
+            Todos</h2>
         <div id="main-layout">
 
             <!-- COLUMNA IZQUIERDA -->
@@ -99,20 +104,20 @@
                     <label>Tiempo estimado (h)<input type="number" id="job-time" min="1"></label>
                     <label>Categoría
                         <select id="job-category">
-                            <option value="">Seleccione una opción</option>
-                            <option>Carpintería</option>
-                            <option>Informática</option>
-                            <option>Jardinería</option>
-                            <option>Limpieza</option>
-                            <option>Transporte</option>
-                            <option>Mudanza/Traslado</option>
-                            <option>Construcción/Reforma</option>
-                            <option>Cuidado personal</option>
-                            <option>Mascotas</option>
-                            <option>Diseño</option>
-                            <option>Evento</option>
-                            <option>Gastronomía</option>
-                            <option>Otros</option>
+                            <option value="" disabled selected>Selecciona una categoría</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="construccion">Construcción/Reforma</option>
+                            <option value="cuidado_personal">Cuidado personal</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="evento">Evento</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="informatica">Informática</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="limpieza">Limpieza</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="mudanza">Mudanza/Traslado</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="otros">Otros</option>
                         </select>
                     </label>
                     <div class="btn-group">
@@ -156,25 +161,25 @@
 
                     <label>Categoría:
                         <select id="filter-cat">
-                            <option value="">Todas</option>
-                            <option>Carpintería</option>
-                            <option>Informática</option>
-                            <option>Jardinería</option>
-                            <option>Limpieza</option>
-                            <option>Transporte</option>
-                            <option>Mudanza/Traslado</option>
-                            <option>Construcción/Reforma</option>
-                            <option>Cuidado personal</option>
-                            <option>Mascotas</option>
-                            <option>Diseño</option>
-                            <option>Evento</option>
-                            <option>Gastronomía</option>
-                            <option>Otros</option>
+                            <option value=""selected>Todas</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="construccion">Construcción/Reforma</option>
+                            <option value="cuidado_personal">Cuidado personal</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="evento">Evento</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="informatica">Informática</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="limpieza">Limpieza</option>
+                            <option value="mascotas">Mascotas</option>
+                            <option value="mudanza">Mudanza/Traslado</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="otros">Otros</option>
                         </select>
                     </label>
 
                     <label style="margin-top: 0;">Rango km: <span id="range-val">1</span> km</label>
-                    <input type="range" id="filter-range" value="1" min="1" max="250"
+                    <input type="range" id="filter-range" value="1" min="1" max="500"
                         style="width: 100%; margin-bottom: 20px;">
 
                     <label>Pago:</label>

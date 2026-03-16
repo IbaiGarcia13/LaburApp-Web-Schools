@@ -1,3 +1,4 @@
+import { auth } from './firebase-config.js';
 import { obtenerTodosLosUsuarios } from './database.js';
 
 let usuariosData = [];
@@ -10,23 +11,50 @@ const itemsPerPage = 5;
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         usuariosData = await obtenerTodosLosUsuarios();
-        // Mapear datos para que coincidan con la lógica de filtrado si es necesario, 
-        // o adaptar la lógica. Por ahora, aseguramos que tengan los campos esperados.
-        usuariosData = usuariosData.map(u => ({
-            ...u,
-            nombre: u.nombre_completo || (u.nombre + " " + u.apellidos),
-            desc: u.bio || "Sin biografía.",
-            loc: u.direccion_principal || "No especificada",
-            lvl: u.nivel || 1,
-            val: u.valoracion_media !== undefined ? u.valoracion_media : 2.5,
-            esp: u.especialidad || "General"
-        }));
-        filteredUsers = [...usuariosData];
-        displayUsers();
+
+        // Esperar a que el usuario esté autenticado para filtrar su propio perfil
+        auth.onAuthStateChanged((user) => {
+            const currentUid = user ? user.uid : null;
+
+            // Mapear datos para que coincidan con la lógica de filtrado si es necesario
+            usuariosData = usuariosData.map(u => ({
+                ...u,
+                nombre: u.nombre_completo || (u.nombre + " " + u.apellidos),
+                desc: u.bio || "Sin biografía.",
+                loc: u.direccion_principal || "No especificada",
+                lvl: u.nivel || 1,
+                val: u.valoracion_media !== undefined ? u.valoracion_media : 2.5,
+                esp: (u.especialidad || "General").toLowerCase().trim()
+            }));
+
+            // Filtrar para no mostrarse a sí mismo
+            filteredUsers = usuariosData.filter(u => u.uid !== currentUid);
+            displayUsers();
+        });
     } catch (e) {
         console.error("Error cargando usuarios:", e);
     }
 });
+
+function getStandardName(catId) {
+    const names = {
+        'carpinteria': 'Carpintería',
+        'construccion': 'Construcción/Reforma',
+        'cuidado_personal': 'Cuidado personal',
+        'diseno': 'Diseño',
+        'evento': 'Evento',
+        'gastronomia': 'Gastronomía',
+        'informatica': 'Informática',
+        'jardineria': 'Jardinería',
+        'limpieza': 'Limpieza',
+        'mascotas': 'Mascotas',
+        'mudanza': 'Mudanza/Traslado',
+        'transporte': 'Transporte',
+        'otros': 'Otros',
+        'general': 'General'
+    };
+    return names[catId] || catId || 'General';
+}
 
 // Función principal para pintar las tarjetas de usuarios en la interfaz
 function displayUsers() {
@@ -55,7 +83,7 @@ function displayUsers() {
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${user.loc}</p>
                         <p><img src="../assets/img/icons/icono-nivel.png" class="icon-img-small" alt=""> Nivel: ${user.lvl}</p>
                         <p><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt=""> Valoración: ${Number(user.val).toFixed(1)}</p>
-                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Especialidad: ${user.esp}</p>
+                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Especialidad: ${getStandardName(user.esp)}</p>
                     </div>
                 </div>
             </article>`;
@@ -82,7 +110,7 @@ document.getElementById('update-btn').onclick = () => {
 
     // Reconstruimos el array de usuarios mostrados filtrando uno a uno mediante las restricciones añadidas en los inputs
     filteredUsers = usuariosData.filter(u => {
-        const matchCat = (cat === "todas" || u.esp === cat);
+        const matchCat = (cat === "todas" || u.esp === cat || u.esp.includes(cat) || cat.includes(u.esp));
         const matchLvl = u.lvl >= lvl;
         const matchVal = parseFloat(u.val) >= minV && parseFloat(u.val) <= maxV;
         return matchCat && matchLvl && matchVal;
@@ -109,5 +137,3 @@ document.getElementById('prev-page').onclick = () => {
         window.scrollTo(0, 0);
     }
 };
-
-displayUsers();

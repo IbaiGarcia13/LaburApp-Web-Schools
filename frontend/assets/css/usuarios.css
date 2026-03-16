@@ -32,6 +32,14 @@
     text-align: left;
 }
 
+.section-title img {
+    width: 35px;
+    vertical-align: middle;
+    margin-right: 10px;
+    filter: invert(1);
+    margin-top: -10px;
+}
+
 /* --- TARJETAS DE USUARIO (Imágenes 200px) --- */
 .user-card {
     background: var(--neutral-white);

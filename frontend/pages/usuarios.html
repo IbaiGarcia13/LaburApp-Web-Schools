@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Usuarios</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
@@ -77,8 +82,7 @@
     <main id="container">
         <!-- SECCIÓN 1: Lista de resultados de usuarios renderizados por JavaScript -->
         <section id="content">
-            <h2 class="section-title"><img src="../assets/img/icons/icono-ajustes.png"
-                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> USUARIOS: Todos</h2>
+            <h2 class="section-title"><img src="../assets/img/icons/icono-perfil.png" alt=""> USUARIOS: Todos</h2>
             <div id="users-list"></div>
 
             <div class="pagination">
@@ -110,8 +114,8 @@
                             <option value="limpieza">Limpieza</option>
                             <option value="mascotas">Mascotas</option>
                             <option value="mudanza">Mudanza/Traslado</option>
-                            <option value="otros">Otros</option>
                             <option value="transporte">Transporte</option>
+                            <option value="otros">Otros</option>
                         </select>
                     </div>
 

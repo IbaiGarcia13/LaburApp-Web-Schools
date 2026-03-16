@@ -22,7 +22,15 @@ let currentFilters = {
 async function loadJobs() {
     try {
         // Obtenemos los trabajos pendientes de la base de datos
+        // Si la categoría es "construccion", intentamos buscar ambas variaciones si fuera necesario, 
+        // pero por ahora dependemos de obtenerTrabajos que hace query directa.
         let rawJobs = await obtenerTrabajos(currentFilters.cat);
+
+        // Filtrar para que no salgan los trabajos propios
+        const user = auth.currentUser;
+        if (user) {
+            rawJobs = rawJobs.filter(j => j.id_publicador !== user.uid);
+        }
 
         // Ordenamos por fecha_publicacion descendente en el cliente (para evitar índices compuestos)
         allJobs = rawJobs.sort((a, b) => {
@@ -63,7 +71,7 @@ function displayJobs() {
 
     // Título dinámico
     const isFiltered = currentFilters.cat !== "todas" || currentFilters.tMin !== 1 || currentFilters.tMax !== 100 || currentFilters.pMin !== 2 || currentFilters.pMax !== 1000;
-    const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
+    const iconHtml = '<img src="../assets/img/icons/icono-trabajos-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     const titleEl = document.querySelector('.section-title');
     if (titleEl) {
         titleEl.innerHTML = isFiltered ? iconHtml + "TRABAJOS: Filtrados" : iconHtml + "TRABAJOS: Todos";
@@ -89,7 +97,7 @@ function displayJobs() {
                     <div class="job-details">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "Ubicación no especificada"}</p>
                         <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</p>
-                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${job.id_categoria.charAt(0).toUpperCase() + job.id_categoria.slice(1)}</p>
+                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${getStandardName(job.id_categoria)}</p>
                         <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</strong></p>
                         <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(job.pago_cliente).toFixed(2)} €</strong></p>
                     </div>
@@ -106,6 +114,25 @@ function displayJobs() {
     const btnNext = document.getElementById('next-page');
     if (btnPrev) btnPrev.style.opacity = currentPage === 1 ? '0.3' : '1';
     if (btnNext) btnNext.style.opacity = currentPage === totalPages ? '0.3' : '1';
+}
+
+function getStandardName(catId) {
+    const names = {
+        'carpinteria': 'Carpintería',
+        'construccion': 'Construcción/Reforma',
+        'cuidado_personal': 'Cuidado personal',
+        'diseno': 'Diseño',
+        'evento': 'Evento',
+        'gastronomia': 'Gastronomía',
+        'informatica': 'Informática',
+        'jardineria': 'Jardinería',
+        'limpieza': 'Limpieza',
+        'mascotas': 'Mascotas',
+        'mudanza': 'Mudanza/Traslado',
+        'transporte': 'Transporte',
+        'otros': 'Otros'
+    };
+    return names[catId] || catId || 'Otros';
 }
 
 // Evento del botón de filtrado: actualiza la lista basándose en los criterios elegidos
@@ -162,4 +189,6 @@ if (btnPrev) {
 }
 
 // Inicio
-loadJobs();
+auth.onAuthStateChanged(user => {
+    loadJobs();
+});

@@ -84,7 +84,7 @@ a:hover {
     background-color: var(--neutral-white);
     padding: 40px;
     border-radius: 20px;
-    border: 1px solid var(--gray-2);
+    border: none;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     margin-bottom: 40px;
     flex: 1;

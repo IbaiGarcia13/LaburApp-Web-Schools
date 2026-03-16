@@ -120,7 +120,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 180px;
+    width: 250px;
     z-index: 20;
 }
 
@@ -147,19 +147,52 @@ body {
 }
 
 .report-modal h4 {
-    margin: 0 0 15px 0;
+    margin: 0 0 5px 0;
     color: var(--gray-9);
     font-size: 1rem;
     text-align: center;
 }
 
+.report-modal-subtitle {
+    font-size: 0.8rem;
+    color: var(--gray-6);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#reportReason {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-3);
+    background: var(--neutral-white);
+    color: var(--gray-7);
+    font-size: 0.85rem;
+    resize: none;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+#reportReason:focus {
+    border-color: var(--primary);
+}
+
 .btn-submit-report {
-    background: none;
-    border: none;
+    background: var(--neutral-white);
+    border: 1px solid var(--red);
     color: var(--red);
+    padding: 8px 20px;
+    border-radius: 20px;
     font-weight: bold;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-submit-report:hover {
+    background: var(--red);
+    color: var(--neutral-white);
 }
 
 /* Messages Area */

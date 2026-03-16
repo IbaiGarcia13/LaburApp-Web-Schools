@@ -1,0 +1,21 @@
+{
+  "name": "LaburApp",
+  "short_name": "LaburApp",
+  "description": "LaburApp - Conectando personas para tareas y servicios.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "assets/img/icons/icono-Laburapp.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/img/icons/icono-Laburapp.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

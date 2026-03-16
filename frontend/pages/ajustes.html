@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Ajustes</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
@@ -32,11 +37,11 @@
             </nav>
 
             <div class="header-icons">
-                <img src="../assets/img/Ibai.jpg" alt="Perfil" class="profile-toggle" id="profileBtn">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="perfil.html">
-                        <img src="../assets/img/Ibai.jpg" alt="Avatar" class="dropdown-avatar">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
                     </a>
                     <p class="dropdown-name">Ibai García</p>
                     <p class="dropdown-email">ibai@mail.com</p>
@@ -75,8 +80,7 @@
 
     <!-- ================= CONTENEDOR PRINCIPAL: PANTALLA DE AJUSTES ================= -->
     <main class="main-content" id="container">
-        <h1 class="page-title"><img src="../assets/img/icons/icono-ajustes.png"
-                style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> AJUSTES</h1>
+        <h1 class="page-title"><img src="../assets/img/icons/icono-ajustes-blanco.png" alt=""> AJUSTES</h1>
 
         <!-- SECCIÓN 1: Formulario y datos registrados del usuario -->
         <section class="settings-card">
@@ -155,34 +159,8 @@
             <div class="card-header">
                 <h2 class="card-title">Historial de Pagos</h2>
             </div>
-            <div class="card-body">
-                <div class="payment-history">
-                    <div class="payment-row">
-                        <p><strong>Pago: 38.70€</strong></p>
-                        <p><strong>Fecha Emisión:</strong> 02/01/2026</p>
-                        <p><strong>Método de Pago:</strong> MasterCard - *4563</p>
-                    </div>
-                    <div class="payment-row">
-                        <p><strong>Pago: 40€</strong></p>
-                        <p><strong>Fecha Emisión:</strong> 13/01/2026</p>
-                        <p><strong>Método de Pago:</strong> MasterCard - *4563</p>
-                    </div>
-                    <div class="payment-row">
-                        <p><strong>Pago: 5.50€</strong></p>
-                        <p><strong>Fecha Emisión:</strong> 30/01/2026</p>
-                        <p><strong>Método de Pago:</strong> Pay Pal - ItxasoS_56</p>
-                    </div>
-                    <div class="payment-row">
-                        <p><strong>Pago: 9.80€</strong></p>
-                        <p><strong>Fecha Emisión:</strong> 06/02/2026</p>
-                        <p><strong>Método de Pago:</strong> Pay Pal - ItxasoS_56</p>
-                    </div>
-                    <div class="payment-row">
-                        <p><strong>Pago: 12€</strong></p>
-                        <p><strong>Fecha Emisión:</strong> 19/02/2026</p>
-                        <p><strong>Método de Pago:</strong> MasterCard - *4563</p>
-                    </div>
-                </div>
+            <div class="card-body" id="paymentHistoryContainer">
+                <p style="color: #666; font-style: italic;">Cargando historial...</p>
             </div>
         </section>
 

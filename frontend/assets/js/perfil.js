@@ -41,19 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnSave = document.getElementById('modal-btn confirm');
 
     const catInfo = {
+        'carpinteria': { nombre: 'Carpintería', color: 'cat-dot-carpinteria' },
+        'construccion': { nombre: 'Construcción/Reforma', color: 'cat-dot-construccion' },
+        'cuidado_personal': { nombre: 'Cuidado personal', color: 'cat-dot-cuidado_personal' },
+        'diseno': { nombre: 'Diseño', color: 'cat-dot-diseno' },
+        'evento': { nombre: 'Evento', color: 'cat-dot-evento' },
         'gastronomia': { nombre: 'Gastronomía', color: 'cat-dot-gastronomia' },
         'informatica': { nombre: 'Informática', color: 'cat-dot-informatica' },
+        'jardineria': { nombre: 'Jardinería', color: 'cat-dot-jardineria' },
         'limpieza': { nombre: 'Limpieza', color: 'cat-dot-limpieza' },
         'mascotas': { nombre: 'Mascotas', color: 'cat-dot-mascotas' },
-        'carpinteria': { nombre: 'Carpintería', color: 'cat-dot-carpinteria' },
-        'otros': { nombre: 'Otros', color: 'cat-dot-otros' },
-        'jardineria': { nombre: 'Jardinería', color: 'cat-dot-jardineria' },
-        'cuidado_personal': { nombre: 'Cuidado Personal', color: 'cat-dot-cuidado_personal' },
-        'evento': { nombre: 'Evento', color: 'cat-dot-evento' },
-        'diseno': { nombre: 'Diseño', color: 'cat-dot-diseno' },
+        'mudanza': { nombre: 'Mudanza/Traslado', color: 'cat-dot-mudanza' },
         'transporte': { nombre: 'Transporte', color: 'cat-dot-transporte' },
-        'mudanza': { nombre: 'Mudanza', color: 'cat-dot-mudanza' },
-        'construccion': { nombre: 'Construcción', color: 'cat-dot-construccion' }
+        'otros': { nombre: 'Otros', color: 'cat-dot-otros' }
     };
 
     // Cargar los datos desde Firebase al abrir la app o iniciar sesión
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         for (let c of ptsCat) {
                             if (c.puntos > 0) {
                                 hasCats = true;
-                                const info = catInfo[c.id_categoria] || { nombre: c.id_categoria, color: 'd-black' };
+                                const info = catInfo[c.id_categoria.toLowerCase()] || { nombre: c.id_categoria, color: 'cat-dot-otros' };
                                 const div = document.createElement('div');
                                 div.className = 'cat-item';
                                 div.innerHTML = `<span class="dot ${info.color}"></span> <strong>${info.nombre}:</strong> ${c.puntos} puntos`;

@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mensajes</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
@@ -31,11 +36,11 @@
             </nav>
 
             <div class="header-icons">
-                <img src="../assets/img/Ibai.jpg" alt="Perfil" class="profile-toggle" id="profileBtn">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="perfil.html">
-                        <img src="../assets/img/Ibai.jpg" alt="Avatar" class="dropdown-avatar">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
                     </a>
                     <p class="dropdown-name">Ibai García</p>
                     <p class="dropdown-email">ibai@mail.com</p>
@@ -76,9 +81,7 @@
         <!-- SECCIÓN IZQUIERDA: Lista de conversaciones -->
         <section id="content">
             <h2 class="section-title">
-                <img src="../assets/img/icons/icono-mensajes.png"
-                    style="width: 35px; vertical-align: middle; margin-right: 10px;" alt="">
-                MENSAJES - USUARIOS
+                <img src="../assets/img/icons/icono-mensajes-blanco.png" alt=""> MENSAJES - USUARIOS
             </h2>
 
             <!-- Lista generada por JS -->
@@ -113,11 +116,11 @@
                     </div>
 
                     <div class="filter-group">
-                        <label>De trabajo:</label>
+                        <label>Tipo de chat:</label>
                         <select id="filter-trabajo">
                             <option value="todos">Todos</option>
-                            <option value="si">Sí</option>
-                            <option value="no">No</option>
+                            <option value="trabajo">De trabajo</option>
+                            <option value="directo">Chat directo</option>
                         </select>
                     </div>
 

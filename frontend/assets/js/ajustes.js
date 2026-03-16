@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = card.querySelector('.card-title')?.textContent || "";
         if (title.includes('Suscripciones')) subsBody = card.querySelector('.card-body');
         if (title.includes('Método de Pago')) paymentsList = card.querySelector('.payment-methods');
-        if (title.includes('Historial de Pagos')) historyContainer = card.querySelector('.card-body');
+        if (title.includes('Historial de Pagos')) historyContainer = document.getElementById('paymentHistoryContainer');
     });
 
     // Cargar los datos reales desde Firestore
@@ -110,28 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // --- 3. RENDER HISTORIAL DE PAGOS ---
                 if (historyContainer) {
                     const historial = await obtenerHistorialPagos(user.uid);
-                    if (historial.length === 0) {
-                        // Si no hay pagos, vaciamos la sección o ponemos mensaje (según petición: "no saldrá ningún registro")
-                        historyContainer.innerHTML = "<p style='color: #666; font-style: italic;'>Aún no has realizado ningún movimiento de pago.</p>";
-                    } else {
-                        let html = '<div class="payment-history">';
-                        historial.forEach(p => {
-                            const fecha = p.fecha_emision?.toDate ? p.fecha_emision.toDate().toLocaleDateString() : "Reciente";
-                            const montoVal = Number(p.monto);
-                            const sign = montoVal > 0 ? "+" : "";
-                            const montoClase = montoVal < 0 ? 'negative-amount' : (montoVal > 0 ? 'positive-amount' : '');
-
-                            html += `
-                                <div class="payment-row">
-                                    <p><strong>Pago:</strong> <strong class="${montoClase}">${sign}${p.monto}€</strong></p>
-                                    <p><strong>Fecha Emisión:</strong> ${fecha}</p>
-                                    <p><strong>Detalle:</strong> ${p.detalle_pago || 'Transacción de LaburApp'}</p>
-                                </div>
-                            `;
-                        });
-                        html += '</div>';
-                        historyContainer.innerHTML = html;
-                    }
+                    renderHistorialPagos(historial, false);
                 }
 
             } catch (error) {
@@ -403,6 +382,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 showCustomAlert("Error", "Por favor, rellena todos los campos.");
             }
         });
+    }
+
+    // --- RENDERIZADO DE HISTORIAL CON PAGINACIÓN ---
+    function renderHistorialPagos(historial, showAll) {
+        if (!historyContainer) return;
+
+        if (historial.length === 0) {
+            historyContainer.innerHTML = "<p style='color: #666; font-style: italic;'>Aún no has realizado ningún movimiento de pago.</p>";
+            return;
+        }
+
+        const itemsToShow = showAll ? historial : historial.slice(0, 5);
+        let html = '<div class="payment-history">';
+        itemsToShow.forEach(p => {
+            const fecha = p.fecha_emision?.toDate ? p.fecha_emision.toDate().toLocaleDateString() : "Reciente";
+            const montoVal = Number(p.monto);
+            const sign = montoVal > 0 ? "+" : "";
+            const montoClase = montoVal < 0 ? 'negative-amount' : (montoVal > 0 ? 'positive-amount' : '');
+
+            html += `
+                <div class="payment-row">
+                    <p><strong>Pago:</strong> <strong class="${montoClase}">${sign}${p.monto}€</strong></p>
+                    <p><strong>Fecha Emisión:</strong> ${fecha}</p>
+                    <p><strong>Detalle:</strong> ${p.detalle_pago || 'Transacción de LaburApp'}</p>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        if (!showAll && historial.length > 5) {
+            html += `
+                <div class="view-more-container">
+                    <button id="btnViewMoreHistory" class="view-more-btn">Ver más</button>
+                </div>
+            `;
+        }
+
+        historyContainer.innerHTML = html;
+
+        // Añadir evento al botón si existe
+        const btnMore = document.getElementById('btnViewMoreHistory');
+        if (btnMore) {
+            btnMore.addEventListener('click', () => {
+                renderHistorialPagos(historial, true);
+            });
+        }
     }
 
     window.addEventListener('click', (event) => {

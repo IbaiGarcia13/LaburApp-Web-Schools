@@ -32,6 +32,13 @@
     text-align: left;
 }
 
+.section-title img {
+    width: 35px;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin-top: -10px;
+}
+
 /* --- TARJETAS DE TRABAJO (Imágenes 200px) --- */
 .job-card {
     background: var(--neutral-white);
@@ -43,6 +50,7 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     align-items: flex-start;
     transition: transform 0.2s ease;
+    position: relative;
     height: 260px;
     width: 100%;
     min-width: 900px;
@@ -70,6 +78,55 @@
     min-width: 0;
     /* Necesario para que el truncamiento de texto funcione en flexbox */
 }
+
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding-right: 60px;
+}
+
+/* Badge de estado (Igual que en postulaciones.css) */
+.status-badge {
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    margin-right: -30px;
+    border-radius: 5px;
+}
+
+/* Colores de estado (Sólo texto, sin backgrounds para coincidir con postulaciones) */
+.status-pendiente {
+    color: var(--neutral-white);
+    background-color: var(--orange-1);
+}
+
+.status-aceptada {
+    color: var(--neutral-white);
+    background-color: var(--green-1);
+}
+
+.status-en.curso,
+.status-en-curso {
+    color: var(--neutral-white);
+    background-color: var(--blue-2);
+}
+
+.status-finalizado,
+.status-completada {
+    color: var(--neutral-white);
+    background-color: var(--neutral-black);
+}
+
+.status-rechazada,
+.status-rechazado,
+.status-cancelado,
+.status-cancelada {
+    color: var(--neutral-white);
+    background-color: var(--red-2);
+}
+
 
 .job-info h3 {
     font-size: 1.4rem;
@@ -114,6 +171,30 @@
     margin-right: 15px;
 }
 
+/* --- BOTONES DE ACCIÓN --- */
+.action-buttons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.action-btn img {
+    width: 24px;
+    height: 24px;
+}
 
 
 #sidebar {

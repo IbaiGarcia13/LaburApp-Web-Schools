@@ -32,6 +32,13 @@
     text-align: left;
 }
 
+.section-title img {
+    margin-top: -10px;
+    width: 35px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
 /* --- TARJETAS DE TRABAJO (Imágenes 200px) --- */
 .job-card {
     background: var(--neutral-white);

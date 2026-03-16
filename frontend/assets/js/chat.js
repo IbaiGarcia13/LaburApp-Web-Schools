@@ -1,7 +1,7 @@
 import { db, auth, storage } from './firebase-config.js';
 import { collection, query, orderBy, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-import { enviarMensajeTrabajo, obtenerTrabajoPorId, obtenerUsuarioPorId, enviarMensajeDirecto, generarIdChatDirecto } from './database.js';
+import { enviarMensajeTrabajo, obtenerTrabajoPorId, obtenerUsuarioPorId, enviarMensajeDirecto, generarIdChat, enviarDenuncia } from './database.js';
 
 
 const listaMensajes = document.getElementById('messages');
@@ -23,12 +23,13 @@ let otherUserData = null;
 // 1. Obtener ID de la URL
 const urlParams = new URLSearchParams(window.location.search);
 const idTrabajo = urlParams.get('id'); // ID of the job
-const userIdDirect = urlParams.get('userId'); // Direct chat with another user without a job
+const userIdDirect = urlParams.get('userId'); // Target user ID
 
-let chatMode = 'job';
-if (userIdDirect) {
-    chatMode = 'direct';
-} else if (!idTrabajo) {
+// PRIORIZAR MODO TRABAJO si hay id de trabajo
+let chatMode = 'direct';
+if (idTrabajo) {
+    chatMode = 'job';
+} else if (!userIdDirect) {
     showCustomAlert("Error", "No se ha especificado un destinatario para el chat.");
     setTimeout(() => window.location.href = 'mensajes.html', 2000);
 }
@@ -99,15 +100,16 @@ loadChatMeta();
 function startMessageListener(myUid, otherUid) {
     if (!listaMensajes) return;
 
-    let mensajesRef;
-    if (chatMode === 'job' && idTrabajo) {
-        mensajesRef = collection(db, "trabajos", idTrabajo, "mensajes");
+    let chatId;
+    if (chatMode === 'job' && idTrabajo && otherUid) {
+        chatId = generarIdChat(myUid, otherUid, idTrabajo);
     } else if (chatMode === 'direct' && otherUid) {
-        const chatId = generarIdChatDirecto(myUid, otherUid);
-        mensajesRef = collection(db, "chats", chatId, "mensajes");
+        chatId = generarIdChat(myUid, otherUid);
     } else {
         return; // Sin info para iniciar chat
     }
+
+    const mensajesRef = collection(db, "chats", chatId, "mensajes");
 
     const q = query(mensajesRef, orderBy("fecha_envio", "asc"));
 
@@ -234,11 +236,12 @@ if (formulario && (idTrabajo || userIdDirect)) {
                 }
 
                 if (chatMode === 'job') {
+                    const recipientId = otherUserData?.uid;
                     if (imageUrl) {
-                        await enviarMensajeTrabajo(idTrabajo, imageUrl, "imagen");
+                        await enviarMensajeTrabajo(idTrabajo, imageUrl, "imagen", recipientId);
                     }
                     if (texto !== "") {
-                        await enviarMensajeTrabajo(idTrabajo, texto, "texto");
+                        await enviarMensajeTrabajo(idTrabajo, texto, "texto", recipientId);
                     }
                 } else {
                     if (imageUrl) {
@@ -262,6 +265,8 @@ if (formulario && (idTrabajo || userIdDirect)) {
 // --- C: MODAL DE DENUNCIA ---
 const btnReport = document.getElementById('btnReport');
 const reportModal = document.getElementById('reportModal');
+const btnSubmitReport = document.getElementById('btnSubmitReport');
+const reportReason = document.getElementById('reportReason');
 
 if (btnReport && reportModal) {
     btnReport.addEventListener('click', (e) => {
@@ -274,6 +279,38 @@ if (btnReport && reportModal) {
             reportModal.classList.add('hidden');
         }
     });
+
+    if (btnSubmitReport) {
+        btnSubmitReport.addEventListener('click', async () => {
+            const motivo = reportReason.value.trim();
+            if (!motivo) {
+                alert("Por favor, escribe el motivo de la denuncia.");
+                return;
+            }
+
+            const otherId = userIdDirect || urlParams.get('userId') || (otherUserData?.uid);
+
+            if (!otherId) {
+                alert("Error: No se puede identificar al usuario para denunciar.");
+                return;
+            }
+
+            try {
+                btnSubmitReport.disabled = true;
+                btnSubmitReport.textContent = "ENVIANDO...";
+                await enviarDenuncia(otherId, motivo);
+                alert("Denuncia enviada correctamente. Gracias por ayudarnos a mantener la comunidad segura.");
+                reportModal.classList.add('hidden');
+                reportReason.value = "";
+            } catch (error) {
+                console.error("Error al enviar denuncia:", error);
+                alert("Hubo un error al enviar la denuncia. Inténtalo de nuevo más tarde.");
+            } finally {
+                btnSubmitReport.disabled = false;
+                btnSubmitReport.textContent = "DENUNCIAR";
+            }
+        });
+    }
 }
 
 // --- D: SELECCIÓN DE IMAGEN (GALERÍA) ---

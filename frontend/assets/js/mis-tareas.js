@@ -15,6 +15,7 @@ const itemsPerPage = 4;
 
 let currentFilters = {
     cat: "todas",
+    status: "todas",
     tMin: 1,
     tMax: 100,
     pMin: 2,
@@ -47,15 +48,27 @@ async function loadMyPostedTasks(uid) {
 
 function applyClientFilters() {
     filteredTareas = allTareas.filter(j => {
-        const isCompletada = (j.estado || "").toLowerCase() === "completada";
-        if (isCompletada) return false;
+        // Ocultar si fue cancelado por el propio publicador O borrado por él tras completarse
+        if (j.cancelado_por === "publicador") return false;
+        if (j.borrado_por_publicador === true) return false;
 
         const matchCat = (currentFilters.cat === "todas" || (j.id_categoria && j.id_categoria.toLowerCase() === currentFilters.cat.toLowerCase()));
+
+        const statusVal = (j.estado || "pendiente").toLowerCase();
+        let matchStatus = false;
+        if (currentFilters.status === "todas") {
+            // "Todas" muestra todo lo que no esté borrado o cancelado por el usuario.
+            // Si el trabajador la canceló, el publicador SÍ quiere verla como "Cancelada".
+            matchStatus = true;
+        } else {
+            matchStatus = statusVal === currentFilters.status.toLowerCase();
+        }
+
         const pago = j.pago_cliente || 0;
         const matchPay = pago >= currentFilters.pMin && pago <= currentFilters.pMax;
         const tiempo = j.tiempo_estimado_horas || 0;
         const matchTime = tiempo >= currentFilters.tMin && tiempo <= currentFilters.tMax;
-        return matchCat && matchPay && matchTime;
+        return matchCat && matchStatus && matchPay && matchTime;
     });
     currentPage = 1;
     displayTareas();
@@ -80,17 +93,19 @@ function displayTareas() {
         const xp = tarea.xp_otorgada || Math.round(pagoCliente * 10);
         const img = tarea.foto_trabajo || "../assets/img/trabajo-defecto.png";
 
+        const isCompletada = (tarea.estado || "").toLowerCase() === "completada";
+        const deleteTitle = isCompletada ? "Eliminar Historial" : "Eliminar Publicación";
+
         const card = `
             <article class="job-card" data-id="${tarea.id}" onclick="window.location.href='mi-tarea.html?id=${tarea.id}'">
                 <div class="action-buttons">
-                    <button class="action-btn edit-btn" title="Editar Tarea" onclick="event.stopPropagation(); window.location.href='mi-tarea.html?id=${tarea.id}'"><img src="../assets/img/icons/icono-editar.png" alt="Editar"></button>
-                    <button class="action-btn delete-btn" title="Eliminar Publicación" onclick="event.stopPropagation(); confirmarEliminar('${tarea.id}')"><img src="../assets/img/icons/icono-eliminar.png" alt="Eliminar"></button>
+                    <button class="action-btn delete-btn" title="${deleteTitle}" onclick="event.stopPropagation(); confirmarEliminar('${tarea.id}')"><img src="../assets/img/icons/icono-eliminar.png" alt="Eliminar"></button>
                 </div>
                 <img src="${img}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">
                     <div class="job-card-header">
                         <h3>${tarea.titulo}</h3>
-                        <span class="status-badge status-${(tarea.estado || 'pendiente').toLowerCase()}">${(tarea.estado || 'Pendiente').toUpperCase()}</span>
+                        <span class="status-badge status-${(tarea.estado || 'pendiente').toLowerCase().replace(/\s+/g, '-')}">${(tarea.estado === 'Aceptado' ? 'Aceptada' : (tarea.estado || 'Pendiente')).toUpperCase()}</span>
                     </div>
                     <p class="job-desc">${tarea.descripcion || "Sin descripción."}</p>
                     <div class="job-details">
@@ -118,6 +133,7 @@ function updatePaginationUI() {
 function setupEventListeners() {
     document.getElementById('update-btn').onclick = () => {
         currentFilters.cat = document.getElementById('filter-category').value;
+        currentFilters.status = document.getElementById('filter-status').value;
         currentFilters.tMin = parseInt(document.getElementById('time-min').value) || 1;
         currentFilters.tMax = parseInt(document.getElementById('time-max').value) || 100;
         currentFilters.pMin = parseFloat(document.getElementById('pay-min').value) || 2;
@@ -143,16 +159,49 @@ function setupEventListeners() {
 }
 
 window.confirmarEliminar = function (id) {
+    const tarea = allTareas.find(t => t.id === id);
+    const isCompletada = tarea && (tarea.estado || "").toLowerCase() === "completada";
+
+    const modalTitle = isCompletada ? "Eliminar del Historial" : "Eliminar Publicación";
+    const modalDesc = isCompletada
+        ? "¿Quieres eliminar esta tarea de tu historial? Solo desaparecerá para ti, el registro se mantiene para el trabajador."
+        : "¿Estás seguro de que quieres eliminar esta tarea? Se borrará permanentemente de la plataforma.";
+
     showCustomConfirm(
-        "Eliminar Publicación",
-        "¿Estás seguro de que quieres eliminar esta tarea? Se borrará permanentemente de la plataforma.",
+        modalTitle,
+        modalDesc,
         async () => {
             try {
-                await deleteDoc(doc(db, "trabajos", id));
-                allTareas = allTareas.filter(t => t.id !== id);
+                const docRef = doc(db, "trabajos", id);
+                const tarea = allTareas.find(t => t.id === id);
+
+                if (tarea && tarea.estado === "Completada") {
+                    // Si está completada, solo marcamos como borrado por este usuario
+                    if (tarea.borrado_por_trabajador === true) {
+                        // Si el trabajador ya lo borró, borramos de la DB
+                        await deleteDoc(docRef);
+                    } else {
+                        await updateDoc(docRef, { borrado_por_publicador: true });
+                    }
+
+                    // Actualizar localmente
+                    const idx = allTareas.findIndex(t => t.id === id);
+                    if (idx !== -1) allTareas[idx].borrado_por_publicador = true;
+                } else {
+                    // Si no está completada, sigue la lógica de cancelación previa
+                    await updateDoc(docRef, {
+                        estado: "Cancelada",
+                        cancelado_por: "publicador"
+                    });
+                    const tareaIndex = allTareas.findIndex(t => t.id === id);
+                    if (tareaIndex !== -1) {
+                        allTareas[tareaIndex].estado = "Cancelada";
+                        allTareas[tareaIndex].cancelado_por = "publicador";
+                    }
+                }
                 applyClientFilters();
             } catch (e) {
-                console.error("Error al borrar:", e);
+                console.error("Error al procesar eliminación:", e);
             }
         },
         "Eliminar",

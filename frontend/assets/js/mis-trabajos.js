@@ -15,6 +15,7 @@ const itemsPerPage = 5;
 
 let currentFilters = {
     cat: "todas",
+    status: "todas",
     tMin: 1,
     tMax: 100,
     pMin: 2,
@@ -46,15 +47,27 @@ async function loadMyAcceptedJobs(uid) {
 
 function applyClientFilters() {
     filteredJobs = allJobs.filter(j => {
-        const isCompletada = (j.estado || "").toLowerCase() === "completada";
-        if (isCompletada) return false;
+        // Ocultar si fue cancelado por el propio trabajador O borrado por él tras completarse
+        if (j.cancelado_por === "trabajador") return false;
+        if (j.borrado_por_trabajador === true) return false;
 
         const matchCat = (currentFilters.cat === "todas" || (j.id_categoria && j.id_categoria.toLowerCase() === currentFilters.cat.toLowerCase()));
-        const pago = j.pago_trabajador || (j.pago_cliente * 0.9);
+
+        const statusVal = (j.estado || "pendiente").toLowerCase();
+        let matchStatus = false;
+        if (currentFilters.status === "todas") {
+            // "Todas" muestra todo lo que no esté borrado por el usuario.
+            // Si el publicador la canceló, el trabajador SÍ la ve como "Cancelada".
+            matchStatus = true;
+        } else {
+            matchStatus = statusVal === currentFilters.status.toLowerCase();
+        }
+
+        const pago = j.pago_cliente || 0;
         const matchPay = pago >= currentFilters.pMin && pago <= currentFilters.pMax;
         const tiempo = j.tiempo_estimado_horas || 0;
         const matchTime = tiempo >= currentFilters.tMin && tiempo <= currentFilters.tMax;
-        return matchCat && matchPay && matchTime;
+        return matchCat && matchStatus && matchPay && matchTime;
     });
     currentPage = 1;
     displayJobs();
@@ -75,18 +88,25 @@ function displayJobs() {
 
     pageItems.forEach(job => {
         const catName = job.id_categoria ? job.id_categoria.charAt(0).toUpperCase() + job.id_categoria.slice(1) : "Otros";
-        const pago = job.pago_trabajador || (job.pago_cliente * 0.9);
+        const pago = job.pago_cliente || 0;
         const xp = job.xp_otorgada || Math.round(job.pago_cliente * 10);
         const img = job.foto_trabajo || "../assets/img/trabajo-defecto.png";
+        const estadoNorm = (job.estado || 'Pendiente');
+
+        const isCompletada = estadoNorm.toLowerCase() === "completada";
+        const deleteTitle = isCompletada ? "Eliminar Historial" : "Abandonar Trabajo";
 
         const card = `
             <article class="job-card" onclick="window.location.href='mi-trabajo.html?id=${job.id}'">
-                <div class="action-buttons" style="position: absolute; right: 10px; top: 10px;">
-                     <button class="action-btn delete-btn" title="Abandonar Trabajo" onclick="event.stopPropagation(); confirmarAbandonar('${job.id}')" style="background: rgba(255,255,255,0.9); border:none; border-radius: 50%; padding: 5px; cursor:pointer;"><img src="../assets/img/icons/icono-eliminar.png" alt="X" style="width:15px"></button>
+                <div class="action-buttons">
+                     <button class="action-btn delete-btn" title="${deleteTitle}" onclick="event.stopPropagation(); confirmarAbandonar('${job.id}')"><img src="../assets/img/icons/icono-eliminar.png" alt="X"></button>
                 </div>
                 <img src="${img}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">
-                    <h3>${job.titulo}</h3>
+                    <div class="job-card-header">
+                        <h3>${job.titulo}</h3>
+                        <span class="status-badge status-${estadoNorm.toLowerCase().replace(' ', '-')}">${(job.estado === 'Aceptado' ? 'Aceptada' : estadoNorm).toUpperCase()}</span>
+                    </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción."}</p>
                     <div class="job-details">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "No especificada"}</p>
@@ -113,6 +133,7 @@ function updatePaginationUI() {
 function setupEventListeners() {
     document.getElementById('update-btn').onclick = () => {
         currentFilters.cat = document.getElementById('filter-category').value;
+        currentFilters.status = document.getElementById('filter-status').value;
         currentFilters.tMin = parseInt(document.getElementById('time-min').value) || 1;
         currentFilters.tMax = parseInt(document.getElementById('time-max').value) || 100;
         currentFilters.pMin = parseFloat(document.getElementById('pay-min').value) || 2;
@@ -136,16 +157,34 @@ function setupEventListeners() {
 }
 
 window.confirmarAbandonar = function (id) {
+    const job = allJobs.find(j => j.id === id);
+    const isCompletada = job && (job.estado || "").toLowerCase() === "completada";
+
+    const modalTitle = isCompletada ? "Eliminar del Historial" : "Abandonar Trabajo";
+    const modalDesc = isCompletada
+        ? "¿Quieres eliminar este trabajo de tu lista? Solo desaparecerá para ti, el registro se mantiene para el publicador."
+        : "¿Quieres dejar de ser el trabajador de esta oferta?";
+
     showCustomConfirm(
-        "Abandonar Trabajo",
-        "¿Quieres dejar de ser el trabajador de esta oferta?",
+        modalTitle,
+        modalDesc,
         async () => {
             try {
+                const docRef = doc(db, "trabajos", id);
+                // Si el trabajador abandona, seteamos estado "Cancelada" y marcamos quién la canceló.
+                // Esto hará que desaparezca para él (en applyClientFilters) pero aparezca "Cancelada" para el publicador.
                 await updateDoc(doc(db, "trabajos", id), {
-                    id_trabajador: null,
-                    estado: "Pendiente"
+                    estado: "Cancelada",
+                    cancelado_por: "trabajador"
                 });
-                allJobs = allJobs.filter(j => j.id !== id);
+
+                // Actualizamos localmente para reflejar el cambio inmediato
+                const jobIndex = allJobs.findIndex(j => j.id === id);
+                if (jobIndex !== -1) {
+                    allJobs[jobIndex].estado = "Cancelada";
+                    allJobs[jobIndex].cancelado_por = "trabajador";
+                }
+
                 applyClientFilters();
             } catch (e) {
                 console.error(e);

@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mi Trabajo</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
@@ -31,11 +36,11 @@
             </nav>
 
             <div class="header-icons">
-                <img src="../assets/img/Ibai.jpg" alt="Perfil" class="profile-toggle" id="profileBtn">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
 
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="perfil.html">
-                        <img src="../assets/img/Ibai.jpg" alt="Avatar" class="dropdown-avatar">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
                     </a>
                     <p class="dropdown-name">Ibai García</p>
                     <p class="dropdown-email">ibai@mail.com</p>
@@ -128,6 +133,15 @@
                 </div>
             </div>
         </section>
+
+        <!-- ESTADO DEL TRABAJO -->
+        <div id="status-container" style="margin-top: 24px;">
+            <span id="displayEstado" class="estado-badge">Cargando...</span>
+        </div>
+
+        <div class="job-actions">
+            <button id="btn-empezar" class="btn-empezar">EMPEZAR</button>
+        </div>
 
     </main>
 

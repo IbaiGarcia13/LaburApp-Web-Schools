@@ -88,7 +88,7 @@ export async function crearTrabajo(datosTrabajo) {
         // fecha_limite debería venir como un objeto Date
         fecha_limite: datosTrabajo.fecha_limite,
         tiempo_estimado_horas: datosTrabajo.tiempo_estimado_horas || null,
-        estado: "Pendiente", // 'Pendiente', 'Aceptado', 'En curso', 'Finalizado', 'Cancelado'
+        estado: "Pendiente", // 'Pendiente', 'Aceptada', 'En curso', 'Completada', 'Cancelada'
         pago_cliente: pagoCliente,
         pago_trabajador: pagoTrabajador,
         xp_otorgada: xpOtorgada,
@@ -127,9 +127,22 @@ export async function actualizarTrabajo(idTrabajo, datosNuevos) {
 export async function obtenerTrabajos(idCategoria = "todas") {
     let q;
     if (idCategoria && idCategoria !== "todas") {
+        // Mapeo de sinónimos para búsqueda más robusta
+        const catSynonyms = {
+            "construccion": ["construccion", "construccion/reforma", "construcción"],
+            "mudanza": ["mudanza", "mudanza/traslado"],
+            "cuidado_personal": ["cuidado_personal", "cuidado personal"],
+            "informatica": ["informatica", "informática"],
+            "gastronomia": ["gastronomia", "gastronomía"],
+            "diseno": ["diseno", "diseño"],
+            "jardineria": ["jardineria", "jardinería"]
+        };
+
+        const categoriesToSearch = catSynonyms[idCategoria] || [idCategoria];
+
         q = query(
             collection(db, "trabajos"),
-            where("id_categoria", "==", idCategoria),
+            where("id_categoria", "in", categoriesToSearch),
             where("estado", "==", "Pendiente")
         );
     } else {
@@ -256,7 +269,7 @@ export async function aceptarPostulacion(idTrabajo, uidTrabajador) {
     // 1. Actualizar el trabajo: poner el trabajador y cambiar estado
     await updateDoc(trabajoRef, {
         id_trabajador: uidTrabajador,
-        estado: "Aceptado"
+        estado: "Aceptada"
     });
 
     // 2. Marcar la postulación como aceptada
@@ -508,25 +521,57 @@ export async function obtenerHistorialPagos(uid) {
     return historial;
 }
 
-// --- 7. CHAT (Mensajes dentro del Trabajo) ---
+// --- 7. CHAT (Centralizado en la colección 'chats') ---
 
-export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto") {
+/**
+ * Genera un ID único para un chat.
+ * Si hay trabajo, el ID depende de los usuarios Y del trabajo.
+ * Si es directo, solo depende de los dos usuarios (ordenados alfabéticamente).
+ */
+export function generarIdChat(uid1, uid2, idTrabajo = null) {
+    const sortedUsers = [uid1, uid2].sort().join("_");
+    if (idTrabajo) {
+        return `${sortedUsers}_job_${idTrabajo}`;
+    }
+    return sortedUsers;
+}
+
+/**
+ * Registra o actualiza una conversación en la subcolección del usuario
+ * para que sepa qué chats tiene activos.
+ */
+async function registrarConversacionActiva(uidActor, uidOtro, idChat, idTrabajo = null) {
+    const convRef = doc(db, "usuarios", uidActor, "conversaciones", idChat);
+    await setDoc(convRef, {
+        id_chat: idChat,
+        id_otro_usuario: uidOtro,
+        id_trabajo: idTrabajo,
+        tipo: idTrabajo ? 'trabajo' : 'directo',
+        ultima_actualizacion: serverTimestamp()
+    }, { merge: true });
+}
+
+export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto", idReceptorOverride = null) {
     const user = auth.currentUser;
     if (!user) throw new Error("Debes iniciar sesión.");
 
-    // Necesitamos el documento del trabajo para saber quién es el receptor
     const trabajo = await obtenerTrabajoPorId(idTrabajo);
     if (!trabajo) throw new Error("Trabajo no encontrado.");
 
-    // El receptor es el publicador si yo soy el trabajador, o viceversa
-    let idReceptor = null;
-    if (user.uid === trabajo.id_publicador) {
-        idReceptor = trabajo.id_trabajador || null;
-    } else if (user.uid === trabajo.id_trabajador) {
-        idReceptor = trabajo.id_publicador;
+    let idReceptor = idReceptorOverride;
+
+    if (!idReceptor) {
+        idReceptor = (user.uid === trabajo.id_publicador) ? trabajo.id_trabajador : trabajo.id_publicador;
     }
 
-    const mensajesRef = collection(db, "trabajos", idTrabajo, "mensajes");
+    if (!idReceptor) {
+        throw new Error("No hay un destinatario asignado para este trabajo.");
+    }
+
+    const idChat = generarIdChat(user.uid, idReceptor, idTrabajo);
+
+    // 1. Guardar mensaje en colección centralizada
+    const mensajesRef = collection(db, "chats", idChat, "mensajes");
     await addDoc(mensajesRef, {
         contenido: texto,
         leido: false,
@@ -535,6 +580,10 @@ export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto") {
         id_receptor: idReceptor,
         fecha_envio: serverTimestamp()
     });
+
+    // 2. Actualizar metadatos de conversación para ambos
+    await registrarConversacionActiva(user.uid, idReceptor, idChat, idTrabajo);
+    await registrarConversacionActiva(idReceptor, user.uid, idChat, idTrabajo);
 }
 
 import { limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -582,29 +631,15 @@ export async function obtenerConversacionesActivas(uid) {
     return filtrados;
 }
 
-// --- 8. CHAT DIRECTO (Sin Trabajo) ---
-
-export function generarIdChatDirecto(uid1, uid2) {
-    return [uid1, uid2].sort().join("_");
-}
+// --- 8. CHAT DIRECTO ---
 
 export async function enviarMensajeDirecto(uidOtro, texto, tipo = "texto") {
     const user = auth.currentUser;
     if (!user) throw new Error("Debes iniciar sesión.");
 
-    const idChat = generarIdChatDirecto(user.uid, uidOtro);
+    const idChat = generarIdChat(user.uid, uidOtro);
 
-    // Guardamos que existe la conversación para ambos usuarios para poder listarlas luego
-    await setDoc(doc(db, "usuarios", user.uid, "chats_directos", uidOtro), {
-        id_otro_usuario: uidOtro,
-        ultimo_mensaje: serverTimestamp()
-    }, { merge: true });
-
-    await setDoc(doc(db, "usuarios", uidOtro, "chats_directos", user.uid), {
-        id_otro_usuario: user.uid,
-        ultimo_mensaje: serverTimestamp()
-    }, { merge: true });
-
+    // 1. Guardar mensaje en colección centralizada
     const mensajesRef = collection(db, "chats", idChat, "mensajes");
     await addDoc(mensajesRef, {
         contenido: texto,
@@ -614,23 +649,24 @@ export async function enviarMensajeDirecto(uidOtro, texto, tipo = "texto") {
         id_receptor: uidOtro,
         fecha_envio: serverTimestamp()
     });
+
+    // 2. Actualizar metadatos de conversación para ambos
+    await registrarConversacionActiva(user.uid, uidOtro, idChat, null);
+    await registrarConversacionActiva(uidOtro, user.uid, idChat, null);
 }
 
-// --- 9. CHATS DIRECTOS ACTIVOS (Para listar en mensajes.html) ---
+// --- 9. OBTENER CONVERSACIONES ---
 
 /**
- * Obtiene la lista de chats directos del usuario (sin trabajo de por medio).
- * Lee la subcolección usuarios/{uid}/chats_directos.
+ * Obtiene todas las conversaciones (directas y de trabajo) del usuario.
+ * Lee la subcolección usuarios/{uid}/conversaciones.
  */
-export async function obtenerChatsDirectos(uid) {
-    const q = query(collection(db, "usuarios", uid, "chats_directos"));
+export async function obtenerTodasLasConversaciones(uid) {
+    const q = query(collection(db, "usuarios", uid, "conversaciones"), orderBy("ultima_actualizacion", "desc"));
     const snapshot = await getDocs(q);
     const chats = [];
     snapshot.forEach(docSnap => {
-        chats.push({
-            id_otro_usuario: docSnap.id,
-            ...docSnap.data()
-        });
+        chats.push(docSnap.data());
     });
     return chats;
 }
@@ -656,3 +692,21 @@ export async function obtenerUltimoMensaje(mensajesRef) {
     return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
+/**
+ * Registra una denuncia contra un usuario.
+ * @param {string} idUsuarioReportado - UID del usuario que está siendo denunciado.
+ * @param {string} motivo - Comentario explicando el motivo del reporte.
+ */
+export async function enviarDenuncia(idUsuarioReportado, motivo) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Debes iniciar sesión.");
+
+    await addDoc(collection(db, "denuncias"), {
+        id_usuario_reportado: idUsuarioReportado,
+        id_usuario_denunciante: user.uid,
+        motivo: motivo,
+        fecha: serverTimestamp()
+    });
+
+    return true;
+}

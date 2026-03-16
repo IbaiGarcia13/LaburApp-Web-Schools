@@ -1,11 +1,12 @@
 import { db, auth } from './firebase-config.js';
 import { collection, query, where, limit, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import {
-    obtenerConversacionesActivas,
-    obtenerChatsDirectos,
+    obtenerTodasLasConversaciones,
     obtenerUsuarioPorId,
     obtenerPerfilUsuario,
-    obtenerTodosPuntosCategorias
+    obtenerTodosPuntosCategorias,
+    obtenerTrabajoPorId,
+    generarIdChat
 } from './database.js';
 
 // =====================================================
@@ -95,8 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const { onSnapshot, collection } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                unreadListener = onSnapshot(collection(db, "usuarios", user.uid, "chats_directos"), () => {
-                    console.log("Cambio en chats directos detectado (Real-time update)...");
+                unreadListener = onSnapshot(collection(db, "usuarios", user.uid, "conversaciones"), () => {
+                    console.log("Cambio en conversaciones detectado (Real-time update)...");
                     loadAllConversations(user.uid);
                 });
             } catch (e) {
@@ -158,85 +159,47 @@ async function loadAllConversations(uid) {
     }
 
     try {
-        // 1. Chats de trabajo
-        console.log("Obteniendo chats de trabajo...");
-        let jobChats = [];
-        try {
-            jobChats = await obtenerConversacionesActivas(uid);
-        } catch (err) {
-            console.warn("Error al obtenerConversacionesActivas (puede ser falta de índice):", err);
-        }
-
-        // 2. Chats directos
-        console.log("Obteniendo chats directos...");
-        let directChats = [];
-        try {
-            directChats = await obtenerChatsDirectos(uid);
-        } catch (err) {
-            console.error("Error al obtenerChatsDirectos:", err);
-        }
-
+        const convsActivas = await obtenerTodasLasConversaciones(uid);
         allConversations = [];
 
-        // Procesar chats de trabajo
-        console.log(`Procesando ${jobChats.length} chats de trabajo...`);
-        for (const job of jobChats) {
+        for (const meta of convsActivas) {
             try {
-                const otherId = (uid === job.id_publicador) ? job.id_trabajador : job.id_publicador;
-                if (!otherId) continue;
+                const { id_chat, id_otro_usuario, id_trabajo, tipo } = meta;
+                const mensajesRef = collection(db, "chats", id_chat, "mensajes");
 
-                const mensajesRef = collection(db, "trabajos", job.id, "mensajes");
-                const ultimoMsg = await getUltimoMensaje(mensajesRef);
-                const noLeidos = await tieneNoLeidos(mensajesRef, uid);
+                const [ultimoMsg, noLeidos, otherUser, ptsCat] = await Promise.all([
+                    getUltimoMensaje(mensajesRef),
+                    tieneNoLeidos(mensajesRef, uid),
+                    obtenerUsuarioPorId(id_otro_usuario),
+                    obtenerTodosPuntosCategorias(id_otro_usuario)
+                ]);
 
-                const otherUser = await obtenerUsuarioPorId(otherId);
-                const ptsCat = await obtenerTodosPuntosCategorias(otherId);
+                // Si no hay mensajes en absoluto, omitir de la lista principal
+                if (!ultimoMsg) continue;
+
+                let job = null;
+                let jobUrl = null;
+                let chatUrl = `chat.html?userId=${id_otro_usuario}`;
+
+                if (tipo === 'trabajo' && id_trabajo) {
+                    job = await obtenerTrabajoPorId(id_trabajo);
+                    jobUrl = `trabajo.html?id=${id_trabajo}`;
+                    chatUrl = `chat.html?id=${id_trabajo}&userId=${id_otro_usuario}`;
+                }
 
                 allConversations.push({
-                    tipo: 'trabajo',
-                    otherId,
+                    tipo,
+                    otherId: id_otro_usuario,
                     otherUser,
                     ptsCat,
                     job,
                     ultimoMsg,
                     noLeidos,
-                    chatUrl: `chat.html?id=${job.id}&userId=${otherId}`,
-                    jobUrl: `trabajo.html?id=${job.id}`
+                    chatUrl,
+                    jobUrl
                 });
             } catch (err) {
-                console.warn(`Error procesando chat de trabajo ${job.id}:`, err);
-            }
-        }
-
-        // Procesar chats directos
-        console.log(`Procesando ${directChats.length} chats directos...`);
-        for (const dc of directChats) {
-            try {
-                const otherId = dc.id_otro_usuario;
-                const chatId = [uid, otherId].sort().join('_');
-                const mensajesRef = collection(db, "chats", chatId, "mensajes");
-                const ultimoMsg = await getUltimoMensaje(mensajesRef);
-
-                // Si no hay ningún mensaje real, omitir
-                if (!ultimoMsg) continue;
-
-                const noLeidos = await tieneNoLeidos(mensajesRef, uid);
-                const otherUser = await obtenerUsuarioPorId(otherId);
-                const ptsCat = await obtenerTodosPuntosCategorias(otherId);
-
-                allConversations.push({
-                    tipo: 'directo',
-                    otherId,
-                    otherUser,
-                    ptsCat,
-                    job: null,
-                    ultimoMsg,
-                    noLeidos,
-                    chatUrl: `chat.html?userId=${otherId}`,
-                    jobUrl: null
-                });
-            } catch (err) {
-                console.warn(`Error procesando chat directo con ${dc.id_otro_usuario}:`, err);
+                console.warn(`Error procesando conversación ${meta.id_chat}:`, err);
             }
         }
 
@@ -287,9 +250,9 @@ function applyFilters() {
         if (estadoVal === 'leidos' && conv.noLeidos) return false;
         if (estadoVal === 'no-leidos' && !conv.noLeidos) return false;
 
-        // Filtro de trabajo
-        if (trabajoVal === 'si' && conv.tipo !== 'trabajo') return false;
-        if (trabajoVal === 'no' && conv.tipo !== 'directo') return false;
+        // Filtro de tipo de chat
+        if (trabajoVal === 'trabajo' && conv.tipo !== 'trabajo') return false;
+        if (trabajoVal === 'directo' && conv.tipo !== 'directo') return false;
 
         // Filtro de fecha por último mensaje
         if (conv.ultimoMsg?.fecha_envio) {
@@ -313,10 +276,12 @@ function applyFilters() {
 function renderMensajes() {
     const container = document.getElementById('msgs-list');
     if (!container) return;
+
+    // Limpiar todo
     container.innerHTML = '';
 
     if (filteredConversations.length === 0) {
-        container.innerHTML = "<p class='msgs-empty'>No hay chats que coincidan con los filtros aplicados.</p>";
+        container.innerHTML = `<p class="msgs-empty">No hay conversaciones disponibles.</p>`;
         updatePaginationUI(0);
         return;
     }
@@ -334,19 +299,18 @@ function renderMensajes() {
         const especialidad = getEspecialidadPrincipal(ptsCat) || "General";
         const ubicacion = otherUser?.direccion_principal || "No especificada";
 
-        const card = document.createElement('article'); // Cambiado a article para consistencia
+        const card = document.createElement('article');
         card.className = `msg-card ${tipo}-card ${noLeidos ? 'unread' : ''}`;
 
-        let taskInfoHTML = '';
+        let labelHTML = '';
         if (tipo === 'trabajo' && job) {
-            taskInfoHTML = `
+            labelHTML = `
                 <div class="msg-task-context">
-                    <p class="msg-label">Trabajo:</p>
-                    <button class="msg-job-link" data-job-url="${jobUrl}">${job.titulo || 'Sin título'}</button>
+                    <p class="msg-label">Trabajo: <button class="msg-job-link" data-job-url="${jobUrl}">${job.titulo || 'Sin título'}</button></p>
                 </div>
             `;
         } else {
-            taskInfoHTML = `
+            labelHTML = `
                 <div class="msg-task-context">
                     <p class="msg-label">Chat Directo</p>
                 </div>
@@ -357,11 +321,12 @@ function renderMensajes() {
             <img src="${avatar}" class="msg-avatar" alt="${nombre}" onerror="this.src='../assets/img/avatar-defecto.png'">
             <div class="msg-info">
                 <h3 class="msg-name">${nombre}</h3>
-                ${taskInfoHTML}
+                ${labelHTML}
                 <div class="msg-stats">
-                    <p><img src="../assets/img/icons/icono-nivel.png" class="icon-img-small" alt=""> Nivel: ${nivel}</p>
-                    <p><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt=""> Valoración: ${valoracion}</p>
-                    <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Especialidad: ${especialidad}</p>
+                    <p><img src="../assets/img/icons/icono-ubicacion.png" alt=""> ${ubicacion}</p>
+                    <p><img src="../assets/img/icons/icono-nivel.png" alt=""> Nivel: ${nivel}</p>
+                    <p><img src="../assets/img/icons/icono-estrella.png" alt=""> Valoración: ${valoracion}</p>
+                    <p><img src="../assets/img/icons/icono-categoria.png" alt=""> Especialidad: ${especialidad}</p>
                 </div>
             </div>
             <button class="msg-chat-btn" title="Abrir chat con ${nombre}">
@@ -374,7 +339,6 @@ function renderMensajes() {
             window.location.href = chatUrl;
         });
 
-        // Clic en el avatar o nombre → Ir al perfil del usuario
         const avatarEl = card.querySelector('.msg-avatar');
         const nameEl = card.querySelector('.msg-name');
 
@@ -386,7 +350,6 @@ function renderMensajes() {
         if (avatarEl) avatarEl.addEventListener('click', goToProfile);
         if (nameEl) nameEl.addEventListener('click', goToProfile);
 
-        // Clic en el link del trabajo
         const jobBtn = card.querySelector('.msg-job-link');
         if (jobBtn) {
             jobBtn.addEventListener('click', (e) => {
@@ -395,7 +358,6 @@ function renderMensajes() {
             });
         }
 
-        // Botón chat → chat.html (ya cubierto por el clic en cardinal pero lo mantenemos por consistencia)
         card.querySelector('.msg-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             window.location.href = chatUrl;

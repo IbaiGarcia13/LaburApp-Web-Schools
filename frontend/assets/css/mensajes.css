@@ -33,6 +33,14 @@
     text-align: left;
 }
 
+.section-title img {
+    width: 35px;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin-top: -10px;
+}
+
+
 /* ==========================================
    TARJETA DE CONVERSACIÓN
    ========================================== */
@@ -69,7 +77,6 @@
     width: 12px;
     height: 12px;
     background: #e74c3c;
-    /* Rojo vibrante */
     border-radius: 50%;
     z-index: 2;
     box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
@@ -134,7 +141,30 @@
     color: var(--primary);
 }
 
-/* Chips de nivel, valoración, especialidad */
+.msg-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.msg-stats p {
+    font-size: 0.9rem;
+    color: var(--gray-11);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.msg-stats p img {
+    width: 16px;
+    height: 16px;
+}
+
 .msg-meta {
     display: flex;
     flex-wrap: wrap;

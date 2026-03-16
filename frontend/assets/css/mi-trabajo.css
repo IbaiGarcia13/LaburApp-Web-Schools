@@ -180,3 +180,77 @@
 .msg-icon:hover {
     transform: scale(1.1);
 }
+
+/* Acciones del trabajo */
+.job-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn-empezar {
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
+    padding: 15px 40px;
+    border: none;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: none;
+    /* Controlado por JS */
+}
+
+.btn-empezar:hover {
+    background-color: var(--gray-11);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-empezar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* --- BADGE DE ESTADO --- */
+.estado-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: var(--gray-2);
+    color: var(--neutral-white);
+    text-transform: uppercase;
+}
+
+.estado-badge.pendiente {
+    background: var(--orange-1);
+    color: var(--neutral-white);
+}
+
+.estado-badge.aceptada {
+    background: var(--green-2);
+    color: var(--neutral-white);
+}
+
+.estado-badge.en-curso,
+.estado-badge.en.curso,
+.status-en-curso {
+    background: var(--blue-2);
+    color: var(--neutral-white);
+}
+
+.estado-badge.completada {
+    background: var(--neutral-black);
+    color: var(--neutral-white);
+}
+
+.estado-badge.cancelada {
+    background: var(--red-2);
+    color: var(--neutral-white);
+}
