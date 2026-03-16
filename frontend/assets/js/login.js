@@ -8,6 +8,23 @@ const usuarioInput = document.getElementById("username"); // It's username visua
 const contraseñaInput = document.getElementById("password");
 const recordarCheckbox = document.getElementById("remember");
 const mensajeError = document.getElementById("mensajeError");
+const togglePassword = document.getElementById("togglePassword");
+
+// 1. Mostrar/Ocultar contraseña
+function toggleVisibility() {
+    const img = togglePassword.querySelector('img');
+    if (contraseñaInput.type === "password") {
+        contraseñaInput.type = "text";
+        if (img) img.src = "assets/img/icons/icono-ojo-no.png";
+    } else {
+        contraseñaInput.type = "password";
+        if (img) img.src = "assets/img/icons/icono-ojo-si.png";
+    }
+}
+
+if (togglePassword) {
+    togglePassword.addEventListener("click", toggleVisibility);
+}
 
 // Redirección automática si ya hay una sesión iniciada
 onAuthStateChanged(auth, (user) => {

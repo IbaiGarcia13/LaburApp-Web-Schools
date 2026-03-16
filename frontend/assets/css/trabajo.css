@@ -19,17 +19,21 @@
 
 .job-image-wrapper {
     flex-shrink: 0;
+    align-self: flex-end;
 }
 
 .job-img {
-    width: 220px;
-    height: 220px;
+    width: 240px;
+    height: 240px;
     border-radius: 20px;
     object-fit: cover;
+    display: block;
 }
 
 .job-info-main {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .job-title {
@@ -40,7 +44,7 @@
 .job-description {
     font-size: 15px;
     line-height: 1.4;
-    padding-bottom: 50px;
+    padding-bottom: 20px;
 }
 
 .contact-links {
@@ -148,9 +152,24 @@
 
 /* Container Chat */
 .message-container {
-    margin-top: -30px;
     text-align: right;
+}
 
+.job-info-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+    gap: 15px;
+    margin-bottom: 8px;
+}
+
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 350px;
 }
 
 .msg-icon {
@@ -175,7 +194,7 @@
     color: var(--neutral-white);
     padding: 15px 40px;
     border: none;
-    border-radius: 12px;
+    border-radius: 15px;
     font-weight: bold;
     font-size: 1.1rem;
     cursor: pointer;

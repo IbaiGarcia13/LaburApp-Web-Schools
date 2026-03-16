@@ -23,7 +23,7 @@
     </header>
     <main>
         <!-- === SECCIÓN PROMOCIONAL DESCARTABLE / DESCARGAR APP === -->
-      
+
         <!-- === SECCIÓN FORMULARIO DE ACCESO (LOGIN) === -->
         <!-- Formulario principal para acceder al Dashboard general o "perfil" del trabajador/cliente -->
         <section id="login">
@@ -34,7 +34,14 @@
                 <input type="text" id="username" name="username" required><br><br>
 
                 <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required><br><br>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" id="togglePassword"
+                        style="width: 45px; height: 48px; padding: 0; background: transparent; border: 1px solid var(--gray-3); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: none;">
+                        <img src="assets/img/icons/icono-ojo-si.png" alt="Mostrar" id="imgToggle"
+                            style="width: 20px; height: 20px; object-fit: contain;">
+                    </button>
+                </div><br><br>
 
                 <div class="remember-me">
                     <input type="checkbox" id="remember" name="remember">
@@ -47,16 +54,17 @@
             <p style="margin-top: -40px;">¿No tienes una cuenta? <a href="pages/register.html">Regístrate aquí</a></p>
         </section>
 
-          <section id="download_app">
+        <section id="download_app">
             <div class="download-text">
                 <img src="assets/img/app-descargar.png" alt="app descargar" class="ordenador">
                 <div>
                     <h2>¡DESCARGA LABURAPP!</h2>
-                    <p>Descárgate nuestra app de LaburApp para Android o IOs gratis y empieza a disfrutar de la comodidad de llevarnos contigo a todas partes y poder ganar dinero desde cualquier lugar.</p>
+                    <p>Descárgate nuestra app de LaburApp para Android o IOs gratis y empieza a disfrutar de la
+                        comodidad de llevarnos contigo a todas partes y poder ganar dinero desde cualquier lugar.</p>
                 </div>
             </div>
             <div class="download-button">
-                <button type="submit" id="descargar">
+                <button type="button" id="descargar" onclick="window.location.href='pages/app.html'">
                     DESCARGAR APP
                     <img src="assets/img/icons/icono-descargar.png" alt="descargar icon">
                 </button>

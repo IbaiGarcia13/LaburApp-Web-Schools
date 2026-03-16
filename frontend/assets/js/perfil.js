@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // --- 1. LÓGICA DE NIVEL Y BARRA DE XP ---
                     const nLvl = perfil.nivel || 1;
                     const xpActual = perfil.experiencia_nivel_actual || 0;
-                    // MaxXP requerida para pasar de nivel = (nLvl) * 100 + 100 => (nLvl + 1) * 100.
-                    const maxXP = (nLvl + 1) * 100;
+                    // Nueva fórmula acumulativa: Incremento = 100 + (nivel - 1) * 50 = 50 * (nivel + 1)
+                    const maxXP = 50 * (nLvl + 1);
 
                     if (lvlVal) lvlVal.textContent = nLvl;
                     if (lvlBars.length >= 3) {

@@ -83,15 +83,18 @@
                 <p class="job-description" id="displayDesc">Necesito a una persona que me corte el césped, se requiere
                     de maquinaria y experiencia con esta maquinaria. Son 200 metros cuadrados de terreno, solo césped y
                     no hay ningún árbol o arbusto.</p>
-                <div class="contact-links">
-                    <div class="link-row">
-                        <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
-                        <span class="italic" id="displayLoc">Barakaldo, Bizkaia, Calle La Paz 21, 2ºF</span>
+                <div class="job-info-footer">
+                    <div class="contact-links">
+                        <div class="link-row">
+                            <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
+                            <span class="italic truncate-text" id="displayLoc">Barakaldo, Bizkaia, Calle La Paz 21,
+                                2ºF</span>
+                        </div>
                     </div>
-                </div>
-                <div class="edit-container">
-                    <img src="../assets/img/icons/icono-editar.png" alt="Editar Principal" class="icon-edit"
-                        id="btnEditMain">
+                    <div class="edit-container">
+                        <img src="../assets/img/icons/icono-editar.png" alt="Editar Principal" class="icon-edit"
+                            id="btnEditMain">
+                    </div>
                 </div>
             </div>
 
@@ -274,7 +277,38 @@
 
             <div class="modal-buttons">
                 <button id="btnCancelValoracion" class="modal-btn cancel">Cancelar</button>
-                <button id="btnConfirmarValoracion" class="modal-btn confirm" disabled>Enviar y Completar</button>
+                <button id="btnConfirmarValoracion" class="modal-btn confirm" disabled>Continuar al Pago</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pago -->
+    <div id="modalPago" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Realizar Pago</h3>
+            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 20px;">Confirma el pago al trabajador para
+                finalizar la tarea.</p>
+
+            <div class="stat-box-large"
+                style="margin-bottom: 20px; background: var(--gray-1); border: 2px solid var(--gray-2);">
+                <span class="stat-label">Importe a Pagar:</span>
+                <span class="stat-value" style="color: var(--gray-11);"><span id="pagoMontoModal">0.00</span> €</span>
+            </div>
+
+            <div class="input-group">
+                <label>Método de Pago:</label>
+                <select id="selectMetodoPago"
+                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gray-2);">
+                    <!-- Se carga por JS -->
+                </select>
+                <div id="noPaymentMethods" class="hidden" style="color: #d15050; font-size: 12px; margin-top: 5px;">
+                    No tienes métodos de pago guardados. Ve a ajustes para añadir uno.
+                </div>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button id="btnCancelPago" class="modal-btn cancel">Cancelar</button>
+                <button id="btnConfirmarPago" class="modal-btn confirm">Confirmar y Finalizar</button>
             </div>
         </div>
     </div>

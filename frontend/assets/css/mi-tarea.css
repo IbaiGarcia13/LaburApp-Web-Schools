@@ -2,10 +2,12 @@
 
 /* Mi Tarea UI */
 .main-content {
-    max-width: 1100px;
     margin: 40px auto;
     padding: 0 20px;
     color: var(--neutral-black);
+    width: 100%;
+    min-width: 900px;
+    max-width: 1000px;
 }
 
 .job-header-section {
@@ -16,17 +18,21 @@
 
 .job-image-wrapper {
     flex-shrink: 0;
+    align-self: flex-end;
 }
 
 .job-img {
-    width: 220px;
-    height: 220px;
+    width: 240px;
+    height: 240px;
     border-radius: 20px;
     object-fit: cover;
+    display: block;
 }
 
 .job-info-main {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .job-title {
@@ -38,7 +44,7 @@
 .job-description {
     font-size: 15px;
     line-height: 1.4;
-    padding-bottom: 50px;
+    padding-bottom: 20px;
 }
 
 .contact-links {
@@ -61,7 +67,6 @@
 }
 
 .edit-container {
-    margin-top: -24px;
     text-align: right;
 }
 
@@ -399,4 +404,21 @@
     font-size: 14px;
     color: var(--gray-5);
     margin-top: 10px;
+}
+
+.job-info-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+    margin-bottom: 8px;
+    gap: 15px;
+}
+
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 350px;
 }

@@ -1,15 +1,25 @@
 @import "paleta-colores.css";
 
-.main-container {
+#container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
     min-height: calc(100vh - 250px);
 }
 
-.main-title {
+.section-title {
+    width: 100%;
     color: var(--neutral-white);
-    margin-bottom: 40px;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: left;
+}
+
+.section-title img {
+    width: 35px;
+    vertical-align: middle;
+    margin-right: 10px;
 }
 
 .subscriptions-grid {

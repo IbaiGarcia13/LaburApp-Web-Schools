@@ -46,6 +46,9 @@ async function loadMyAcceptedJobs(uid) {
 
 function applyClientFilters() {
     filteredJobs = allJobs.filter(j => {
+        const isCompletada = (j.estado || "").toLowerCase() === "completada";
+        if (isCompletada) return false;
+
         const matchCat = (currentFilters.cat === "todas" || (j.id_categoria && j.id_categoria.toLowerCase() === currentFilters.cat.toLowerCase()));
         const pago = j.pago_trabajador || (j.pago_cliente * 0.9);
         const matchPay = pago >= currentFilters.pMin && pago <= currentFilters.pMax;
@@ -87,9 +90,10 @@ function displayJobs() {
                     <p class="job-desc">${job.descripcion || "Sin descripción."}</p>
                     <div class="job-details">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "No especificada"}</p>
-                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo: ${job.tiempo_estimado_horas}h</p>
+                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</p>
                         <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:16px" alt=""> Pago: <strong>${Number(pago).toFixed(2)} €</strong></p>
+                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></p>
+                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:16px" alt=""><strong>${Number(pago).toFixed(2)} €</strong></p>
                     </div>
                 </div>
             </article>`;

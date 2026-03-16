@@ -91,7 +91,7 @@ function displayJobs() {
                         <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</p>
                         <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${job.id_categoria.charAt(0).toUpperCase() + job.id_categoria.slice(1)}</p>
                         <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</strong></p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""> Pago: <strong>${Number(job.pago_cliente).toFixed(2)} €</strong></p>
+                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(job.pago_cliente).toFixed(2)} €</strong></p>
                     </div>
                 </div>
             </article>`;

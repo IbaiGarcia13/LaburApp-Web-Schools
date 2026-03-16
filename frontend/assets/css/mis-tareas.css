@@ -73,15 +73,57 @@
     /* Necesario para que el truncamiento de texto funcione en flexbox */
 }
 
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding-right: 60px;
+    /* Espacio para los botones de acción */
+}
+
 .job-info h3 {
     font-size: 1.4rem;
-    margin-bottom: 12px;
+    margin: 0;
     color: var(--gray-11);
-    padding-right: 60px;
-    /* Espacio para los botones */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Badge de estado (Igual que en postulaciones.css) */
+.status-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Colores de estado (Sólo texto, sin backgrounds para coincidir con postulaciones) */
+.status-pendiente {
+    color: var(--orange-1);
+}
+
+.status-aceptada,
+.status-aceptado {
+    color: var(--green-1);
+}
+
+.status-en.curso,
+.status-en-curso {
+    color: var(--blue-1);
+}
+
+.status-finalizado,
+.status-completada {
+    color: var(--gray-6);
+}
+
+.status-rechazada,
+.status-rechazado,
+.status-cancelado,
+.status-cancelada {
+    color: var(--red-2);
 }
 
 .job-desc {

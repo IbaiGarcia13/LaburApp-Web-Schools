@@ -106,6 +106,24 @@ export async function obtenerTrabajoPorId(idTrabajo) {
     return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
 }
 
+/**
+ * Actualiza un trabajo en Firestore. Centraliza la lógica de negocio
+ * como el recálculo de XP y pago al trabajador si cambia el pago del cliente.
+ */
+export async function actualizarTrabajo(idTrabajo, datosNuevos) {
+    const docRef = doc(db, "trabajos", idTrabajo);
+
+    // Lógica de negocio si se cambia el pago
+    if (datosNuevos.pago_cliente !== undefined) {
+        const pagoC = Number(datosNuevos.pago_cliente);
+        datosNuevos.pago_trabajador = pagoC * 0.90;
+        datosNuevos.xp_otorgada = Math.round(pagoC * 10);
+    }
+
+    await updateDoc(docRef, datosNuevos);
+    return true;
+}
+
 export async function obtenerTrabajos(idCategoria = "todas") {
     let q;
     if (idCategoria && idCategoria !== "todas") {
@@ -266,12 +284,15 @@ export async function rechazarPostulacion(idTrabajo, uidTrabajador) {
 export async function completarTrabajo(idTrabajo, uidTrabajador) {
     const trabajoRef = doc(db, "trabajos", idTrabajo);
 
-    // 1. Obtener datos del trabajo para saber su categoría
+    // 1. Obtener datos del trabajo para saber su categoría y recompensas
     const trabajoSnap = await getDoc(trabajoRef);
-    let idCategoria = "otros"; // Por defecto si no tiene
+    let idCategoria = "otros";
+    let xpRecompensa = 0;
+
     if (trabajoSnap.exists()) {
         const data = trabajoSnap.data();
-        if (data.categoria) idCategoria = data.categoria;
+        idCategoria = data.id_categoria || data.categoria || "otros";
+        xpRecompensa = data.xp_otorgada || Math.round((data.pago_cliente || 0) * 10);
     }
 
     // 2. Cambiar el estado del trabajo a Completada
@@ -280,11 +301,39 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
         fecha_completada: serverTimestamp()
     });
 
-    // 3. Incrementar atómicamente tareas_realizadas en el perfil del trabajador
+    // 3. Incrementar recompensas en el perfil del trabajador
     const trabajadorRef = doc(db, "usuarios", uidTrabajador);
-    await updateDoc(trabajadorRef, {
-        tareas_realizadas: increment(1)
-    });
+    const trabajadorSnap = await getDoc(trabajadorRef);
+    const updateTrabajador = {
+        tareas_realizadas: increment(1),
+        experiencia_total: increment(xpRecompensa)
+    };
+
+    if (trabajoSnap.exists()) {
+        const data = trabajoSnap.data();
+        const pagoT = data.pago_trabajador || 0;
+        updateTrabajador.saldo = increment(pagoT);
+        updateTrabajador.dinero_ganado_total = increment(pagoT);
+    }
+
+    // Lógica simple de nivel (opcional, si queremos que se guarde en DB)
+    if (trabajadorSnap.exists()) {
+        const tData = trabajadorSnap.data();
+        let currentLvl = tData.nivel || 1;
+        let currentXP = tData.experiencia_nivel_actual || 0;
+        let newXP = currentXP + xpRecompensa;
+        let maxXP = 50 * (currentLvl + 1);
+
+        while (newXP >= maxXP) {
+            newXP -= maxXP;
+            currentLvl++;
+            maxXP = 50 * (currentLvl + 1);
+        }
+        updateTrabajador.nivel = currentLvl;
+        updateTrabajador.experiencia_nivel_actual = newXP;
+    }
+
+    await updateDoc(trabajadorRef, updateTrabajador);
 
     // 4. Sumar 1 punto a la categoría correspondiente
     await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);

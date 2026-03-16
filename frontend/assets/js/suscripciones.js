@@ -103,11 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.showCustomAlert("¡Éxito!", `Suscripción ${selectedSub.name} activada correctamente.`);
             modal.classList.add('hidden');
 
-            // Opcional: Redirigir a ajustes para ver el cambio
-            setTimeout(() => {
-                window.location.href = "ajustes.html";
-            }, 1500);
-
         } catch (error) {
             console.error("Error al procesar compra:", error);
             window.showCustomAlert("Error", "Hubo un problema al procesar el pago. Inténtalo de nuevo.");

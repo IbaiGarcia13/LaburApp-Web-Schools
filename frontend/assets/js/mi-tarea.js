@@ -1,6 +1,5 @@
-import { auth, db } from './firebase-config.js';
-import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion, completarTrabajo, dejarValoracion } from './database.js';
-import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { auth } from './firebase-config.js';
+import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion, completarTrabajo, dejarValoracion, obtenerMetodosPago, actualizarTrabajo } from './database.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Obtener el ID de la tarea desde la URL
@@ -41,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderTarea(tarea);
 
                 // Si la tarea está pendiente, cargamos candidatos
-                if (tarea.estado === "Pendiente") {
+                if (tarea.estado && tarea.estado.toLowerCase() === "pendiente") {
                     loadApplicants(id);
                 } else {
                     document.getElementById('applicantsSection').style.display = 'none';
@@ -188,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const photoFile = document.getElementById('inputPhoto').files[0];
 
         try {
-            const ref = doc(db, "trabajos", tareaId);
             const dataToUpdate = {
                 titulo: inputTitle.value,
                 descripcion: inputDesc.value,
@@ -206,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dataToUpdate.foto_trabajo = base64Photo;
             }
 
-            await updateDoc(ref, dataToUpdate);
+            await actualizarTrabajo(tareaId, dataToUpdate);
 
             displayTitle.textContent = inputTitle.value;
             displayDesc.textContent = inputDesc.value;
@@ -240,15 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const newValue = parseFloat(inputPay.value);
         if (!isNaN(newValue)) {
             try {
-                const ref = doc(db, "trabajos", tareaId);
-                const pagoTrabajador = newValue * 0.9;
-                const xp = Math.round(newValue * 10);
-                // Como cliente, actualizo el pago que yo ofrezco
-                await updateDoc(ref, {
-                    pago_cliente: newValue,
-                    pago_trabajador: pagoTrabajador,
-                    xp_otorgada: xp
+                await actualizarTrabajo(tareaId, {
+                    pago_cliente: newValue
                 });
+                const xp = Math.round(newValue * 10);
                 displayPay.textContent = newValue.toFixed(2);
                 displayExp.textContent = xp;
                 modalPay.classList.add('hidden');
@@ -281,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnCancelInfo').onclick = () => modalInfo.classList.add('hidden');
     document.getElementById('btnSaveInfo').onclick = async () => {
         try {
-            const ref = doc(db, "trabajos", tareaId);
             const dataToUpdate = {
                 id_categoria: inputCat.value.split(" ")[0].toLowerCase(), // Ejemplo: "Jardinería"
                 tiempo_estimado_horas: parseInt(inputTime.value) || 0
@@ -291,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dataToUpdate.fecha_limite = new Date(inputDate.value);
             }
 
-            await updateDoc(ref, dataToUpdate);
+            await actualizarTrabajo(tareaId, dataToUpdate);
 
             displayCat.textContent = inputCat.options[inputCat.selectedIndex].text;
             displayTime.textContent = inputTime.value + "h";
@@ -307,7 +299,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const modalValoracion = document.getElementById('modalValoracion');
+    const modalPago = document.getElementById('modalPago');
     const btnCancelValoracion = document.getElementById('btnCancelValoracion');
+    const btnCancelPago = document.getElementById('btnCancelPago');
+    const btnConfirmarPago = document.getElementById('btnConfirmarPago');
+    const selectMetodoPago = document.getElementById('selectMetodoPago');
+    const noPaymentMethods = document.getElementById('noPaymentMethods');
 
     // Cerrar al clicar fuera
     window.onclick = (event) => {
@@ -315,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target == modalPay) modalPay.classList.add('hidden');
         if (event.target == modalInfo) modalInfo.classList.add('hidden');
         if (event.target == modalValoracion) modalValoracion.classList.add('hidden');
+        if (event.target == modalPago) modalPago.classList.add('hidden');
     };
 
     // Botón de Chat
@@ -370,29 +368,79 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     });
 
+    // --- LÓGICA DEL MODAL DE PAGO ---
+
+
+    async function cargarMetodosPago() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        try {
+            const metodos = await obtenerMetodosPago(user.uid);
+            selectMetodoPago.innerHTML = "";
+
+            if (metodos.length === 0) {
+                selectMetodoPago.style.display = 'none';
+                noPaymentMethods.classList.remove('hidden');
+                btnConfirmarPago.disabled = true;
+                btnConfirmarPago.style.opacity = '0.5';
+            } else {
+                selectMetodoPago.style.display = 'block';
+                noPaymentMethods.classList.add('hidden');
+                btnConfirmarPago.disabled = false;
+                btnConfirmarPago.style.opacity = '1';
+
+                metodos.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id_metodo;
+                    opt.textContent = `${m.tipo}: ${m.detalle}`;
+                    selectMetodoPago.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    if (btnCancelPago) {
+        btnCancelPago.onclick = () => modalPago.classList.add('hidden');
+    }
+
+    // Paso 1: Al confirmar valoración -> Abrir Pago
     if (btnConfirmarValoracion) {
         btnConfirmarValoracion.onclick = () => {
-            if (currentRating < 1 || !currentTarea || !currentTarea.id_trabajador) return;
+            modalValoracion.classList.add('hidden');
+            document.getElementById('pagoMontoModal').textContent = Number(currentTarea.pago_cliente).toFixed(2);
+            cargarMetodosPago();
+            modalPago.classList.remove('hidden');
+        };
+    }
+
+    // Paso 2: Al confirmar pago -> Finalizar Todo
+    if (btnConfirmarPago) {
+        btnConfirmarPago.onclick = async () => {
+            if (!currentTarea || !currentTarea.id_trabajador) return;
 
             showCustomConfirm(
-                "¿Finalizar y Valorar?",
-                "Esta acción no se puede deshacer.",
+                "¿Confirmar Pago y Finalizar?",
+                "Se transferirá el importe al trabajador y la tarea se marcará como completada.",
                 async () => {
                     try {
-                        btnConfirmarValoracion.disabled = true;
-                        btnConfirmarValoracion.textContent = "Procesando...";
+                        btnConfirmarPago.disabled = true;
+                        btnConfirmarPago.textContent = "Procesando...";
 
+                        const puntuacion = currentRating;
                         const comentario = inputComentario.value.trim();
 
                         // 1. Guardar la valoración
-                        await dejarValoracion(currentTarea.id_trabajador, tareaId, currentRating, comentario);
+                        await dejarValoracion(currentTarea.id_trabajador, tareaId, puntuacion, comentario);
 
-                        // 2. Marcar la tarea como completada e incrementar XP/tareas
+                        // 2. Marcar como completada y transferir dinero (en database.js)
                         await completarTrabajo(tareaId, currentTarea.id_trabajador);
 
-                        showCustomAlert("¡Completada!", "La tarea ha sido finalizada y la valoración enviada.");
+                        showCustomAlert("¡Tarea Finalizada!", "El pago se ha realizado y la tarea está ahora completada.");
 
-                        modalValoracion.classList.add('hidden');
+                        modalPago.classList.add('hidden');
                         if (btnCompletar) btnCompletar.style.display = 'none';
 
                         // Actualizar badge
@@ -402,10 +450,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             badgeEl.className = 'estado-badge completada';
                         }
                     } catch (e) {
-                        console.error("Error al completar/valorar:", e);
-                        showCustomAlert("Error", "Ocurrió un error al procesar la solicitud.");
-                        btnConfirmarValoracion.disabled = false;
-                        btnConfirmarValoracion.textContent = "Enviar y Completar";
+                        console.error(e);
+                        showCustomAlert("Error", "No se pudo procesar el pago.");
+                        btnConfirmarPago.disabled = false;
+                        btnConfirmarPago.textContent = "Confirmar y Finalizar";
                     }
                 },
                 "Confirmar",

@@ -47,6 +47,9 @@ async function loadMyPostedTasks(uid) {
 
 function applyClientFilters() {
     filteredTareas = allTareas.filter(j => {
+        const isCompletada = (j.estado || "").toLowerCase() === "completada";
+        if (isCompletada) return false;
+
         const matchCat = (currentFilters.cat === "todas" || (j.id_categoria && j.id_categoria.toLowerCase() === currentFilters.cat.toLowerCase()));
         const pago = j.pago_cliente || 0;
         const matchPay = pago >= currentFilters.pMin && pago <= currentFilters.pMax;
@@ -85,15 +88,18 @@ function displayTareas() {
                 </div>
                 <img src="${img}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">
-                    <h3>${tarea.titulo}</h3>
+                    <div class="job-card-header">
+                        <h3>${tarea.titulo}</h3>
+                        <span class="status-badge status-${(tarea.estado || 'pendiente').toLowerCase()}">${(tarea.estado || 'Pendiente').toUpperCase()}</span>
+                    </div>
                     <p class="job-desc">${tarea.descripcion || "Sin descripción."}</p>
                     <div class="job-details">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${tarea.direccion || "No especificada"}</p>
-                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo: ${tarea.tiempo_estimado_horas}h</p>
+                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${tarea.tiempo_estimado_horas}h</p>
                         <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:16px" alt=""> Pago Cliente: <strong>${Number(pagoCliente).toFixed(2)} €</strong></p>
+                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></p>
+                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:16px" alt=""><strong>${Number(pagoCliente).toFixed(2)} €</strong></p>
                     </div>
-                    <div class="job-status-badge ${(tarea.estado || 'Pendiente').toLowerCase()}">${tarea.estado || 'Pendiente'}</div>
                 </div>
             </article>`;
         container.innerHTML += card;

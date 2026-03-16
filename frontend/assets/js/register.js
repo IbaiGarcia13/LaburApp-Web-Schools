@@ -27,12 +27,14 @@ const successMsg = document.getElementById("registerSuccess");
 function toggleVisibility(inputId, buttonId) {
     const input = document.getElementById(inputId);
     const button = document.getElementById(buttonId);
+    const img = button.querySelector('img');
+
     if (input.type === "password") {
         input.type = "text";
-        button.textContent = "🙈";
+        if (img) img.src = "../assets/img/icons/icono-ojo-no.png";
     } else {
         input.type = "password";
-        button.textContent = "👁️";
+        if (img) img.src = "../assets/img/icons/icono-ojo-si.png";
     }
 }
 

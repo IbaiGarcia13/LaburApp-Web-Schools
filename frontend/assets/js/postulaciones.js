@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsuarioPorId } from './database.js';
+import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsuarioPorId, cancelarPostulacion } from './database.js';
 
 // =====================================================
 // JS de la página de Postulaciones
@@ -54,30 +54,72 @@ function renderTrabajos() {
         container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>No te has postulado a ningún trabajo aún.</p>";
     }
 
+    // Mapa de categorías (igual que en mensajes.js/usuario.js)
+    const catInfo = {
+        'gastronomia': 'Gastronomía',
+        'informatica': 'Informática',
+        'limpieza': 'Limpieza',
+        'mascotas': 'Mascotas',
+        'carpinteria': 'Carpintería',
+        'otros': 'Otros',
+        'jardineria': 'Jardinería',
+        'cuidado_personal': 'Cuidado Personal',
+        'evento': 'Evento',
+        'diseno': 'Diseño',
+        'transporte': 'Transporte',
+        'mudanza': 'Mudanza',
+        'construccion': 'Construcción'
+    };
+
     items.forEach(trabajo => {
         const post = trabajo.postulacion;
-        const estadoClass = `status-${(post.estado_postulacion || 'pendiente').toLowerCase()}`;
-        const estadoText = (post.estado_postulacion || 'Pendiente');
+        const estadoRaw = (post.estado_postulacion || 'Pendiente');
+        const estadoClass = `status-${estadoRaw.toLowerCase()}`;
+        const estadoText = estadoRaw.toUpperCase();
         const xp = trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10);
         const img = trabajo.foto_trabajo || "../assets/img/trabajo-defecto.png";
+        const categoriaNom = catInfo[trabajo.id_categoria] || "General";
+
+        // Logic for red dot notification
+        // We store the last seen status in localStorage to know if it has changed
+        const lastSeenStatusKey = `lastSeenStatus_${trabajo.id}`;
+        const lastSeenStatus = localStorage.getItem(lastSeenStatusKey);
+        const isUnread = lastSeenStatus && lastSeenStatus !== estadoRaw && estadoRaw !== 'Pendiente';
 
         const card = document.createElement('article');
-        card.className = 'job-card';
-        card.onclick = () => { window.location.href = `trabajo.html?id=${trabajo.id}`; };
+        card.className = `job-card ${isUnread ? 'unread' : ''}`;
+
+        card.onclick = () => {
+            localStorage.setItem(lastSeenStatusKey, estadoRaw); // Mark as seen
+            window.location.href = `trabajo.html?id=${trabajo.id}`;
+        };
+
+        // If it's the first time we see this job, we save the status but don't show the dot
+        if (!lastSeenStatus) {
+            localStorage.setItem(lastSeenStatusKey, estadoRaw);
+        }
 
         card.innerHTML = `
+            <div class="action-buttons">
+                <button class="delete-btn" title="Cancelar Postulación" onclick="event.stopPropagation(); confirmarCancelarPostulacion('${trabajo.id}')">
+                    <img src="../assets/img/icons/icono-eliminar.png" alt="Eliminar">
+                </button>
+            </div>
             <img src="${img}" class="job-card-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
             <div class="job-card-info">
-                <h3 class="job-card-title">${trabajo.titulo}</h3>
+                <div class="job-card-header">
+                    <h3 class="job-card-title">${trabajo.titulo}</h3>
+                    <span class="status-badge ${estadoClass}">${estadoText}</span>
+                </div>
                 <p class="job-card-desc">${trabajo.descripcion || ""}</p>
                 <div class="job-card-meta">
                     <span><img src="../assets/img/icons/icono-ubicacion.png" alt=""> ${trabajo.direccion || "No especificada"}</span>
                     <span><img src="../assets/img/icons/icono-relog.png" alt=""> Tiempo estimado: ${trabajo.tiempo_estimado_horas}h</span>
+                    <span><img src="../assets/img/icons/icono-categoria.png" alt=""> Categoría: ${categoriaNom}</span>
                     <span><img src="../assets/img/icons/icono-xp.png" alt=""> Experiencia: <strong>${xp} XP</strong></span>
                 </div>
                 <div class="job-card-footer">
-                    <span class="status-badge ${estadoClass}">${estadoText.toUpperCase()}</span>
-                    <span class="job-card-pago"><img src="../assets/img/icons/icono-dinero.png" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;" alt=""> Pago: <strong>${Number(trabajo.pago_cliente).toFixed(2)} €</strong></span>
+                    <span class="job-card-pago"><img src="../assets/img/icons/icono-dinero.png" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;" alt=""><strong>${Number(trabajo.pago_cliente).toFixed(2)} €</strong></span>
                 </div>
             </div>
         `;
@@ -157,3 +199,27 @@ function setupPaginationEvents() {
         }
     });
 }
+
+window.confirmarCancelarPostulacion = function (jobId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    showCustomConfirm(
+        "Cancelar Postulación",
+        "¿Estás seguro de que quieres retirar tu postulación para este trabajo?",
+        async () => {
+            try {
+                await cancelarPostulacion(jobId, user.uid);
+                // Actualizar lista local y renderizar
+                misPostulaciones = misPostulaciones.filter(p => p.id !== jobId);
+                renderTrabajos();
+                showCustomAlert("Éxito", "Postulación cancelada correctamente.");
+            } catch (e) {
+                console.error("Error al cancelar postulación:", e);
+                showCustomAlert("Error", "No se pudo cancelar la postulación.");
+            }
+        },
+        "Sí, retirar",
+        "No, volver"
+    );
+};

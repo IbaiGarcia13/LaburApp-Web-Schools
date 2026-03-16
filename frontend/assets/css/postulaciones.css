@@ -75,6 +75,53 @@
     box-sizing: border-box;
     align-items: center;
     padding: 15px;
+    position: relative;
+}
+
+/* Edit/Delete buttons (similar to mis-trabajos.css) */
+.action-buttons {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 10;
+}
+
+.delete-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: var(--neutral-white);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.delete-btn img {
+    width: 15px;
+    height: 15px;
+}
+
+/* Notificación de estado actualizado (punto rojo) */
+.job-card.unread::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background: #e74c3c;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+    z-index: 5;
 }
 
 .job-card:hover {
@@ -96,11 +143,19 @@
     min-width: 0;
 }
 
+.job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+}
+
 .job-card-title {
     font-size: 1rem;
     font-weight: bold;
-    margin: 0 0 5px 0;
+    margin: 0;
     color: var(--gray-11);
+    flex: 1;
 }
 
 .job-card-desc {
@@ -134,7 +189,7 @@
 /* Estado de la postulación */
 .job-card-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-top: 8px;
 }
