@@ -6,7 +6,8 @@ import {
     obtenerPerfilUsuario,
     obtenerTodosPuntosCategorias,
     obtenerTrabajoPorId,
-    generarIdChat
+    generarIdChat,
+    eliminarReferenciaConversacion
 } from './database.js';
 
 // =====================================================
@@ -179,12 +180,23 @@ async function loadAllConversations(uid) {
 
                 let job = null;
                 let jobUrl = null;
-                let chatUrl = `chat.html?userId=${id_otro_usuario}`;
 
                 if (tipo === 'trabajo' && id_trabajo) {
                     job = await obtenerTrabajoPorId(id_trabajo);
-                    jobUrl = `trabajo.html?id=${id_trabajo}`;
-                    chatUrl = `chat.html?id=${id_trabajo}&userId=${id_otro_usuario}`;
+                    if (job) {
+                        // 1. Trabajador -> mi-trabajo.html
+                        if (job.id_trabajador === uid) {
+                            jobUrl = `mi-trabajo.html?id=${id_trabajo}`;
+                        }
+                        // 2. Publicador -> mi-tarea.html
+                        else if (job.id_publicador === uid) {
+                            jobUrl = `mi-tarea.html?id=${id_trabajo}`;
+                        }
+                        // 3. Otro -> trabajo.html
+                        else {
+                            jobUrl = `trabajo.html?id=${id_trabajo}`;
+                        }
+                    }
                 }
 
                 allConversations.push({
@@ -195,8 +207,11 @@ async function loadAllConversations(uid) {
                     job,
                     ultimoMsg,
                     noLeidos,
-                    chatUrl,
-                    jobUrl
+                    chatUrl: (tipo === 'trabajo' && id_trabajo)
+                        ? `chat.html?id=${id_trabajo}&userId=${id_otro_usuario}`
+                        : `chat.html?userId=${id_otro_usuario}`,
+                    jobUrl,
+                    idChat: id_chat
                 });
             } catch (err) {
                 console.warn(`Error procesando conversación ${meta.id_chat}:`, err);
@@ -332,6 +347,9 @@ function renderMensajes() {
             <button class="msg-chat-btn" title="Abrir chat con ${nombre}">
                 <img src="../assets/img/icons/icono-chat-2.png" alt="Chat">
             </button>
+            <button class="msg-hide-btn" title="Ocultar conversación">
+                <img src="../assets/img/icons/icono-ojo-no.png" alt="Ocultar">
+            </button>
         `;
 
         // Clic en la tarjeta → Ir al chat
@@ -361,6 +379,26 @@ function renderMensajes() {
         card.querySelector('.msg-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             window.location.href = chatUrl;
+        });
+
+        card.querySelector('.msg-hide-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const myUid = auth.currentUser.uid;
+            showCustomConfirm(
+                "Ocultar chat",
+                "¿Quieres ocultar esta conversación? Seguirá existiendo, pero no aparecerá en esta lista hasta que vuelvas a contactar con el usuario.",
+                async () => {
+                    try {
+                        await eliminarReferenciaConversacion(myUid, conv.idChat);
+                        // No hace falta reload manual, el onSnapshot de loadAllConversations lo detectará
+                    } catch (err) {
+                        console.error("Error al ocultar chat:", err);
+                    }
+                },
+                "Ocultar",
+                "Cancelar",
+                "confirm"
+            );
         });
 
         container.appendChild(card);

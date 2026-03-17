@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsuarioPorId, cancelarPostulacion } from './database.js';
+import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsuarioPorId, cancelarPostulacion, aceptarPostulacion, rechazarPostulacion, obtenerMetodosPago } from './database.js';
 
 // =====================================================
 // JS de la página de Postulaciones
@@ -101,7 +101,7 @@ function renderTrabajos() {
 
         card.innerHTML = `
             <div class="action-buttons">
-                <button class="delete-btn" title="Cancelar Postulación" onclick="event.stopPropagation(); confirmarCancelarPostulacion('${trabajo.id}')">
+                <button class="action-btn delete-btn" title="Cancelar Postulación" onclick="event.stopPropagation(); confirmarCancelarPostulacion('${trabajo.id}')">
                     <img src="../assets/img/icons/icono-eliminar.png" alt="Eliminar">
                 </button>
             </div>
@@ -161,6 +161,14 @@ async function renderUsuarios() {
                     <strong class="user-task-link" data-id="${app.id_trabajo}">${app.trabajo_titulo}</strong>
                 </p>
             </div>
+            <div class="user-app-actions">
+                <button class="action-btn btn-accept-small" title="Aceptar Candidato">
+                    <img src="../assets/img/icons/icono-si-blanco.png" alt="Aceptar">
+                </button>
+                <button class="action-btn btn-reject-small" title="Rechazar Candidato">
+                    <img src="../assets/img/icons/icono-no-blanco.png" alt="Rechazar">
+                </button>
+            </div>
             <button class="user-chat-btn" title="Chatear con ${user.nombre}">
                 <img src="../assets/img/icons/icono-chat-2.png" alt="Chat">
             </button>
@@ -177,6 +185,84 @@ async function renderUsuarios() {
         card.querySelector('.user-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             window.location.href = `chat.html?id=${app.id_trabajo}&userId=${user.uid}`;
+        });
+
+        // Click en Aceptar
+        card.querySelector('.btn-accept-small').addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            const modal = document.getElementById('modalAceptarTrabajador');
+            const montoEl = document.getElementById('montoRetenerModal');
+            const btnConfirm = document.getElementById('btnConfirmarAceptar');
+            const btnCancel = document.getElementById('btnCancelAceptar');
+            const selectMetodo = document.getElementById('selectMetodoAceptar');
+            const noMethods = document.getElementById('noMethodsAceptar');
+
+            if (!modal || !montoEl || !btnConfirm || !btnCancel || !selectMetodo || !noMethods) return;
+
+            // Cargar datos
+            montoEl.textContent = Number(app.pago_cliente || 0).toFixed(2);
+
+            const userAuth = auth.currentUser;
+            if (userAuth) {
+                obtenerMetodosPago(userAuth.uid).then(metodos => {
+                    selectMetodo.innerHTML = "";
+                    if (metodos.length === 0) {
+                        selectMetodo.style.display = 'none';
+                        noMethods.classList.remove('hidden');
+                        btnConfirm.disabled = true;
+                        btnConfirm.style.opacity = '0.5';
+                    } else {
+                        selectMetodo.style.display = 'block';
+                        noMethods.classList.add('hidden');
+                        btnConfirm.disabled = false;
+                        btnConfirm.style.opacity = '1';
+
+                        metodos.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id_metodo;
+                            opt.textContent = `${m.tipo}: ${m.detalle}`;
+                            selectMetodo.appendChild(opt);
+                        });
+                    }
+                });
+            }
+
+            modal.classList.remove('hidden');
+
+            btnCancel.onclick = () => modal.classList.add('hidden');
+            btnConfirm.onclick = async () => {
+                try {
+                    btnConfirm.disabled = true;
+                    btnConfirm.textContent = "Procesando...";
+                    await aceptarPostulacion(app.id_trabajo, user.uid);
+                    modal.classList.add('hidden');
+                    showCustomAlert("¡Confirmado!", `${user.nombre} ha sido asignado al trabajo.`);
+                    location.reload();
+                } catch (err) {
+                    console.error("Error aceptando postulación:", err);
+                    showCustomAlert("Error", "No se pudo asignar al trabajador.");
+                    btnConfirm.disabled = false;
+                    btnConfirm.textContent = "Confirmar";
+                }
+            };
+        });
+
+        // Click en Rechazar
+        card.querySelector('.btn-reject-small').addEventListener('click', (e) => {
+            e.stopPropagation();
+            showCustomConfirm("Rechazar Candidato", `¿Estás seguro de rechazar la solicitud de ${user.nombre} para "${app.trabajo_titulo}"?`, async () => {
+                try {
+                    await rechazarPostulacion(app.id_trabajo, user.uid);
+                    card.remove();
+                    if (container.children.length === 0) {
+                        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nadie se ha postulado a tus tareas todavía.</p>";
+                    }
+                } catch (err) {
+                    console.error("Error rechazando postulación:", err);
+                    showCustomAlert("Error", "No se pudo rechazar la postulación.");
+                }
+            });
         });
     }
 }
@@ -199,6 +285,14 @@ function setupPaginationEvents() {
         }
     });
 }
+
+// Cerrar modal al clicar fuera
+window.onclick = (event) => {
+    const modalAceptar = document.getElementById('modalAceptarTrabajador');
+    if (event.target == modalAceptar) {
+        modalAceptar.classList.add('hidden');
+    }
+};
 
 window.confirmarCancelarPostulacion = function (jobId) {
     const user = auth.currentUser;

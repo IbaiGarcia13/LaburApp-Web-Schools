@@ -226,6 +226,36 @@
     opacity: 0.8;
 }
 
+/* Botón de ocultar */
+.msg-hide-btn {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    transition: transform 0.2s, opacity 0.3s;
+    z-index: 5;
+    opacity: 0;
+    /* Oculto por defecto */
+}
+
+/* Mostrar botón cuando el card está en hover */
+.msg-card:hover .msg-hide-btn {
+    opacity: 0.6;
+}
+
+.msg-hide-btn:hover {
+    transform: scale(1.15);
+    opacity: 1 !important;
+}
+
+.msg-hide-btn img {
+    width: 28px;
+    height: 28px;
+}
+
 /* Estado vacío */
 .msgs-empty {
     color: white;

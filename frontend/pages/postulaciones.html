@@ -73,6 +73,7 @@
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
             <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
             </li>
+            <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a></li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
@@ -122,6 +123,43 @@
             </button>
         </div>
     </main>
+
+    <!-- Modal Aceptar Trabajador (Retención Escrow) -->
+    <div id="modalAceptarTrabajador" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Confirmar y Retener Pago</h3>
+            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 15px;">Para aceptar a este trabajador, el
+                importe del trabajo será retirado de tu cuenta y retenido por LaburApp.</p>
+
+            <div class="stat-box-large"
+                style="margin-bottom: 20px; background: var(--gray-1) !important; border: 2px solid var(--gray-2) !important; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <span class="stat-label" style="font-weight: 600; color: var(--gray-8);">Importe a Retener:</span>
+                <span class="stat-value" style="color: var(--gray-11); font-size: 1.2rem; font-weight: 700;"><span
+                        id="montoRetenerModal">0.00</span> €</span>
+            </div>
+
+            <div class="input-group">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Método de Pago:</label>
+                <select id="selectMetodoAceptar"
+                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--gray-2); font-size: 14px;"></select>
+                <div id="noMethodsAceptar" class="hidden" style="color: #d15050; font-size: 12px; margin-top: 5px;">
+                    No tienes métodos de pago guardados.
+                </div>
+            </div>
+
+            <p style="font-size: 12px; color: var(--gray-6); margin-top: 15px; font-style: italic; line-height: 1.4;">
+                * El dinero solo se entregará al trabajador cuando marques la tarea como completada. De lo contrario,
+                será reembolsado.
+            </p>
+
+            <div class="modal-buttons" style="margin-top: 25px; display: flex; gap: 12px;">
+                <button id="btnCancelAceptar" class="modal-btn cancel"
+                    style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--gray-3); background: white; cursor: pointer; font-weight: 600;">Cancelar</button>
+                <button id="btnConfirmarAceptar" class="modal-btn confirm"
+                    style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: #000; color: white; cursor: pointer; font-weight: 600;">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="../assets/js/general.js"></script>
     <script type="module" src="../assets/js/postulaciones.js"></script>

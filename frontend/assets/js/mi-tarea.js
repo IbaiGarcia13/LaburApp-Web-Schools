@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         btnCompletar.style.display = 'none';
                     }
                 }
+
+                // Cargar trabajador asignado si existe
+                if (tarea.id_trabajador && tarea.estado !== "Pendiente") {
+                    loadAssignedWorker(tarea.id_trabajador);
+                } else {
+                    document.getElementById('workerSection').style.display = 'none';
+                }
             } else {
                 console.error("Tarea no encontrada");
             }
@@ -114,11 +121,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Eventos
         card.querySelector('.btn-accept').onclick = () => {
-            showCustomConfirm("Aceptar Candidato", `¿Quieres elegir a ${user.nombre} para realizar este trabajo?`, async () => {
-                await aceptarPostulacion(tareaId, user.uid);
-                showCustomAlert("¡Confirmado!", `${user.nombre} ha sido asignado al trabajo.`);
-                location.reload();
-            });
+            const modal = document.getElementById('modalAceptarTrabajador');
+            const montoEl = document.getElementById('montoRetenerModal');
+            const btnConfirm = document.getElementById('btnConfirmarAceptar');
+            const btnCancel = document.getElementById('btnCancelAceptar');
+            const selectMetodo = document.getElementById('selectMetodoAceptar');
+            const noMethods = document.getElementById('noMethodsAceptar');
+
+            // Cargar datos en el modal
+            montoEl.textContent = Number(currentTarea.pago_cliente).toFixed(2);
+
+            // Cargar métodos específicos para este modal
+            const userAuth = auth.currentUser;
+            if (userAuth) {
+                obtenerMetodosPago(userAuth.uid).then(metodos => {
+                    selectMetodo.innerHTML = "";
+                    if (metodos.length === 0) {
+                        selectMetodo.style.display = 'none';
+                        noMethods.classList.remove('hidden');
+                        btnConfirm.disabled = true;
+                        btnConfirm.style.opacity = '0.5';
+                    } else {
+                        selectMetodo.style.display = 'block';
+                        noMethods.classList.add('hidden');
+                        btnConfirm.disabled = false;
+                        btnConfirm.style.opacity = '1';
+
+                        metodos.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id_metodo;
+                            opt.textContent = `${m.tipo}: ${m.detalle}`;
+                            selectMetodo.appendChild(opt);
+                        });
+                    }
+                });
+            }
+
+            modal.classList.remove('hidden');
+
+            btnCancel.onclick = () => modal.classList.add('hidden');
+            btnConfirm.onclick = async () => {
+                try {
+                    btnConfirm.disabled = true;
+                    btnConfirm.textContent = "Procesando...";
+                    await aceptarPostulacion(tareaId, user.uid);
+                    modal.classList.add('hidden');
+                    showCustomAlert("¡Confirmado!", `${user.nombre} ha sido asignado al trabajo.`);
+                    location.reload();
+                } catch (err) {
+                    console.error("Error aceptando postulación:", err);
+                    showCustomAlert("Error", "No se pudo asignar al trabajador.");
+                    btnConfirm.disabled = false;
+                    btnConfirm.textContent = "Confirmar";
+                }
+            };
         };
 
         card.querySelector('.btn-reject').onclick = () => {
@@ -130,6 +186,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         };
+
+        card.querySelector('.btn-chat-small').onclick = () => {
+            window.location.href = `chat.html?id=${tareaId}&userId=${user.uid}`;
+        };
+
+        list.appendChild(card);
+    }
+
+    async function loadAssignedWorker(workerId) {
+        const section = document.getElementById('workerSection');
+        const list = document.getElementById('workerList');
+        section.style.display = 'block';
+
+        try {
+            const user = await obtenerUsuarioPorId(workerId);
+            if (user) {
+                renderWorkerCard(user);
+            }
+        } catch (e) {
+            console.error("Error cargando trabajador asignado:", e);
+            list.innerHTML = "<p style='color: red;'>Error al cargar datos del trabajador.</p>";
+        }
+    }
+
+    function renderWorkerCard(user) {
+        const list = document.getElementById('workerList');
+        const avatar = user.foto_perfil || "../assets/img/avatar-defecto.png";
+
+        list.innerHTML = ""; // Solo puede haber uno
+        const card = document.createElement('div');
+        card.className = 'applicant-card';
+        card.innerHTML = `
+            <img src="${avatar}" class="applicant-avatar" alt="${user.nombre}">
+            <div class="applicant-info">
+                <span class="applicant-name">${user.nombre}</span>
+                <div class="applicant-actions">
+                    <button class="app-btn btn-chat-small" title="Chat" style="width: 100%;"><img src="../assets/img/icons/icono-chat-2.png" alt=""> Chatear</button>
+                </div>
+            </div>
+        `;
 
         card.querySelector('.btn-chat-small').onclick = () => {
             window.location.href = `chat.html?id=${tareaId}&userId=${user.uid}`;
@@ -313,6 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectMetodoPago = document.getElementById('selectMetodoPago');
     const noPaymentMethods = document.getElementById('noPaymentMethods');
 
+    const modalAceptar = document.getElementById('modalAceptarTrabajador');
+
     // Cerrar al clicar fuera
     window.onclick = (event) => {
         if (event.target == modalMain) modalMain.classList.add('hidden');
@@ -320,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target == modalInfo) modalInfo.classList.add('hidden');
         if (event.target == modalValoracion) modalValoracion.classList.add('hidden');
         if (event.target == modalPago) modalPago.classList.add('hidden');
+        if (event.target == modalAceptar) modalAceptar.classList.add('hidden');
     };
 
     // Botón de Chat

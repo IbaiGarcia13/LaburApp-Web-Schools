@@ -1,7 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajosAceptadosPorMi } from './database.js';
-import { db } from './firebase-config.js';
-import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { obtenerTrabajosAceptadosPorMi, gestionarBorradoTarea } from './database.js';
 
 /**
  * MIS TRABAJOS: Trabajos que el usuario VA A HACER (Trabajador/Worker)
@@ -170,19 +168,15 @@ window.confirmarAbandonar = function (id) {
         modalDesc,
         async () => {
             try {
-                const docRef = doc(db, "trabajos", id);
-                // Si el trabajador abandona, seteamos estado "Cancelada" y marcamos quién la canceló.
-                // Esto hará que desaparezca para él (en applyClientFilters) pero aparezca "Cancelada" para el publicador.
-                await updateDoc(doc(db, "trabajos", id), {
-                    estado: "Cancelada",
-                    cancelado_por: "trabajador"
-                });
+                const { permanent } = await gestionarBorradoTarea(id, 'trabajador');
 
-                // Actualizamos localmente para reflejar el cambio inmediato
-                const jobIndex = allJobs.findIndex(j => j.id === id);
-                if (jobIndex !== -1) {
-                    allJobs[jobIndex].estado = "Cancelada";
-                    allJobs[jobIndex].cancelado_por = "trabajador";
+                if (permanent) {
+                    allJobs = allJobs.filter(j => j.id !== id);
+                } else {
+                    const jobIndex = allJobs.findIndex(j => j.id === id);
+                    if (jobIndex !== -1) {
+                        allJobs[jobIndex].borrado_por_trabajador = true;
+                    }
                 }
 
                 applyClientFilters();

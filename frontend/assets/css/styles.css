@@ -235,6 +235,8 @@ header nav a:hover {
     z-index: 999;
     padding: 30px 0;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
 }
 
 .side-menu.active {
@@ -294,9 +296,8 @@ header nav a:hover {
 }
 
 .side-menu-footer {
-    position: absolute;
-    bottom: 40px;
-    left: 30px;
+    margin-top: auto;
+    padding: 20px 30px 0px 30px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -424,4 +425,219 @@ footer {
 
 .hidden {
     display: none !important;
+}
+
+/* --- NOTIFICATIONS SIDEBAR --- */
+.notifications-sidebar {
+    position: fixed;
+    top: 70px;
+    right: -350px;
+    width: 350px;
+    height: calc(100vh - 70px);
+    background: var(--neutral-white);
+    display: flex;
+    flex-direction: column;
+    z-index: 1050;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+}
+
+.notifications-sidebar.active {
+    right: 0;
+}
+
+.notif-sidebar-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notif-sidebar-header h3 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+#closeNotifPanel {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.notif-sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.notif-empty {
+    text-align: center;
+    color: var(--gray-6);
+    padding: 40px 20px;
+}
+
+/* Badge de notificaciones en el side menu */
+.side-menu li {
+    position: relative;
+}
+
+.notif-badge {
+    background-color: var(--red-2);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 10px;
+    display: inline-flex;
+    justify-content: center;
+    margin-left: 10px;
+    margin-top: -2px;
+    vertical-align: middle;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.notif-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.notif-delete {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--gray-4);
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: 0.2s;
+    opacity: 0;
+}
+
+.notif-item:hover .notif-delete {
+    opacity: 1;
+}
+
+.notif-delete:hover {
+    color: var(--red-2);
+    transform: scale(1.2);
+}
+
+.notif-item.unread {
+    background: #fff;
+    border-left: 4px solid var(--orange-1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.notif-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.notif-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notif-item.type-nivel .notif-icon-box {
+    background: var(--red-1);
+}
+
+.notif-item.type-mensaje .notif-icon-box {
+    background: var(--orange-1);
+}
+
+.notif-item.type-pago .notif-icon-box {
+    background: var(--green-2);
+}
+
+.notif-item.type-suscripcion .notif-icon-box {
+    background: var(--blue-3);
+}
+
+.notif-item.type-valoracion .notif-icon-box {
+    background: var(--yellow-1);
+}
+
+.notif-item.type-tarea_empezada .notif-icon-box {
+    background: var(--blue-2);
+}
+
+.notif-item.type-nuevo_trabajo .notif-icon-box {
+    background: var(--blue-3);
+}
+
+.notif-item.type-nueva_postulacion .notif-icon-box {
+    background: var(--blue-1);
+}
+
+.notif-item.type-rechazado .notif-icon-box {
+    background: var(--red-2);
+}
+
+.notif-item.type-aceptado .notif-icon-box {
+    background: var(--green-1);
+}
+
+.notif-item.type-info .notif-icon-box {
+    background: #ccc;
+}
+
+.notif-icon-box img {
+    width: 20px;
+    height: 20px;
+}
+
+/* Invertimos solo los iconos que el usuario ha pedido para que se vean blancos */
+.notif-item.type-nueva_postulacion .notif-icon-box img,
+.notif-item.type-suscripcion .notif-icon-box img {
+    filter: brightness(0) invert(1);
+}
+
+.notif-content {
+    flex: 1;
+}
+
+.notif-content h4 {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--neutral-black);
+}
+
+.notif-content p {
+    font-size: 0.85rem;
+    color: var(--gray-8);
+    margin-bottom: 6px;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.notif-date {
+    font-size: 0.75rem;
+    color: var(--gray-5);
+}
+
+.notif-loader {
+    text-align: center;
+    padding: 30px;
+    color: var(--gray-6);
 }

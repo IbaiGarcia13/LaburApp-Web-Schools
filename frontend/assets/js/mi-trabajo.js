@@ -10,11 +10,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
+    let currentTrabajo = null;
     // 2. Cargar datos del trabajo desde Firestore
     try {
-        const trabajo = await obtenerTrabajoPorId(trabajoId);
-        if (trabajo) {
-            renderTrabajo(trabajo);
+        currentTrabajo = await obtenerTrabajoPorId(trabajoId);
+        if (currentTrabajo) {
+            renderTrabajo(currentTrabajo);
         } else {
             console.error("Trabajo no encontrado");
         }
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 "Chat",
                 "¿Quieres hablar con la persona que publicó esta oferta?",
                 () => {
-                    const otherId = trabajo?.id_publicador || "";
+                    const otherId = currentTrabajo?.id_publicador || "";
                     window.location.href = `chat.html?id=${trabajoId}&userId=${otherId}`;
                 },
                 "Chatear",
@@ -140,4 +141,39 @@ function renderTrabajo(trabajo) {
         // La clase CSS debe coincidir con el texto para soportar selectores como .en.curso
         badgeEl.className = `estado-badge ${estado.toLowerCase()}`;
     }
+
+    // Inicializar Mini Mapa
+    if (trabajo.latitud && trabajo.longitud) {
+        initMiniMap(trabajo.latitud, trabajo.longitud, trabajo.id_categoria);
+    }
+}
+
+function initMiniMap(lat, lng, cat) {
+    const miniMap = L.map('mini-map', {
+        zoomControl: true,
+        dragging: !L.Browser.mobile,
+        touchZoom: true,
+        scrollWheelZoom: false
+    }).setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(miniMap);
+
+    const colorMap = {
+        "carpinteria": "#A52A2A", "construccion": "#808080", "cuidado_personal": "#FFC0CB",
+        "diseno": "#5F9EA0", "evento": "#FF0000", "gastronomia": "#FFD700",
+        "informatica": "#0000FF", "jardineria": "#008000", "limpieza": "#800080",
+        "mascotas": "#006400", "mudanza": "#8B0000", "transporte": "#FFA500", "otros": "#000000"
+    };
+    const color = colorMap[cat?.toLowerCase()] || "#000000";
+
+    L.circleMarker([lat, lng], {
+        radius: 10,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.8
+    }).addTo(miniMap).bindPopup("Ubicación del trabajo").openPopup();
+
+    setTimeout(() => miniMap.invalidateSize(), 500);
 }

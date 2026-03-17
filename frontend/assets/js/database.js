@@ -49,9 +49,33 @@ export async function actualizarPerfilUsuario(uid, datosNuevos) {
 export async function actualizarSuscripcionUsuario(uid, tipo, idSuscripcion) {
     const docRef = doc(db, "usuarios", uid);
     const campo = tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
-    await updateDoc(docRef, {
-        [campo]: idSuscripcion.toLowerCase()
-    });
+
+    const updateData = {};
+    updateData[campo] = idSuscripcion;
+
+    await updateDoc(docRef, updateData);
+
+    // Notificar al usuario
+    await crearNotificacion(uid, "Nueva suscripción adquirida", `Tu suscripción de ${tipo} ahora es "${idSuscripcion}".`, "suscripcion");
+
+    return true;
+}
+
+/**
+ * Cancela una suscripción activa (la pone a vacío)
+ */
+export async function cancelarSuscripcionUsuario(uid, tipo) {
+    const docRef = doc(db, "usuarios", uid);
+    const campo = tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
+
+    const updateData = {};
+    updateData[campo] = ""; // O "ninguna" si prefieres, pero el código parece esperar IDs
+
+    await updateDoc(docRef, updateData);
+
+    // Notificar
+    await crearNotificacion(uid, "Suscripción Cancelada", `Has cancelado tu suscripción de ${tipo}.`, "rechazado");
+
     return true;
 }
 
@@ -118,6 +142,14 @@ export async function actualizarTrabajo(idTrabajo, datosNuevos) {
         const pagoC = Number(datosNuevos.pago_cliente);
         datosNuevos.pago_trabajador = pagoC * 0.90;
         datosNuevos.xp_otorgada = Math.round(pagoC * 10);
+    }
+
+    // Notificar si se empieza el trabajo (siendo el trabajador el que lo actualiza)
+    if (datosNuevos.estado === "En curso") {
+        const trabajo = await obtenerTrabajoPorId(idTrabajo);
+        if (trabajo && trabajo.id_publicador) {
+            await crearNotificacion(trabajo.id_publicador, "Tarea en Curso", `El trabajador ha empezado el trabajo "${trabajo.titulo}".`, "tarea_empezada", { id_trabajo: idTrabajo });
+        }
     }
 
     await updateDoc(docRef, datosNuevos);
@@ -199,6 +231,13 @@ export async function postularseATrabajo(idTrabajo) {
         estado_postulacion: "Pendiente", // 'Pendiente', 'Aceptada', 'Rechazada', 'Cancelada'
         fecha_postulacion: serverTimestamp()
     });
+
+    // Notificar al publicador
+    const trabajo = await obtenerTrabajoPorId(idTrabajo);
+    if (trabajo && trabajo.id_publicador) {
+        await crearNotificacion(trabajo.id_publicador, "Nueva Postulación", `Un usuario ha postulado a tu trabajo "${trabajo.titulo}".`, "nueva_postulacion", { id_trabajo: idTrabajo });
+    }
+
     return true;
 }
 
@@ -219,7 +258,7 @@ export async function obtenerMisPostulaciones(uid) {
     // Firestore no permite queries collectionGroup fácilmente sin índices complejos para subcolecciones profundas
     // Así que buscaremos en todos los trabajos y filtraremos las subcolecciones (o mejor, usaremos una query de ayuda)
     // Para simplificar esta demo, buscaremos en todos los trabajos donde el usuario NO es el dueño
-    // y luego verificamos si existe su documento en la subcolección 'postulaciones'
+    // y luego verificaremos si existe su documento en la subcolección 'postulaciones'
     const q = query(collection(db, "trabajos"), where("estado", "==", "Pendiente"));
     const snapshot = await getDocs(q);
     const misPostulaciones = [];
@@ -243,15 +282,19 @@ export async function obtenerMisPostulaciones(uid) {
  */
 export async function obtenerPostulacionesParaMisTareas(uid) {
     const misTrabajos = await obtenerTrabajosPublicadosPorMi(uid);
+    // Solo mostramos postulantes de trabajos que aún están pendientes
+    const pendientes = misTrabajos.filter(t => t.estado === "Pendiente");
+
     const todasLasPostulaciones = [];
 
-    for (const trabajo of misTrabajos) {
+    for (const trabajo of pendientes) {
         const posts = await obtenerPostulacionesDeUnTrabajo(trabajo.id);
         posts.forEach(p => {
             todasLasPostulaciones.push({
                 ...p,
                 trabajo_titulo: trabajo.titulo,
-                id_trabajo: trabajo.id
+                id_trabajo: trabajo.id,
+                pago_cliente: trabajo.pago_cliente
             });
         });
     }
@@ -259,18 +302,39 @@ export async function obtenerPostulacionesParaMisTareas(uid) {
 }
 
 export async function cancelarPostulacion(idTrabajo, uid) {
+    const job = await obtenerTrabajoPorId(idTrabajo);
     const postRef = doc(db, "trabajos", idTrabajo, "postulaciones", uid);
     await deleteDoc(postRef);
+
+    // Notificar al publicador que alguien retiró su postulación (opcional, pero útil)
+    if (job) {
+        await crearNotificacion(job.id_publicador, "Postulación Retirada", `Un candidato ha retirado su postulación de "${job.titulo}".`, "info");
+    }
     return true;
 }
 
 export async function aceptarPostulacion(idTrabajo, uidTrabajador) {
     const trabajoRef = doc(db, "trabajos", idTrabajo);
-    // 1. Actualizar el trabajo: poner el trabajador y cambiar estado
+    const jobSnap = await getDoc(trabajoRef);
+    if (!jobSnap.exists()) return;
+    const trabajo = jobSnap.data();
+
+    // 1. Actualizar el trabajo: poner el trabajador, cambiar estado y marcar pago retenido
+    const pagoC = Number(trabajo.pago_cliente || 0);
     await updateDoc(trabajoRef, {
         id_trabajador: uidTrabajador,
-        estado: "Aceptada"
+        estado: "Aceptada",
+        pago_retenido: true
     });
+
+    // 1.1 Descontar saldo al publicador (Escrow)
+    const publicadorRef = doc(db, "usuarios", trabajo.id_publicador);
+    await updateDoc(publicadorRef, {
+        saldo: increment(-pagoC)
+    });
+
+    // 1.2 Registrar en el historial del publicador
+    await registrarPagoHistorial(trabajo.id_publicador, "Saldo LaburApp", -pagoC, `Retención por tarea: ${trabajo.titulo}`);
 
     // 2. Marcar la postulación como aceptada
     const postRef = doc(db, "trabajos", idTrabajo, "postulaciones", uidTrabajador);
@@ -278,15 +342,35 @@ export async function aceptarPostulacion(idTrabajo, uidTrabajador) {
         estado_postulacion: "Aceptada"
     });
 
-    // 3. (Opcional) Podríamos rechazar automáticamente al resto
+    // 3. Notificar al trabajador
+    await crearNotificacion(uidTrabajador, "¡Postulación Aceptada!", `Has sido aceptado para el trabajo "${trabajo.titulo}".`, "aceptado", { id_trabajo: idTrabajo });
+    await crearNotificacion(uidTrabajador, "Nuevo Trabajo", `Tienes un nuevo trabajo asignado: "${trabajo.titulo}".`, "nuevo_trabajo", { id_trabajo: idTrabajo });
+
+    // 4. Rechazar o eliminar automáticamente al resto
+    const postulaciones = await obtenerPostulacionesDeUnTrabajo(idTrabajo);
+    for (const post of postulaciones) {
+        if (post.id_usuario !== uidTrabajador) {
+            // Notificamos antes de borrar para que lo sepan? O simplemente borramos.
+            // Según el feedback anterior, al resto se le elimina. Les notificamos.
+            await crearNotificacion(post.id_usuario, "Trabajo No Disponible", `El trabajo "${trabajo.titulo}" al que postulaste ya tiene un trabajador.`, "rechazado");
+            await cancelarPostulacion(idTrabajo, post.id_usuario);
+        }
+    }
+
     return true;
 }
 
 export async function rechazarPostulacion(idTrabajo, uidTrabajador) {
+    const trabajo = await obtenerTrabajoPorId(idTrabajo);
     const postRef = doc(db, "trabajos", idTrabajo, "postulaciones", uidTrabajador);
     await updateDoc(postRef, {
         estado_postulacion: "Rechazada"
     });
+
+    // Notificar al trabajador
+    if (trabajo) {
+        await crearNotificacion(uidTrabajador, "Postulación Rechazada", `Tu postulación para "${trabajo.titulo}" ha sido rechazada.`, "rechazado");
+    }
     return true;
 }
 
@@ -308,10 +392,11 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
         xpRecompensa = data.xp_otorgada || Math.round((data.pago_cliente || 0) * 10);
     }
 
-    // 2. Cambiar el estado del trabajo a Completada
+    // 2. Cambiar el estado del trabajo a Completada y liberar retención
     await updateDoc(trabajoRef, {
         estado: "Completada",
-        fecha_completada: serverTimestamp()
+        fecha_completada: serverTimestamp(),
+        pago_retenido: false
     });
 
     // 3. Incrementar recompensas en el perfil del trabajador
@@ -348,22 +433,43 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
 
     await updateDoc(trabajadorRef, updateTrabajador);
 
+    // Notificación de completada y pago
+    const data = trabajoSnap.data();
+    const pagoT = data.pago_trabajador || 0;
+    await crearNotificacion(uidTrabajador, "Trabajo Completado", `Has finalizado "${data.titulo}".`, "aceptado");
+    await crearNotificacion(uidTrabajador, "Pago Recibido", `Has recibido ${Number(pagoT).toFixed(2)}€ por "${data.titulo}".`, "pago");
+
+    // Lógica simple de nivel (opcional, si queremos que se guarde en DB)
+    if (trabajadorSnap.exists()) {
+        const tData = trabajadorSnap.data();
+        let oldLvl = tData.nivel || 1;
+        let currentLvl = tData.nivel || 1;
+        let currentXP = tData.experiencia_nivel_actual || 0;
+        let newXP = currentXP + xpRecompensa;
+        let maxXP = 50 * (currentLvl + 1);
+
+        while (newXP >= maxXP) {
+            newXP -= maxXP;
+            currentLvl++;
+            maxXP = 50 * (currentLvl + 1);
+        }
+
+        if (currentLvl > oldLvl) {
+            await crearNotificacion(uidTrabajador, "¡Subida de Nivel!", `¡Enhorabuena! Has alcanzado el nivel ${currentLvl}.`, "nivel");
+        }
+    }
+
     // 4. Sumar 1 punto a la categoría correspondiente
     await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);
 
     // 5. Registrar pagos en el historial
-    if (trabajoSnap.exists()) {
-        const data = trabajoSnap.data();
-        const pagoC = data.pago_cliente || 0;
-        const pagoT = data.pago_trabajador || 0;
-        const titulo = data.titulo || "Trabajo";
+    // Al publicador (empleador) YA se le descontó al aceptar la postulación (Escrow),
+    // así que NO lo volvemos a hacer aquí. Solo registramos la confirmación si queremos,
+    // pero para evitar saldos duplicados negativos, omitimos la deducción de saldo extra.
 
-        // Al publicador (empleador) le sale negativo
-        await registrarPagoHistorial(data.id_publicador, "Saldo LaburApp", -Math.abs(pagoC), `Pago por trabajo: ${titulo}`);
-
-        // Al trabajador le sale positivo
-        await registrarPagoHistorial(uidTrabajador, "Saldo LaburApp", Math.abs(pagoT), `Cobro por trabajo: ${titulo}`);
-    }
+    // Al trabajador le sale positivo
+    const titulo = data.titulo || "Trabajo";
+    await registrarPagoHistorial(uidTrabajador, "Saldo LaburApp", Math.abs(pagoT), `Cobro por trabajo: ${titulo}`);
 
     return true;
 }
@@ -413,6 +519,9 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
         id_usuario_emisor: user.uid
     });
 
+    // Notificar al receptor
+    await crearNotificacion(uidReceptor, "¡Nueva Valoración!", `Has recibido una valoración de ${puntuacion} estrellas.`, "valoracion");
+
     // 2. Recalcular la VALORACIÓN MEDIA del usuario receptor
     const userRef = doc(db, "usuarios", uidReceptor);
     const userSnap = await getDoc(userRef);
@@ -435,9 +544,53 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
 }
 
 /**
- * Obtiene todas las valoraciones recibidas por un usuario,
- * con los datos del emisor (foto, nombre) para mostrarlas en su perfil.
+ * --- SISTEMA DE NOTIFICACIONES ---
  */
+
+export async function crearNotificacion(uid, titulo, mensaje, tipo = "info", metadata = {}) {
+    try {
+        const notifRef = collection(db, "usuarios", uid, "notificaciones");
+        await addDoc(notifRef, {
+            titulo,
+            mensaje,
+            tipo,
+            leida: false,
+            fecha: serverTimestamp(),
+            ...metadata
+        });
+    } catch (e) {
+        console.error("Error creando notificación:", e);
+    }
+}
+
+export async function obtenerNotificaciones(uid) {
+    const q = query(
+        collection(db, "usuarios", uid, "notificaciones"),
+        orderBy("fecha", "desc"),
+        limit(20)
+    );
+    const snap = await getDocs(q);
+    const notifs = [];
+    snap.forEach(doc => {
+        notifs.push({ id: doc.id, ...doc.data() });
+    });
+    return notifs;
+}
+
+export async function marcarNotificacionesComoLeidas(uid) {
+    const q = query(collection(db, "usuarios", uid, "notificaciones"), where("leida", "==", false));
+    const snap = await getDocs(q);
+    const batch = [];
+    snap.forEach(docSnap => {
+        batch.push(updateDoc(docSnap.ref, { leida: true }));
+    });
+    await Promise.all(batch);
+}
+
+export async function eliminarNotificacion(uid, notifId) {
+    await deleteDoc(doc(db, "usuarios", uid, "notificaciones", notifId));
+}
+
 export async function obtenerValoracionesRecibidas(uid) {
     const q = query(
         collection(db, "usuarios", uid, "valoraciones_recibidas"),
@@ -500,6 +653,17 @@ export async function obtenerMetodosPago(uid) {
     return metodos;
 }
 
+/**
+ * Verifica si un usuario tiene al menos un método de pago registrado.
+ * @param {string} uid - UID del usuario.
+ * @returns {Promise<boolean>} - True si tiene métodos de pago, false en caso contrario.
+ */
+export async function usuarioTieneMetodoPago(uid) {
+    const q = query(collection(db, "usuarios", uid, "metodos_pago"), limit(1));
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+}
+
 export async function registrarPagoHistorial(uid, idMetodo, monto, detallePago = 'Transacción de LaburApp') {
     await addDoc(collection(db, "usuarios", uid, "historial_pagos"), {
         monto: monto,
@@ -540,7 +704,7 @@ export function generarIdChat(uid1, uid2, idTrabajo = null) {
  * Registra o actualiza una conversación en la subcolección del usuario
  * para que sepa qué chats tiene activos.
  */
-async function registrarConversacionActiva(uidActor, uidOtro, idChat, idTrabajo = null) {
+export async function registrarConversacionActiva(uidActor, uidOtro, idChat, idTrabajo = null) {
     const convRef = doc(db, "usuarios", uidActor, "conversaciones", idChat);
     await setDoc(convRef, {
         id_chat: idChat,
@@ -549,6 +713,15 @@ async function registrarConversacionActiva(uidActor, uidOtro, idChat, idTrabajo 
         tipo: idTrabajo ? 'trabajo' : 'directo',
         ultima_actualizacion: serverTimestamp()
     }, { merge: true });
+}
+
+/**
+ * Elimina la referencia de una conversación en la subcolección del usuario.
+ * Esto "oculta" el chat en mensajes.html sin borrar los mensajes reales.
+ */
+export async function eliminarReferenciaConversacion(uid, idChat) {
+    const convRef = doc(db, "usuarios", uid, "conversaciones", idChat);
+    await deleteDoc(convRef);
 }
 
 export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto", idReceptorOverride = null) {
@@ -581,9 +754,8 @@ export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto", idR
         fecha_envio: serverTimestamp()
     });
 
-    // 2. Actualizar metadatos de conversación para ambos
-    await registrarConversacionActiva(user.uid, idReceptor, idChat, idTrabajo);
-    await registrarConversacionActiva(idReceptor, user.uid, idChat, idTrabajo);
+    // 3. Notificar al receptor
+    await crearNotificacion(idReceptor, "Nuevo Mensaje", `Has recibido un nuevo mensaje.`, "mensaje");
 }
 
 import { limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -709,4 +881,87 @@ export async function enviarDenuncia(idUsuarioReportado, motivo) {
     });
 
     return true;
+}
+
+/**
+ * Elimina por completo un chat de trabajo y sus referencias.
+ */
+export async function eliminarChatDeTrabajo(idTrabajo, uidPublicador, uidTrabajador) {
+    if (!uidPublicador || !uidTrabajador) return;
+
+    const idChat = generarIdChat(uidPublicador, uidTrabajador, idTrabajo);
+
+    // 1. Borrar mensajes del chat
+    const mensajesRef = collection(db, "chats", idChat, "mensajes");
+    const snapshotMensajes = await getDocs(mensajesRef);
+    for (const docMsg of snapshotMensajes.docs) {
+        await deleteDoc(docMsg.ref);
+    }
+
+    // 2. Borrar documento del chat
+    await deleteDoc(doc(db, "chats", idChat));
+
+    // 3. Borrar referencias en las conversaciones de los usuarios
+    await deleteDoc(doc(db, "usuarios", uidPublicador, "conversaciones", idChat));
+    await deleteDoc(doc(db, "usuarios", uidTrabajador, "conversaciones", idChat));
+}
+
+/**
+ * Gestiona el borrado de una tarea. Si ambos la borran, se elimina de la DB y limpia chats.
+ */
+export async function gestionarBorradoTarea(idTrabajo, rol) {
+    const trabajoRef = doc(db, "trabajos", idTrabajo);
+    const snap = await getDoc(trabajoRef);
+
+    if (!snap.exists()) return;
+    const tarea = snap.data();
+
+    const yaBorradaPorOtro = (rol === 'publicador') ? tarea.borrado_por_trabajador : tarea.borrado_por_publicador;
+
+    if (yaBorradaPorOtro === true || !tarea.id_trabajador) {
+        // Notificar al otro si todavía existe y no la ha borrado
+        if (!yaBorradaPorOtro && tarea.id_trabajador) {
+            const targetUid = (rol === 'publicador') ? tarea.id_trabajador : tarea.id_publicador;
+            const msg = (rol === 'publicador') ? `El publicador ha cancelado el trabajo "${tarea.titulo}".` : `El trabajador ha abandonado el trabajo "${tarea.titulo}".`;
+            await crearNotificacion(targetUid, "Trabajo Cancelado", msg, "rechazado");
+        }
+
+        // Si ya la borró el otro O no tenía trabajador asignado (nadie más que la vea), borramos permanentemente
+        await eliminarChatDeTrabajo(idTrabajo, tarea.id_publicador, tarea.id_trabajador);
+
+        // --- NUEVO: Borrar subcolección de postulaciones ---
+        const postsRef = collection(db, "trabajos", idTrabajo, "postulaciones");
+        const snapshotPosts = await getDocs(postsRef);
+        for (const docPost of snapshotPosts.docs) {
+            await deleteDoc(docPost.ref);
+        }
+
+        await deleteDoc(trabajoRef);
+        return { permanent: true };
+    } else {
+        // --- 1. Si el trabajador abandona, reembolsamos al publicador ---
+        if (rol === 'trabajador' && tarea.pago_retenido === true) {
+            const monto = Number(tarea.pago_cliente || 0);
+            const publicadorRef = doc(db, "usuarios", tarea.id_publicador);
+
+            await updateDoc(publicadorRef, {
+                saldo: increment(monto)
+            });
+            await registrarPagoHistorial(tarea.id_publicador, "Saldo LaburApp", monto, `Reembolso por abandono: ${tarea.titulo}`);
+
+            // Marcamos como no retenido para no reembolsar dos veces
+            await updateDoc(trabajoRef, { pago_retenido: false });
+        }
+
+        // Si el publicador cancela (rol === 'publicador'), NO reembolsamos automáticamente
+        // tal como pidió el usuario ("seguir reteniendo por si acaso").
+
+        // --- 2. Si no, solo marcamos ---
+        const updateData = {};
+        if (rol === 'publicador') updateData.borrado_por_publicador = true;
+        else updateData.borrado_por_trabajador = true;
+
+        await updateDoc(trabajoRef, updateData);
+        return { permanent: false };
+    }
 }

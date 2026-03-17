@@ -215,6 +215,18 @@
     transform: none;
 }
 
+/* Mini Mapa */
+.mini-map {
+    height: 300px;
+    width: 100%;
+    margin-top: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid var(--neutral-white);
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
 /* --- BADGE DE ESTADO --- */
 .estado-badge {
     display: inline-block;

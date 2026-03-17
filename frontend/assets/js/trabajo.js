@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerTrabajoPorId, postularseATrabajo } from './database.js';
+import { obtenerTrabajoPorId, postularseATrabajo, usuarioTieneMetodoPago } from './database.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -61,6 +61,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (btnPostular) {
                     btnPostular.style.display = 'block';
                     btnPostular.onclick = async () => {
+                        // VERIFICAR MÉTODO DE PAGO
+                        const tienePago = await usuarioTieneMetodoPago(user.uid);
+                        if (!tienePago) {
+                            showCustomAlert("Acción Requerida", "Para poder postularte a un trabajo, primero debes añadir un método de pago en los ajustes.", "Ir a Ajustes");
+                            setTimeout(() => {
+                                window.location.href = "ajustes.html";
+                            }, 3000);
+                            return;
+                        }
+
                         showCustomConfirm(
                             "Postularse",
                             "¿Quieres postularte a este trabajo?",
@@ -143,4 +153,39 @@ function renderTrabajo(trabajo) {
         }
         infoTexts[2].innerText = fechaStr;
     }
+
+    // Inicializar Mini Mapa
+    if (trabajo.latitud && trabajo.longitud) {
+        initMiniMap(trabajo.latitud, trabajo.longitud, trabajo.id_categoria);
+    }
+}
+
+function initMiniMap(lat, lng, cat) {
+    const miniMap = L.map('mini-map', {
+        zoomControl: true,
+        dragging: !L.Browser.mobile,
+        touchZoom: true,
+        scrollWheelZoom: false
+    }).setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(miniMap);
+
+    const colorMap = {
+        "carpinteria": "#A52A2A", "construccion": "#808080", "cuidado_personal": "#FFC0CB",
+        "diseno": "#5F9EA0", "evento": "#FF0000", "gastronomia": "#FFD700",
+        "informatica": "#0000FF", "jardineria": "#008000", "limpieza": "#800080",
+        "mascotas": "#006400", "mudanza": "#8B0000", "transporte": "#FFA500", "otros": "#000000"
+    };
+    const color = colorMap[cat?.toLowerCase()] || "#000000";
+
+    L.circleMarker([lat, lng], {
+        radius: 10,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.8
+    }).addTo(miniMap).bindPopup("Ubicación del trabajo").openPopup();
+
+    setTimeout(() => miniMap.invalidateSize(), 500);
 }

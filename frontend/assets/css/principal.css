@@ -328,10 +328,12 @@
     /* SIDE MENU OVERRIDES */
     .side-menu {
         width: 180px !important;
-        /* Even smaller menu */
+        /* Aligned with bottom nav height (70px) and header height (70px) */
         height: calc(100vh - 140px) !important;
         top: 70px !important;
-        z-index: 2100 !important;
+        z-index: 1500 !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .side-menu li {
@@ -352,10 +354,10 @@
     }
 
     .side-menu-footer {
-        position: absolute !important;
-        bottom: 15px !important;
-        left: 15px !important;
-        width: calc(100% - 30px);
+        margin-top: auto !important;
+        position: static !important;
+        padding: 10px 15px !important;
+        width: 100% !important;
     }
 
     .side-menu-footer a {

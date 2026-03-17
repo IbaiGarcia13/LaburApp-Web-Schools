@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajos, crearTrabajo, obtenerMetodosPago } from './database.js';
+import { obtenerTrabajos, crearTrabajo, obtenerMetodosPago, usuarioTieneMetodoPago } from './database.js';
 
 // Variables globales para almacenar trabajos, marcadores en el mapa y controlar el modo de creación
 let allTrabajosDB = [], myMarkers = [], tempMarker = null, creatingMode = false;
@@ -300,8 +300,8 @@ if (btnAdd) {
 
         try {
             // Verificar si el usuario tiene métodos de pago antes de dejarle añadir un marcador
-            const metodos = await obtenerMetodosPago(user.uid);
-            if (metodos.length === 0) {
+            const tienePago = await usuarioTieneMetodoPago(user.uid);
+            if (!tienePago) {
                 showCustomAlert("Atención", "Antes de publicar trabajos en el mapa, necesitas añadir un método de pago en los ajustes.", "Ir a Ajustes");
                 setTimeout(() => {
                     window.location.href = "ajustes.html";

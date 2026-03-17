@@ -1,11 +1,13 @@
-import { auth } from './firebase-config.js';
-import { obtenerPerfilUsuario } from './database.js';
+import { auth, db } from './firebase-config.js';
+import { obtenerPerfilUsuario, obtenerNotificaciones, marcarNotificacionesComoLeidas, eliminarNotificacion } from './database.js';
+import { onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Evento global que inicializa el menú lateral y las acciones comunes en la barra superior al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     // -- LÓGICA DE USUARIO EN CABECERA --
     auth.onAuthStateChanged(async (user) => {
         if (user) {
+            setupNotificationBadgeListener(user.uid);
             // Comprobar si han pasado más de 7 días (si se usó "Recordarme")
             const loginTimestamp = localStorage.getItem("loginTimestamp");
             if (loginTimestamp) {
@@ -46,6 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (menuBtn && sideMenu) {
         menuBtn.addEventListener('click', (e) => {
+            const isOpening = !sideMenu.classList.contains('active');
+            if (isOpening) {
+                // Cerrar otros si estamos abriendo este
+                if (profileDropdown) profileDropdown.classList.remove('show');
+                toggleNotificationsPanel(false);
+            }
+
             // Alterna la clase 'active' en el menú lateral para abrirlo
             sideMenu.classList.toggle('active');
 
@@ -56,9 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Cerrar el menú y quitar el fondo gris al hacer clic fuera
-        document.addEventListener('click', () => {
-            sideMenu.classList.remove('active');
-            menuBtn.classList.remove('active'); // Quita el fondo gris
+        document.addEventListener('click', (e) => {
+            // No cerrar si el clic es dentro del menú o del botón
+            if (!sideMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                sideMenu.classList.remove('active');
+                menuBtn.classList.remove('active');
+            }
         });
     }
 
@@ -69,12 +81,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (profileBtn && profileDropdown) {
         profileBtn.addEventListener('click', (e) => {
+            const isOpening = !profileDropdown.classList.contains('show');
+            if (isOpening) {
+                // Cerrar otros
+                if (sideMenu) {
+                    sideMenu.classList.remove('active');
+                    if (menuBtn) menuBtn.classList.remove('active');
+                }
+                toggleNotificationsPanel(false);
+            }
             profileDropdown.classList.toggle('show');
             e.stopPropagation();
         });
 
-        document.addEventListener('click', () => {
-            profileDropdown.classList.remove('show');
+        document.addEventListener('click', (e) => {
+            if (!profileDropdown.contains(e.target) && !profileBtn.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+            }
         });
     }
 
@@ -109,7 +132,204 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- LÓGICA DE NOTIFICACIONES ---
+    injectNotificationsHtml();
+    setupNotificationsLogic();
+
 });
+
+function setupNotificationsLogic() {
+    const sideMenu = document.getElementById('sideMenu');
+    if (!sideMenu) return;
+
+    // Buscamos el enlace de notificaciones (que añadiremos a los HTML)
+    // O lo añadimos dinámicamente si no existe para asegurar cobertura
+    let notifLink = document.getElementById('notifLink');
+    if (!notifLink) {
+        const ul = sideMenu.querySelector('ul');
+        if (ul) {
+            const li = document.createElement('li');
+            li.innerHTML = `<img src="${window.location.pathname.includes('/pages/') ? '../assets/img/icons/icono-ajustes.png' : 'frontend/assets/img/icons/icono-ajustes.png'}"><a href="#" id="notifLink">Notificaciones</a>`;
+            ul.appendChild(li);
+            notifLink = li.querySelector('a');
+        }
+    }
+
+    if (notifLink) {
+        notifLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Cerrar otros al abrir notificaciones
+            if (profileDropdown) profileDropdown.classList.remove('show');
+            // Nota: Aquí no cerramos el sideMenu obligatoriamente porque 
+            // a veces las notificaciones salen ENCIMA del sideMenu, 
+            // pero el usuario pidió que se cierren.
+            if (sideMenu) {
+                sideMenu.classList.remove('active');
+                if (menuBtn) menuBtn.classList.remove('active');
+            }
+
+            toggleNotificationsPanel(true);
+        });
+    }
+
+    const closeBtn = document.getElementById('closeNotifPanel');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => toggleNotificationsPanel(false));
+    }
+}
+
+async function toggleNotificationsPanel(show) {
+    const panel = document.getElementById('notificationsPanel');
+    if (!panel) return;
+
+    if (show) {
+        panel.classList.add('active');
+        // Al abrir, cargamos notificaciones
+        await renderNotifications();
+    } else {
+        panel.classList.remove('active');
+        // Al cerrar, marcamos como leídas
+        const user = auth.currentUser;
+        if (user) {
+            await marcarNotificacionesComoLeidas(user.uid);
+        }
+    }
+}
+
+async function renderNotifications() {
+    const container = document.getElementById('notifHeaderList'); // El contenedor de la lista
+    if (!container) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+        container.innerHTML = "<p class='notif-empty'>Inicia sesión para ver notificaciones.</p>";
+        return;
+    }
+
+    container.innerHTML = "<div class='notif-loader'>Cargando...</div>";
+
+    try {
+        const notifs = await obtenerNotificaciones(user.uid);
+        if (notifs.length === 0) {
+            container.innerHTML = "<p class='notif-empty'>No tienes notificaciones todavía.</p>";
+            return;
+        }
+
+        container.innerHTML = "";
+        notifs.forEach(n => {
+            const date = n.fecha?.toDate ? n.fecha.toDate().toLocaleString() : "";
+            const item = document.createElement('div');
+            item.className = `notif-item ${n.leida ? 'read' : 'unread'} type-${n.tipo}`;
+            item.innerHTML = `
+                <button class="notif-delete" title="Eliminar">×</button>
+                <div class="notif-icon-box">
+                    <img src="${getNotifIcon(n.tipo)}" alt="">
+                </div>
+                <div class="notif-content">
+                    <h4>${n.titulo}</h4>
+                    <p>${n.mensaje}</p>
+                    <span class="notif-date">${date}</span>
+                </div>
+            `;
+
+            const delBtn = item.querySelector('.notif-delete');
+            delBtn.onclick = async (e) => {
+                e.stopPropagation();
+                try {
+                    await eliminarNotificacion(user.uid, n.id);
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(20px)';
+                    setTimeout(() => {
+                        item.remove();
+                        if (container.children.length === 0) {
+                            container.innerHTML = "<p class='notif-empty'>No tienes notificaciones todavía.</p>";
+                        }
+                    }, 300);
+                } catch (err) {
+                    console.error("Error eliminando notificación:", err);
+                }
+            };
+
+            // Redirección al hacer click
+            item.style.cursor = 'pointer';
+            item.onclick = async () => {
+                let targetUrl = null;
+                const isPage = window.location.pathname.includes('/pages/');
+                const prefix = isPage ? '' : 'pages/';
+
+                switch (n.tipo) {
+                    case 'nueva_postulacion':
+                        targetUrl = prefix + 'postulaciones.html';
+                        break;
+                    case 'nuevo_trabajo':
+                        if (n.id_trabajo) targetUrl = prefix + `mi-trabajo.html?id=${n.id_trabajo}`;
+                        break;
+                    case 'nivel':
+                        targetUrl = prefix + 'perfil.html';
+                        break;
+                    case 'tarea_empezada':
+                        if (n.id_trabajo) targetUrl = prefix + `mi-tarea.html?id=${n.id_trabajo}`;
+                        break;
+                }
+
+                // Si tiene destino, redirigimos y borramos
+                if (targetUrl) {
+                    try {
+                        await eliminarNotificacion(user.uid, n.id);
+                        window.location.href = targetUrl;
+                    } catch (err) {
+                        console.error("Error al procesar click en notificación:", err);
+                    }
+                }
+            };
+
+            container.appendChild(item);
+        });
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = "<p class='notif-empty'>Error al cargar notificaciones.</p>";
+    }
+}
+
+function getNotifIcon(tipo) {
+    const base = window.location.pathname.includes('/pages/') ? '../assets/img/icons/' : 'frontend/assets/img/icons/';
+    switch (tipo) {
+        // Nuevos tipos
+        case 'nivel': return base + 'noti/icono-noti-nivel.png';
+        case 'mensaje': return base + 'noti/icono-noti-nuevo-mensaje.png';
+        case 'pago': return base + 'noti/icono-noti-pago.png';
+        case 'suscripcion': return base + 'noti/icono-noti-suscripcion.png';
+        case 'valoracion': return base + 'noti/icono-noti-valoracion.png';
+        case 'tarea_empezada': return base + 'noti/icono-noti-tarea-empezada.png';
+        case 'nuevo_trabajo': return base + 'noti/icono-noti-nuevo-trabajo.png';
+        case 'nueva_postulacion': return base + 'noti/icono-noti-nueva-postulacion.png';
+        case 'rechazado': return base + 'icono-no-blanco.png';
+        case 'aceptado': return base + 'icono-si-blanco.png';
+        // Base / Otros
+        case 'info': return base + 'icono-notificaciones.png';
+        default: return base + 'icono-notificaciones.png';
+    }
+}
+
+function injectNotificationsHtml() {
+    if (document.getElementById('notificationsPanel')) return;
+
+    const panel = document.createElement('div');
+    panel.id = 'notificationsPanel';
+    panel.className = 'notifications-sidebar';
+    panel.innerHTML = `
+        <div class="notif-sidebar-header">
+            <h3>Notificaciones</h3>
+            <button id="closeNotifPanel">&times;</button>
+        </div>
+        <div class="notif-sidebar-body" id="notifHeaderList">
+            <!-- Las notificaciones se inyectan aquí -->
+        </div>
+    `;
+    document.body.appendChild(panel);
+}
 
 /* --- MODAL GLOBAL (Alerts & Confirms) --- */
 // Función principal que inyecta en tiempo de ejecución o recupera (si ya existe) la estructura base del modal de alertas global en el body de la página.
@@ -212,3 +432,30 @@ window.showCustomPrompt = function (title, message, onConfirm, confirmText = "Ac
         if (typeof onConfirm === 'function') onConfirm(val);
     };
 };
+// --- LÓGICA DEL BADGE DE NOTIFICACIONES ---
+function setupNotificationBadgeListener(uid) {
+    const notifLink = document.getElementById('notifLink');
+    if (!notifLink) return;
+
+    // Buscamos o creamos el badge dentro del link de notificaciones
+    let badge = notifLink.querySelector('.notif-badge');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'notif-badge hidden';
+        notifLink.appendChild(badge);
+    }
+
+    const q = query(
+        collection(db, "usuarios", uid, "notificaciones")
+    );
+
+    onSnapshot(q, (snapshot) => {
+        const count = snapshot.size;
+        if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    });
+}

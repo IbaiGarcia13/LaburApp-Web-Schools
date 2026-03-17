@@ -1,7 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajosPublicadosPorMi } from './database.js';
-import { db } from './firebase-config.js';
-import { doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { obtenerTrabajosPublicadosPorMi, gestionarBorradoTarea } from './database.js';
 
 /**
  * MIS TAREAS: Tareas que el usuario HA COLGADO (Publicador/Cliente)
@@ -172,32 +170,15 @@ window.confirmarEliminar = function (id) {
         modalDesc,
         async () => {
             try {
-                const docRef = doc(db, "trabajos", id);
-                const tarea = allTareas.find(t => t.id === id);
+                const { permanent } = await gestionarBorradoTarea(id, 'publicador');
 
-                if (tarea && tarea.estado === "Completada") {
-                    // Si está completada, solo marcamos como borrado por este usuario
-                    if (tarea.borrado_por_trabajador === true) {
-                        // Si el trabajador ya lo borró, borramos de la DB
-                        await deleteDoc(docRef);
-                    } else {
-                        await updateDoc(docRef, { borrado_por_publicador: true });
-                    }
-
-                    // Actualizar localmente
+                if (permanent) {
+                    // Si se borró de la DB, lo quitamos de la lista local
+                    allTareas = allTareas.filter(t => t.id !== id);
+                } else {
+                    // Si solo se marcó, actualizamos localmente para ocultar
                     const idx = allTareas.findIndex(t => t.id === id);
                     if (idx !== -1) allTareas[idx].borrado_por_publicador = true;
-                } else {
-                    // Si no está completada, sigue la lógica de cancelación previa
-                    await updateDoc(docRef, {
-                        estado: "Cancelada",
-                        cancelado_por: "publicador"
-                    });
-                    const tareaIndex = allTareas.findIndex(t => t.id === id);
-                    if (tareaIndex !== -1) {
-                        allTareas[tareaIndex].estado = "Cancelada";
-                        allTareas[tareaIndex].cancelado_por = "publicador";
-                    }
                 }
                 applyClientFilters();
             } catch (e) {

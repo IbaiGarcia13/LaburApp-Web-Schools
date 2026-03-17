@@ -38,8 +38,11 @@
     padding: 40px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    /* Se alinea desde arriba */
     transition: transform 0.3s ease;
+    position: relative;
+    /* Para el footer absoluto */
 }
 
 .sub-card:hover {
@@ -138,7 +141,17 @@
     font-weight: bold;
 }
 
-/* Alinear Precios */
+/* Alinear Precios y Botones (Footer fijo) */
+.card-bottom {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .price-text {
     text-align: center;
 }
@@ -157,6 +170,37 @@
     height: 150px;
     width: 100%;
     margin-top: 60px;
+}
+
+/* CANCELAR SUSCRIPCIÓN EN CARD */
+.cancel-placeholder {
+    margin-top: 5px;
+    text-align: center;
+    width: 100%;
+}
+
+.btn-cancel-sub {
+    background: none;
+    border: none;
+    color: var(--gray-8);
+    cursor: pointer;
+    font-weight: 500;
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 5px;
+    transition: 0.2s;
+    margin-bottom: 0px;
+    text-align: center;
+}
+
+.btn-cancel-sub:hover {
+    color: var(--red-2);
+    transform: scale(1.05);
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none !important;
 }
 
 /* RESPONSIVE */

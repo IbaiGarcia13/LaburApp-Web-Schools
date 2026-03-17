@@ -1,7 +1,7 @@
 import { db, auth, storage } from './firebase-config.js';
 import { collection, query, orderBy, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-import { enviarMensajeTrabajo, obtenerTrabajoPorId, obtenerUsuarioPorId, enviarMensajeDirecto, generarIdChat, enviarDenuncia } from './database.js';
+import { enviarMensajeTrabajo, obtenerTrabajoPorId, obtenerUsuarioPorId, enviarMensajeDirecto, generarIdChat, enviarDenuncia, registrarConversacionActiva } from './database.js';
 
 
 const listaMensajes = document.getElementById('messages');
@@ -81,6 +81,11 @@ async function loadChatMeta() {
                         const modalTextLink = document.getElementById("modalProfileLinkText");
                         if (modalImgLink) modalImgLink.href = `usuario.html?id=${otherId}`;
                         if (modalTextLink) modalTextLink.href = `usuario.html?id=${otherId}`;
+
+                        // --- RE-REGISTRAR CONVERSACIÓN ---
+                        // Si el usuario llega aquí (desde perfil o buscador), nos aseguramos de que el chat aparezca en mensajes.html
+                        const idChat = chatMode === 'job' ? generarIdChat(user.uid, otherId, idTrabajo) : generarIdChat(user.uid, otherId);
+                        registrarConversacionActiva(user.uid, otherId, idChat, idTrabajo).catch(err => console.error("Error al re-registrar conv:", err));
                     }
                 } else {
                     // This fallback is only reached if there's no info at all
