@@ -451,6 +451,8 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid var(--gray-1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .notif-sidebar-header h3 {
@@ -640,4 +642,66 @@ footer {
     text-align: center;
     padding: 30px;
     color: var(--gray-6);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .notifications-sidebar {
+        width: 200px;
+        right: -200px;
+        top: 70px;
+        height: calc(100vh - 140px);
+        /* Aligned with bottom nav and header */
+    }
+
+    .notifications-sidebar.active {
+        right: 0;
+    }
+
+    .notif-sidebar-header {
+        padding: 12px 15px;
+    }
+
+    .notif-sidebar-header h3 {
+        font-size: 0.8rem;
+    }
+
+    #closeNotifPanel {
+        font-size: 1rem;
+    }
+
+    .notif-sidebar-body {
+        padding: 5px;
+    }
+
+    .notif-item {
+        padding: 10px;
+        gap: 10px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .notif-icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .notif-icon-box img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .notif-content h4 {
+        font-size: 0.85rem;
+    }
+
+    .notif-content p {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    .notif-date {
+        font-size: 0.7rem;
+    }
 }
