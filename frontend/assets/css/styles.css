@@ -644,14 +644,13 @@ footer {
     color: var(--gray-6);
 }
 
-/* --- RESPONSIVE --- */
+/* --- RESPONSIVE NOTIFICATIONS --- */
 @media (max-width: 768px) {
     .notifications-sidebar {
         width: 200px;
         right: -200px;
         top: 70px;
         height: calc(100vh - 140px);
-        /* Aligned with bottom nav and header */
     }
 
     .notifications-sidebar.active {
@@ -663,11 +662,11 @@ footer {
     }
 
     .notif-sidebar-header h3 {
-        font-size: 0.8rem;
+        font-size: 1rem;
     }
 
     #closeNotifPanel {
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
 
     .notif-sidebar-body {
