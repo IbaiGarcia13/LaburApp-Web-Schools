@@ -266,3 +266,87 @@
     background: var(--red-2);
     color: var(--neutral-white);
 }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .main-content {
+        min-width: 0;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .job-header-section {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .job-img {
+        width: 100%;
+        max-width: 260px;
+        height: auto;
+        aspect-ratio: 1/1;
+    }
+
+    .job-title {
+        font-size: 1.5rem;
+    }
+
+    .job-description {
+        font-size: 0.95rem;
+    }
+
+    .job-info-footer {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .truncate-text {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .job-stats-container {
+        border-left: none;
+        border-top: 2px solid var(--neutral-white);
+        padding: 20px 0;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .stat-label,
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .info-section {
+        padding: 20px;
+    }
+
+    .cat-title {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .job-actions {
+        justify-content: center;
+    }
+
+    .btn-empezar {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .mini-map {
+        height: 250px;
+        margin-top: 20px;
+    }
+}

@@ -177,7 +177,7 @@
     color: var(--gray-9);
     border-radius: 15px;
     padding: 30px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -465,4 +465,96 @@
 #displayPDF:hover {
     color: var(--gray-3);
     /* Un ligero cambio al pasar el ratón */
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .main-content {
+        min-width: 0;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .profile-section {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 0;
+    }
+
+    .avatar-wrapper {
+        align-self: center;
+        /* Override flex-end from desktop */
+    }
+
+    .profile-pic {
+        width: 100%;
+        max-width: 240px;
+        /* Reducimos ligeramente para que no se vea gigante */
+        height: auto;
+        aspect-ratio: 1/1;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .profile-info h1 {
+        font-size: 1.6rem;
+    }
+
+    .profile-info-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .contact-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: left;
+    }
+
+    .truncate-text {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .stats-card {
+        border-left: none;
+        border-top: 2px solid var(--neutral-white);
+        padding: 20px 0;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .categories-container,
+    .info-card {
+        padding: 20px 15px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    .cat-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+        margin: 5% auto;
+    }
 }

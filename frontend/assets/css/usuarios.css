@@ -226,3 +226,76 @@
     font-size: 1rem;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    #container {
+        flex-direction: column;
+        margin: 10px auto;
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    #sidebar {
+        width: 100%;
+        order: -1;
+    }
+
+    .filter-box {
+        position: static;
+        padding: 20px;
+    }
+
+    #content {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .user-card {
+        flex-direction: column;
+        height: auto;
+        min-height: 500px;
+        min-width: 0;
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .user-img {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .user-info h3 {
+        font-size: 1.2rem;
+        white-space: normal;
+    }
+
+    .user-desc {
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        font-size: 0.9rem;
+    }
+
+    .pagination {
+        margin: 20px auto 40px auto;
+        gap: 10px;
+    }
+
+    #page-info {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    .pag-btn {
+        width: 40px;
+        height: 40px;
+    }
+}

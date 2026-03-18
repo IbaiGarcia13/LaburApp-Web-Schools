@@ -177,7 +177,7 @@ header nav a:hover {
     right: 28px;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 10px solid var(--neutral-white);
+    border-bottom: 11px solid var(--neutral-white);
 }
 
 .dropdown-avatar {
@@ -644,17 +644,174 @@ footer {
     color: var(--gray-6);
 }
 
-/* --- RESPONSIVE NOTIFICATIONS --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
     .notifications-sidebar {
         width: 200px;
         right: -200px;
-        top: 70px;
-        height: calc(100vh - 140px);
+        top: 60px;
+        bottom: 0 !important;
+        height: auto !important;
+        padding-bottom: 60px !important;
     }
 
     .notifications-sidebar.active {
         right: 0;
+    }
+
+    /* --- GLOBAL HEADER RESPONSIVE --- */
+    header {
+        height: 60px !important;
+    }
+
+    .logo img {
+        height: 35px;
+        width: 35px;
+    }
+
+    header nav {
+        display: none !important;
+    }
+
+    .logo-text {
+        display: none !important;
+    }
+
+    /* --- SIDE MENU RESPONSIVE (Global) --- */
+    .side-menu {
+        width: 180px !important;
+        top: 60px !important;
+        bottom: 0 !important;
+        height: auto !important;
+        padding-bottom: 60px !important;
+        /* Space for bottom nav */
+        z-index: 1500 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .side-menu li {
+        padding: 10px 15px !important;
+        gap: 12px !important;
+    }
+
+    .side-menu li img {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .side-menu li a {
+        font-size: 0.85rem !important;
+        margin-bottom: 3px;
+    }
+
+    .side-menu-footer {
+        margin-top: auto !important;
+        position: static !important;
+        padding: 10px 15px !important;
+        width: 100% !important;
+    }
+
+    .side-menu-footer a {
+        font-size: 0.85rem !important;
+    }
+
+    .side-menu-footer img {
+        width: 18px !important;
+    }
+
+    .side-menu ul {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+    /* --- GLOBAL PROFILE DROPDOWN RESPONSIVE --- */
+    .profile-dropdown {
+        top: 75px;
+        right: 54px;
+        width: 150px;
+        background: var(--neutral-white);
+        border-radius: 15px;
+        padding: 15px;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        color: var(--neutral-black);
+        z-index: 2000;
+    }
+
+    .profile-dropdown img {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    .profile-dropdown .dropdown-name {
+        font-size: 0.8rem !important;
+    }
+
+    .profile-dropdown .dropdown-email {
+        font-size: 0.5rem !important;
+        margin-bottom: 10px;
+    }
+
+    .profile-dropdown .dropdown-footer a {
+        font-size: 0.7rem !important;
+    }
+
+    .profile-dropdown .dropdown-footer img {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    /* --- GLOBAL BOTTOM NAVIGATION RESPONSIVE --- */
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: var(--neutral-white);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        z-index: 2000;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 1px solid var(--gray-2);
+    }
+
+    .nav-item {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--gray-5);
+        gap: 5px;
+        transition: background-color 0.2s ease;
+    }
+
+    .nav-item:active {
+        background-color: rgba(0, 0, 0, 0.05);
+        opacity: 0.7;
+    }
+
+    .nav-item img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+    }
+
+    .nav-item span {
+        display: none;
+    }
+
+    /* Map Icon specific treatment */
+    .nav-item[href="mapa.html"] img {
+        content: url("../img/icons/icono-mapa-blanco.png");
+        filter: invert(1);
     }
 
     .notif-sidebar-header {

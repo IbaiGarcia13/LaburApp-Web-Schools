@@ -209,3 +209,52 @@
 .leaflet-popup-content {
     line-height: 22px;
 }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    #page-container {
+        margin: 10px auto;
+        padding: 0 10px;
+    }
+
+    #main-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .left-column,
+    .right-column {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #map {
+        height: 350px;
+        order: 1;
+    }
+
+    .dark-box {
+        max-width: 100%;
+        order: 2;
+        padding: 20px 15px;
+    }
+
+    #marker-form-box,
+    #marker-view-box {
+        order: 3;
+        padding: 20px 15px;
+    }
+
+    .btn-giant {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        order: 4;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+}

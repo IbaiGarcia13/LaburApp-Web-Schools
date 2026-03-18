@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Actualizar nombre y email
                 const dropdownName = document.querySelector('.dropdown-name');
                 const dropdownEmail = document.querySelector('.dropdown-email');
-                if (dropdownName) dropdownName.innerText = perfil.nombre || "Usuario";
+                if (dropdownName) dropdownName.innerText = (perfil.nombre || "Usuario").split(' ')[0];
                 if (dropdownEmail) dropdownEmail.innerText = user.email;
             }
         }

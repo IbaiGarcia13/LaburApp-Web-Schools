@@ -143,6 +143,7 @@ function setupEventListeners() {
         if (currentPage < Math.ceil(filteredJobs.length / itemsPerPage)) {
             currentPage++;
             displayJobs();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
@@ -150,6 +151,7 @@ function setupEventListeners() {
         if (currentPage > 1) {
             currentPage--;
             displayJobs();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 }

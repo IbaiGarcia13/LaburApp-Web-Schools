@@ -272,7 +272,7 @@ function setupPaginationEvents() {
         if (currentPage > 1) {
             currentPage--;
             renderTrabajos();
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
@@ -281,7 +281,7 @@ function setupPaginationEvents() {
         if (currentPage < totalPages) {
             currentPage++;
             renderTrabajos();
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 }

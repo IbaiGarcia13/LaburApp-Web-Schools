@@ -106,7 +106,10 @@
         <div class="about-grid">
             <div class="info-row">
                 <div class="image-card">
-                    <img src="../assets/img/principal-2.png" alt="Que es LaburApp">
+                    <picture>
+                        <source media="(max-width: 768px)" srcset="../assets/img/principal-1-movil.png">
+                        <img src="../assets/img/principal-2.png" alt="Que es LaburApp">
+                    </picture>
                 </div>
                 <div class="text-card">
                     <h3>¿Qué es?</h3>
@@ -131,7 +134,10 @@
 
             <div class="info-row reverse">
                 <div class="image-card">
-                    <img src="../assets/img/principal-3.png" alt="Creadores">
+                    <picture>
+                        <source media="(max-width: 768px)" srcset="../assets/img/principal-2-movil.png">
+                        <img src="../assets/img/principal-3.png" alt="Creadores">
+                    </picture>
                 </div>
                 <div class="text-card">
                     <h3>¿Quiénes somos?</h3>
@@ -153,7 +159,7 @@
         </div>
     </main>
 
-    <nav class="mobile-bottom-nav">
+    <nav class="mobile-bottom-nav" style="display: none;">
         <a href="usuarios.html" class="nav-item">
             <img src="../assets/img/icons/icono-perfil.png" alt="Usuarios">
             <span>Usuarios</span>

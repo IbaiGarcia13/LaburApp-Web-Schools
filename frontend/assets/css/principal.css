@@ -158,20 +158,11 @@
 
 @media (max-width: 768px) {
 
-    /* Header Fixes (Strictly via Media Query) */
-    header nav {
-        display: none !important;
-    }
-
-    .logo-text {
-        display: none !important;
-    }
 
     /* Container adjustments */
     .main-container {
         margin: 20px auto;
         padding: 0 10px 100px 10px;
-        /* Reduced side padding */
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
@@ -179,7 +170,7 @@
 
     /* Dashboard Stats - Stacked for clarity as they are numbers */
     .dashboard-stats {
-        flex-direction: row;
+        flex-direction: column;
         gap: 12px;
         display: flex !important;
     }
@@ -187,18 +178,21 @@
     .stat-card {
         padding: 12px;
         border-radius: 15px;
+        width: 100%;
+        height: 100%;
+        min-height: 65px;
     }
 
     .stat-card p {
-        font-size: 0.7rem;
+        font-size: 1rem;
     }
 
     .stat-card h3 {
-        font-size: 0.4rem;
+        font-size: 0.8rem;
     }
 
     .main-title {
-        font-size: 0.9rem;
+        font-size: 1rem;
         text-align: center;
         margin-bottom: 20px;
     }
@@ -213,169 +207,75 @@
         border-radius: 10px;
     }
 
-    /* Info Sections - Mobile Floating */
+    /* Info Sections - Mobile Full Width */
+    .about-grid {
+        margin: 0 -10px;
+        gap: 0;
+    }
+
     .info-row {
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        margin-bottom: 0 !important;
+        width: 100% !important;
+        gap: 0 !important;
     }
 
     .text-card {
+        order: 1 !important;
         display: block !important;
-        /* Back to block for floating */
-        padding: 15px !important;
-        position: relative;
-        overflow: hidden;
-        /* Clearfix for floating */
+        width: 100% !important;
+        margin: 10px 0 !important;
+        border-radius: 0 !important;
+        padding: 30px 20px !important;
+        background: var(--neutral-white) !important;
+        box-shadow: none !important;
     }
 
-    /* First box: Image top-right */
-    .info-row:nth-of-type(1) .image-card {
-        float: right;
-        margin-left: 12px;
-        margin-bottom: 5px;
-        width: 100px !important;
-        max-width: 100% !important;
-        height: 100%;
-        max-height: 100px;
-        border-radius: 10px;
-        min-width: 100px !important;
-        min-height: 100px !important;
-    }
-
-    /* Second box (Creators): Image top-left to allow text wrapping on the right */
+    /* REORDERING ROW 3: Image(1), Text(2) para secuencia T-I-T-I-T */
     .info-row.reverse .image-card {
-        float: left;
-        margin-right: 12px;
-        margin-bottom: 5px;
-        width: 100px !important;
-        max-width: 100% !important;
-        height: 100%;
-        max-height: 100px;
-        border-radius: 10px;
-        min-width: 100px !important;
-        min-height: 100px !important;
+        order: 1 !important;
     }
 
-    /* Handling the third box (Creators) specially if needed */
     .info-row.reverse .text-card {
+        order: 2 !important;
+    }
+
+    .image-card {
+        order: 2 !important;
+        width: 100% !important;
+        min-width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        height: 250px !important;
+        padding: 0 !important;
+        overflow: hidden;
+        margin: 10px 0 !important;
+    }
+
+    .image-card img {
+        border-radius: 0 !important;
+        height: 250px !important;
         display: block !important;
-        /* Must be block for float to wrap text */
+        box-shadow: none !important;
     }
 
     .text-card h3 {
-        font-size: 0.9rem !important;
-        margin-bottom: 8px !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 12px !important;
     }
 
     .text-card p {
-        font-size: 0.6rem !important;
-        line-height: 1.4 !important;
-        text-align: justify;
+        font-size: 0.85rem !important;
+        line-height: 1.6 !important;
+        text-align: left;
     }
 
-    /* BOTTOM NAVIGATION */
-    .mobile-bottom-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 70px;
-        background: var(--neutral-white);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        z-index: 2000;
-        justify-content: space-around;
-        align-items: center;
-        border-top: 1px solid var(--gray-2);
-    }
 
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: var(--gray-5);
-        gap: 5px;
-    }
-
-    .nav-item img {
-        width: 35px;
-        height: 35px;
-        object-fit: contain;
-    }
-
-    .nav-item span {
-        display: none;
-    }
-
-    /* Change Map Icon to icono-mapa-blanco.png and invert it */
-    .nav-item[href="mapa.html"] img {
-        content: url("../img/icons/icono-mapa-blanco.png");
-        filter: invert(1);
-    }
-
-    .nav-item:active {
-        opacity: 0.7;
-    }
-
-    .about-grid {
-        gap: 20px;
-    }
-
-    .text-card {
-        border-radius: 15px;
-        /* Clearfix for floating */
-    }
 
     .dashboard-stats {
         margin-bottom: 20px;
     }
 
-    /* SIDE MENU OVERRIDES */
-    .side-menu {
-        width: 180px !important;
-        /* Aligned with bottom nav height (70px) and header height (70px) */
-        height: calc(100vh - 140px) !important;
-        top: 70px !important;
-        z-index: 1500 !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-
-    .side-menu li {
-        padding: 10px 15px !important;
-        /* Less padding */
-        gap: 12px !important;
-    }
-
-    .side-menu li img {
-        width: 18px !important;
-        /* Smaller icons */
-        height: 18px !important;
-    }
-
-    .side-menu li a {
-        font-size: 0.85rem !important;
-        margin-bottom: 3px;
-    }
-
-    .side-menu-footer {
-        margin-top: auto !important;
-        position: static !important;
-        padding: 10px 15px !important;
-        width: 100% !important;
-    }
-
-    .side-menu-footer a {
-        font-size: 0.85rem !important;
-    }
-
-    .side-menu-footer img {
-        width: 18px !important;
-    }
-
-    /* Ensure vertical scroll if content is too long */
-    .side-menu ul {
-        max-height: calc(100vh - 200px);
-        overflow-y: auto;
-    }
 }

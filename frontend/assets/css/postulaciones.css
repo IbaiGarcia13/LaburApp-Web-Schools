@@ -401,3 +401,115 @@
     font-size: 1rem;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    #container {
+        padding: 0 15px;
+        margin: 15px auto;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .postulaciones-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .col-usuarios {
+        flex: none;
+        width: 100%;
+    }
+
+    .col-trabajos {
+        width: 100%;
+    }
+
+    .col-divider {
+        display: none;
+        /* Ocultamos el divisor en móvil */
+    }
+
+    .col-header {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    /* Tarjetas de Trabajo */
+    .job-card {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        min-height: 420px;
+        /* Unified minimum height for smaller detail cards */
+        padding: 15px;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .job-card-img {
+        width: 100%;
+        height: 150px;
+    }
+
+    .job-card-header {
+        flex-direction: column;
+        gap: 5px;
+        padding-right: 0;
+    }
+
+    .job-card-footer {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .job-card-pago {
+        text-align: left;
+        margin-top: 5px;
+        margin-right: 0;
+    }
+
+    /* Tarjetas de Usuario */
+    .user-app-card {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        min-height: 400px;
+        /* Slightly smaller for user cards */
+        padding: 15px;
+        gap: 12px;
+    }
+
+    .user-app-img {
+        width: 100%;
+        height: 150px;
+    }
+
+    .user-app-actions {
+        top: 10px;
+        right: 10px;
+    }
+
+    .user-chat-btn {
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .pagination {
+        margin: 20px 0 40px;
+        gap: 10px;
+    }
+
+    #page-info {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    .pag-btn {
+        width: 40px;
+        height: 40px;
+    }
+}

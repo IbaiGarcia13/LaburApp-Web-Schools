@@ -172,7 +172,7 @@ if (btnNext) {
         if (currentPage < Math.ceil(filteredJobs.length / itemsPerPage)) {
             currentPage++;
             displayJobs();
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 }
@@ -183,7 +183,7 @@ if (btnPrev) {
         if (currentPage > 1) {
             currentPage--;
             displayJobs();
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 }

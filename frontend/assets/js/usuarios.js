@@ -125,7 +125,7 @@ document.getElementById('next-page').onclick = () => {
     if (currentPage < Math.ceil(filteredUsers.length / itemsPerPage)) {
         currentPage++;
         displayUsers();
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 };
 
@@ -134,6 +134,6 @@ document.getElementById('prev-page').onclick = () => {
     if (currentPage > 1) {
         currentPage--;
         displayUsers();
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 };

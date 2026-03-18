@@ -423,7 +423,7 @@ function setupPaginationEvents() {
         if (currentPage > 1) {
             currentPage--;
             renderMensajes();
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
     document.getElementById('next-page').addEventListener('click', () => {
@@ -431,7 +431,7 @@ function setupPaginationEvents() {
         if (currentPage < totalPages) {
             currentPage++;
             renderMensajes();
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 }

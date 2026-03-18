@@ -295,3 +295,63 @@
 .modal-buttons {
     justify-content: right;
 }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 0 15px;
+        margin: 20px auto;
+    }
+
+    .page-title {
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .settings-card {
+        min-width: 0;
+        padding: 20px 15px;
+        margin-bottom: 20px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .payment-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .payment-row strong {
+        display: block;
+    }
+
+    .delete-account-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .delete-action {
+        justify-content: center;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+    }
+}

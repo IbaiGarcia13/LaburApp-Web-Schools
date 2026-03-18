@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (statDinero) statDinero.textContent = dinero.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
 
                     // 4. Actualizar dinámicamente el Header (Desplegable superior derecho)
-                    if (dropdownName) dropdownName.textContent = perfil.nombre_completo || (perfil.nombre + " " + perfil.apellidos);
+                    if (dropdownName) dropdownName.textContent = (perfil.nombre || "Usuario").split(' ')[0];
                     if (dropdownEmail) dropdownEmail.textContent = user.email;
                 }
             } catch (error) {

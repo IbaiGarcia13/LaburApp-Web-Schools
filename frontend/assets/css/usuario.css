@@ -346,3 +346,98 @@
     width: 100%;
     margin-top: 20px;
 }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .main-content {
+        min-width: 0;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .profile-section {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 0;
+    }
+
+    .avatar-wrapper {
+        align-self: center;
+        /* Override flex-end from desktop */
+    }
+
+    .profile-pic {
+        width: 100%;
+        max-width: 240px;
+        height: auto;
+        aspect-ratio: 1/1;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .profile-info h1 {
+        font-size: 1.6rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+    }
+
+    .profile-info-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .contact-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: left;
+    }
+
+    .truncate-text {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .stats-card {
+        border-left: none;
+        border-top: 2px solid var(--neutral-white);
+        padding: 20px 0;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .lvl-val {
+        font-size: 2rem;
+    }
+
+    .categories-container {
+        padding: 20px;
+    }
+
+    .cat-title {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    .cat-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .review-card {
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .review-stars-date {
+        flex-wrap: wrap;
+    }
+}
