@@ -1,32 +1,32 @@
-// Definición local (mockup) temporal de los datos de múltiples usuarios para rellenar la lista dinámicamente
-const usuariosData = [
-    { nombre: "Juan García Méndez", desc: "Informático que hace páginas web y arregla ordenadores en su tiempo libre.", loc: "Barakaldo, Bizkaia", lvl: 6, val: 3.7, esp: "informatica" },
-    { nombre: "María Isabel Gómez", desc: "Ama de casa con experiencia paseando perros y cuidando animales.", loc: "Castro Urdiales, Cantabria", lvl: 2, val: 4.2, esp: "mascotas" },
-    { nombre: "Asier Uriarte González", desc: "Me gusta la jardinería y la gastronomía, tengo experiencia de cocinero.", loc: "Castro Urdiales, Cantabria", lvl: 4, val: 4.7, esp: "jardineria" },
-    { nombre: "Eneko Lozano Fuertes", desc: "Ex-trabajador de Ikea con mucha experiencia montando muebles.", loc: "Sestao, Bizkaia", lvl: 1, val: 3.1, esp: "carpinteria" },
-    { nombre: "Laura Martínez", desc: "Limpieza profunda de hogares y oficinas con materiales propios.", loc: "Bilbao, Bizkaia", lvl: 5, val: 4.9, esp: "limpieza" },
-    { nombre: "Carlos Ruiz", desc: "Reparación de hardware y configuración de redes locales.", loc: "Barakaldo, Bizkaia", lvl: 8, val: 4.5, esp: "informatica" },
-    { nombre: "Sofía Vega", desc: "Paseadora de perros de razas grandes y adiestramiento básico.", loc: "Getxo, Bizkaia", lvl: 3, val: 3.8, esp: "mascotas" },
-    { nombre: "Diego San José", desc: "Diseño de jardines y mantenimiento de piscinas.", loc: "Laredo, Cantabria", lvl: 7, val: 4.1, esp: "jardineria" },
-    { nombre: "Marta Ibáñez", desc: "Montaje de armarios empotrados y arreglos de madera.", loc: "Portugalete, Bizkaia", lvl: 2, val: 3.5, esp: "carpinteria" },
-    { nombre: "Jorge Blanco", desc: "Limpieza de cristales en altura y mantenimiento general.", loc: "Bilbao, Bizkaia", lvl: 4, val: 4.0, esp: "limpieza" },
-    { nombre: "Elena Prieto", desc: "Desarrollo de apps móviles y consultoría tecnológica.", loc: "Santander, Cantabria", lvl: 9, val: 5.0, esp: "informatica" },
-    { nombre: "Raúl Goti", desc: "Cuidado de gatos a domicilio y visitas veterinarias.", loc: "Barakaldo, Bizkaia", lvl: 1, val: 4.2, esp: "mascotas" },
-    { nombre: "Sara Otero", desc: "Podas de frutales y cuidado de huertos urbanos.", loc: "Basauri, Bizkaia", lvl: 6, val: 4.3, esp: "jardineria" },
-    { nombre: "Pablo Herrero", desc: "Restauración de muebles antiguos y barnizado.", loc: "Erandio, Bizkaia", lvl: 3, val: 3.9, esp: "carpinteria" },
-    { nombre: "Lucía Méndez", desc: "Limpieza de fin de obra y desinfección total.", loc: "Bilbao, Bizkaia", lvl: 7, val: 4.6, esp: "limpieza" },
-    { nombre: "Iker Casado", desc: "Técnico de soporte remoto y eliminación de virus.", loc: "Barakaldo, Bizkaia", lvl: 4, val: 3.2, esp: "informatica" },
-    { nombre: "Andrea Soler", desc: "Peluquería canina a domicilio.", loc: "Getxo, Bizkaia", lvl: 5, val: 4.8, esp: "mascotas" },
-    { nombre: "Víctor Peña", desc: "Corte de setos y desbroce de parcelas.", loc: "Castro Urdiales, Cantabria", lvl: 2, val: 3.4, esp: "jardineria" },
-    { nombre: "Nerea Ortiz", desc: "Montaje de cocinas y estanterías metálicas.", loc: "Sestao, Bizkaia", lvl: 8, val: 4.7, esp: "carpinteria" },
-    { nombre: "Manuel Garea", desc: "Limpieza de comunidades y portales.", loc: "Bilbao, Bizkaia", lvl: 3, val: 4.1, esp: "limpieza" }
-];
+import { obtenerTodosLosUsuarios } from './database.js';
 
+let usuariosData = [];
 // Array global que mantendrá los usuarios actualmente mostrados después de ser filtrados
-let filteredUsers = [...usuariosData];
+let filteredUsers = [];
 // Variables para controlar la paginación de la lista
 let currentPage = 1;
 const itemsPerPage = 5;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        usuariosData = await obtenerTodosLosUsuarios();
+        // Mapear datos para que coincidan con la lógica de filtrado si es necesario, 
+        // o adaptar la lógica. Por ahora, aseguramos que tengan los campos esperados.
+        usuariosData = usuariosData.map(u => ({
+            ...u,
+            nombre: u.nombre_completo || (u.nombre + " " + u.apellidos),
+            desc: u.bio || "Sin biografía.",
+            loc: u.direccion_principal || "No especificada",
+            lvl: u.nivel || 1,
+            val: u.valoracion_media || 0,
+            esp: u.especialidad || "General"
+        }));
+        filteredUsers = [...usuariosData];
+        displayUsers();
+    } catch (e) {
+        console.error("Error cargando usuarios:", e);
+    }
+});
 
 // Función principal para pintar las tarjetas de usuarios en la interfaz
 function displayUsers() {
@@ -43,19 +43,19 @@ function displayUsers() {
     }
 
     // Bucle para iterar y pintar cada uno de los elementos de la página actual
-    pageItems.forEach((user, index) => {
-        const mockId = start + index + 1;
+    pageItems.forEach((user) => {
+        const avatar = user.foto_perfil || "../assets/img/avatar-defecto.png";
         const card = `
-            <article class="user-card" onclick="window.location.href='usuario.html?id=${mockId}'">
-                <img src="../assets/img/Ibai.jpg" class="user-img">
+            <article class="user-card" onclick="window.location.href='usuario.html?id=${user.uid}'">
+                <img src="${avatar}" class="user-img">
                 <div class="user-info">
                     <h3>${user.nombre}</h3>
                     <p class="user-desc">${user.desc}</p>
                     <div class="user-stats">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${user.loc}</p>
                         <p><img src="../assets/img/icons/icono-nivel.png" class="icon-img-small" alt=""> Nivel: ${user.lvl}</p>
-                        <p><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt=""> Valoración Media: ${user.val}</p>
-                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Especialidad: ${user.esp.charAt(0).toUpperCase() + user.esp.slice(1)}</p>
+                        <p><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt=""> Valoración: ${Number(user.val).toFixed(1)}</p>
+                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Especialidad: ${user.esp}</p>
                     </div>
                 </div>
             </article>`;

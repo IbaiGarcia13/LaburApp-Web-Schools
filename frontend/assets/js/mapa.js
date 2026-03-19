@@ -1,5 +1,8 @@
+import { auth } from './firebase-config.js';
+import { obtenerTrabajos, crearTrabajo } from './database.js';
+
 // Variables globales para almacenar trabajos, marcadores en el mapa y controlar el modo de creación
-let trabajos = [], myMarkers = [], tempMarker = null, creatingMode = false;
+let allTrabajosDB = [], myMarkers = [], tempMarker = null, creatingMode = false;
 // Inicialización del mapa pasándole el elemento HTML con id 'map'
 const map = L.map('map').setView([0, 0], 13);
 
@@ -9,9 +12,7 @@ let userMarker = null, userCircle = null;
 let userLat = 0, userLng = 0;
 
 /* ===== UBICACIÓN REAL USUARIO ===== */
-// Pedimos permiso al navegador para usar el GPS o localización de la IP
 if (navigator.geolocation) {
-    // Si accede, ubicamos el marcador rojo ("Tú estás aquí")
     navigator.geolocation.getCurrentPosition(pos => {
         userLat = pos.coords.latitude;
         userLng = pos.coords.longitude;
@@ -20,111 +21,180 @@ if (navigator.geolocation) {
             .addTo(map).bindPopup("Tú estás aquí").openPopup();
         map.setView([userLat, userLng], 13);
 
-        updateVisibleMarkers(); // Círculo de rango inicial
-    }, () => { // Si no permite ubicación
+        updateVisibleMarkers();
+        loadRealJobs();
+    }, () => {
         userLat = 43.2630; userLng = -2.9349; // Bilbao por defecto
         userMarker = L.marker([userLat, userLng], { icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png', iconSize: [25, 25] }) })
             .addTo(map).bindPopup("Ubicación por defecto: Bilbao").openPopup();
         map.setView([userLat, userLng], 13);
         updateVisibleMarkers();
+        loadRealJobs();
     });
 }
 
+/**
+ * Carga los trabajos reales de la base de datos y los pinta como marcadores
+ */
+async function loadRealJobs() {
+    try {
+        // Borrar marcadores anteriores
+        myMarkers.forEach(m => map.removeLayer(m));
+        myMarkers = [];
+
+        allTrabajosDB = await obtenerTrabajos(); // Obtenemos todos los pendientes
+
+        allTrabajosDB.forEach(t => {
+            if (t.latitud && t.longitud) {
+                const color = getColor(t.id_categoria);
+                const marker = L.circleMarker([t.latitud, t.longitud], {
+                    radius: 8,
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.9
+                });
+
+                const xp = t.xp_otorgada || Math.round(t.pago_cliente * 10);
+                const pagoDisplay = t.pago_cliente || 0;
+
+                const popupContent = `
+            <div style="font-family: inherit; min-width: 180px;">
+                <h3 style="margin: 0 0 8px; color: #333; font-size: 16px;">${t.titulo}</h3>
+                <p style="margin: 0 0 5px; font-size: 13px; color: #666;">
+                    <img src="../assets/img/icons/icono-dinero.png" style="width:14px; vertical-align:middle;"> <b>${Number(t.pago_cliente).toFixed(2)} €</b>
+                </p>
+                <p style="margin: 0 0 10px; font-size: 13px; color: #666;">
+                    <img src="../assets/img/icons/icono-xp.png" style="width:14px; vertical-align:middle;"> <b>${xp} XP</b>
+                </p>
+    <button class="popup-btn" data-id="${t.id}" style="cursor:pointer; background: black; color: white; border: none; padding: 2px 8px; border-radius: 4px; margin-top: 5px;">Más</button>
+                </div>`;
+
+                marker.bindPopup(popupContent);
+
+                // Evento para el botón dentro del popup
+                marker.on('popupopen', () => {
+                    const btn = document.querySelector(`.popup-btn[data-id="${t.id}"]`);
+                    if (btn) btn.onclick = () => verMasReal(t.id);
+                });
+
+                myMarkers.push(marker);
+            }
+        });
+
+        aplicarFiltros(); // Aplicar filtros iniciales
+    } catch (e) {
+        console.error("Error cargando marcadores:", e);
+    }
+}
+
 /* ===== COLORES ===== */
-// Diccionario de colores según la categoría elegida para pintar el marcador en el mapa
 function getColor(cat) {
     const colors = {
-        "Carpintería": "brown", "Construcción/Reforma": "gray", "Cuidado personal": "pink",
-        "Diseño": "cadetblue", "Evento": "red", "Gastronomía": "gold", "Informática": "blue",
-        "Jardinería": "green", "Limpieza": "purple", "Mascotas": "darkgreen",
-        "Mudanza/Traslado": "darkred", "Transporte": "orange", "Otros": "black"
+        "carpinteria": "brown", "construccion": "gray", "cuidado_personal": "pink",
+        "diseno": "cadetblue", "evento": "red", "gastronomia": "gold", "informatica": "blue",
+        "jardineria": "green", "limpieza": "purple", "mascotas": "darkgreen",
+        "mudanza": "darkred", "transporte": "orange", "otros": "black"
     };
-    return colors[cat] || "black";
+    // Normalizar a minúsculas para coincidir con la DB
+    const key = cat ? cat.toLowerCase() : "otros";
+    return colors[key] || "black";
 }
 
 /* CREAR MARCADOR */
-// Función invocada al hacer click en el mapa en "modo creación". Dibuja un pin temporal y abre el formulario Lateral.
 function crearMarcador(latlng) {
     if (tempMarker) map.removeLayer(tempMarker);
-    // Dibujamos un círculo marcando el lugar exacto pulsado
-    tempMarker = L.circleMarker(latlng, { radius: 8, color: getColor("Otros"), fillColor: getColor("Otros"), fillOpacity: 0.9 }).addTo(map);
+    tempMarker = L.circleMarker(latlng, { radius: 8, color: "black", fillColor: "black", fillOpacity: 0.9 }).addTo(map);
 
     document.getElementById("marker-view-box").classList.add("hidden");
     document.getElementById("marker-form-box").classList.remove("hidden");
-
-    // Desliza para que se vea form
     document.getElementById("marker-form-box").scrollIntoView({ behavior: "smooth" });
 }
 
-/* CLICK MAPA */
 map.on("click", e => { if (creatingMode) { creatingMode = false; crearMarcador(e.latlng); } });
 
-/* PRECIO TIEMPO REAL */
-// Actualiza la previsualización de las ganancias ("Trabajador gana") restándole un supuesto 10% de comisión (0.9) al precio base
-document.getElementById("job-price").addEventListener("input", function () {
-    let v = parseFloat(this.value);
-    if (!isNaN(v)) document.getElementById("price-preview").innerText = "Trabajador gana: " + (v * 0.9).toFixed(2) + "€";
-});
+/* GUARDAR TRABAJO REAL */
+document.getElementById("save-job-btn").addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) {
+        showCustomAlert("Acceso Denegado", "Debes estar logueado para crear un trabajo.");
+        return;
+    }
 
-/* GUARDAR TRABAJO */
-document.getElementById("save-job-btn").addEventListener("click", () => {
     const t = document.getElementById("job-title").value,
         d = document.getElementById("job-desc").value,
         a = document.getElementById("job-address").value,
         dl = document.getElementById("job-deadline").value,
         pU = parseFloat(document.getElementById("job-price").value),
         time = parseInt(document.getElementById("job-time").value),
-        cat = document.getElementById("job-category").value;
+        cat = document.getElementById("job-category").value.toLowerCase();
 
     if (!t || !d || !a || !dl || isNaN(pU) || !time || !cat) {
         showCustomAlert("Error en Formulario", "Todos los campos son obligatorios.");
         return;
     }
-    if (pU < 2 || !Number.isInteger(time)) {
-        showCustomAlert("Datos Inválidos", "El precio debe ser ≥ 2€ y el tiempo estimado un número entero.");
-        return;
+
+    try {
+        const coords = tempMarker.getLatLng();
+        await crearTrabajo({
+            titulo: t,
+            descripcion: d,
+            direccion: a,
+            fecha_limite: new Date(dl),
+            pagoCliente: pU,
+            tiempo_estimado_horas: time,
+            id_categoria: cat,
+            latitud: coords.lat,
+            longitud: coords.lng
+        });
+
+        showCustomAlert("Éxito", "Trabajo publicado correctamente en el mapa.");
+        ["job-title", "job-desc", "job-address", "job-deadline", "job-price", "job-time"].forEach(id => document.getElementById(id).value = "");
+        document.getElementById("job-category").value = "";
+        document.getElementById("marker-form-box").classList.add("hidden");
+        if (tempMarker) map.removeLayer(tempMarker);
+        tempMarker = null;
+
+        await loadRealJobs(); // Recargar todos
+    } catch (e) {
+        console.error("Error al guardar:", e);
+        showCustomAlert("Error", "No se pudo publicar el trabajo.");
     }
-
-    const pW_raw = pU * 0.9;
-    const pW = Number.isInteger(pW_raw) ? pW_raw : Number(pW_raw).toFixed(2);
-    const xp = Math.ceil(pW_raw * 10);
-    tempMarker.setStyle({ color: getColor(cat), fillColor: getColor(cat) });
-    tempMarker.bindPopup(`<b>${t}</b><br><img src="../assets/img/icons/icono-categoria-color.png" class="icon-img-small" alt=""> ${cat}<br><img src="../assets/img/icons/icono-dinero-color.png" class="icon-img-small" alt=""> ${pW}€<br><img src="../assets/img/icons/icono-xp-color.png" class="icon-img-small" alt=""> ${xp} XP<br><button onclick="verMas('${t}')">Más</button>`);
-
-    trabajos.push({ title: t, desc: d, addr: a, deadline: dl, priceUser: pU, priceWorker: pW, time, category: cat, xp, marker: tempMarker });
-    myMarkers.push(tempMarker);
-
-    ["job-title", "job-desc", "job-address", "job-deadline", "job-price", "job-time"].forEach(id => document.getElementById(id).value = "");
-    document.getElementById("job-category").value = "";
-    document.getElementById("marker-form-box").classList.add("hidden");
-    updateVisibleMarkers();
 });
 
-/* CANCELAR */
+/* CANCELAR CREACIÓN */
 document.getElementById("cancel-job-btn").addEventListener("click", () => {
     if (tempMarker) map.removeLayer(tempMarker);
     tempMarker = null;
     document.getElementById("marker-form-box").classList.add("hidden");
 });
 
-/* VER MÁS */
-// Función llamada desde el popup del marcador que abre el panel lateral derecho con detalles
-function verMas(title) {
-    const t = trabajos.find(x => x.title === title);
+/* VER MÁS REAL */
+function verMasReal(jobId) {
+    const t = allTrabajosDB.find(x => x.id === jobId);
     if (!t) return;
-    document.getElementById("view-title").innerText = t.title;
-    document.getElementById("view-desc").innerText = t.desc;
-    document.getElementById("view-address").innerText = t.addr;
-    document.getElementById("view-deadline").innerText = t.deadline;
-    document.getElementById("view-price").innerText = t.priceWorker;
-    document.getElementById("view-category").innerText = t.category;
-    document.getElementById("view-xp").innerText = t.xp;
 
-    // Configurar acción del botón Ver Todo para redirigir a trabajo.html
+    document.getElementById("view-title").innerText = t.titulo;
+    document.getElementById("view-desc").innerText = t.descripcion || "Sin descripción";
+    document.getElementById("view-address").innerText = t.direccion || "No especificada";
+
+    let dlStr = "Sin fecha";
+    if (t.fecha_limite) {
+        const d = t.fecha_limite.toDate ? t.fecha_limite.toDate() : new Date(t.fecha_limite);
+        dlStr = d.toLocaleDateString();
+    }
+    document.getElementById("view-deadline").innerText = dlStr;
+
+    const xp = t.xp_otorgada || Math.round(t.pago_cliente * 10);
+    const pagoDisplay = t.pago_cliente || 0;
+
+    document.getElementById("view-price").innerText = Number(pagoDisplay).toFixed(2);
+    document.getElementById("view-category").innerText = t.id_categoria ? t.id_categoria.charAt(0).toUpperCase() + t.id_categoria.slice(1) : "Otros";
+    document.getElementById("view-xp").innerText = xp;
+
     const btnVerTodo = document.getElementById("view-all-btn");
     if (btnVerTodo) {
         btnVerTodo.onclick = () => {
-            window.location.href = "trabajo.html";
+            window.location.href = `trabajo.html?id=${t.id}`;
         };
     }
 
@@ -132,9 +202,10 @@ function verMas(title) {
     document.getElementById("marker-view-box").classList.remove("hidden");
     document.getElementById("marker-view-box").scrollIntoView({ behavior: "smooth" });
 }
+
 document.getElementById("close-view-btn").addEventListener("click", () => document.getElementById("marker-view-box").classList.add("hidden"));
 
-/* BOTÓN AÑADIR MARCADOR DERECHA */
+/* BOTÓN AÑADIR MARCADOR */
 const btnAdd = document.getElementById("create-marker-btn");
 if (btnAdd) {
     btnAdd.addEventListener("click", () => {
@@ -144,48 +215,6 @@ if (btnAdd) {
     });
 }
 
-/* CARGAR EVENTOS DE FILTROS AL INICIO FIJO */
-window.addEventListener("DOMContentLoaded", () => {
-    const slider = document.getElementById("filter-range");
-    const out = document.getElementById("range-val");
-    if (slider && out) {
-        slider.addEventListener("input", function () {
-            out.textContent = this.value;
-            updateVisibleMarkers();
-        });
-    }
-
-    const btnApply = document.getElementById("apply-filters-btn");
-    if (btnApply) {
-        btnApply.addEventListener("click", () => { aplicarFiltros(); });
-    }
-});
-
-/* BORRAR */
-function borrarMarcadores() { myMarkers.forEach(m => map.removeLayer(m)); myMarkers = []; trabajos = []; }
-
-
-
-/* EDITAR (No visible ahora mismo publicamente) */
-function editarMarcador(i) {
-    const t = trabajos[i];
-    tempMarker = t.marker;
-    creatingMode = false;
-    document.getElementById("marker-view-box").classList.add("hidden");
-    document.getElementById("marker-form-box").classList.remove("hidden");
-    document.getElementById("job-title").value = t.title;
-    document.getElementById("job-desc").value = t.desc;
-    document.getElementById("job-address").value = t.addr;
-    document.getElementById("job-deadline").value = t.deadline;
-    document.getElementById("job-price").value = t.priceUser;
-    document.getElementById("job-time").value = t.time;
-    document.getElementById("job-category").value = t.category;
-    trabajos.splice(i, 1);
-    myMarkers.splice(i, 1);
-}
-
-/* CÍRCULO RANGO DINÁMICO */
-// Dibuja o actualiza un círculo rojo semitransparente indicando el área de rango cubierta
 function updateVisibleMarkers() {
     if (!userMarker) return;
     const range = parseFloat(document.getElementById("filter-range")?.value || 10);
@@ -193,14 +222,13 @@ function updateVisibleMarkers() {
     userCircle = L.circle([userLat, userLng], { radius: range * 1000, color: 'rgb(220,108,108)', fillOpacity: 0.1 }).addTo(map);
 }
 
-/* FILTROS TRABAJOS */
-// Evento para aplicar un filtro de distancia (en km) y precio basado en coordenadas y los inputs de formulario
 function aplicarFiltros() {
-    const cat = document.getElementById("filter-cat").value;
+    const cat = document.getElementById("filter-cat").value.toLowerCase();
     const range = parseFloat(document.getElementById("filter-range").value);
     const priceMin = parseFloat(document.getElementById("filter-price-min").value);
     const priceMax = parseFloat(document.getElementById("filter-price-max").value);
 
+    // Actualizar título
     const isFiltered = cat !== "" || range !== 1 || priceMin !== 2 || priceMax !== 1000;
     const title = document.getElementById('mapa-title');
     const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
@@ -208,23 +236,39 @@ function aplicarFiltros() {
         title.innerHTML = isFiltered ? iconHtml + "MAPA: Filtrado" : iconHtml + "MAPA: Todos";
     }
 
-    if (userCircle) map.removeLayer(userCircle);
-    userCircle = L.circle([userLat, userLng], { radius: range * 1000, color: 'rgb(220,108,108)', fillOpacity: 0.1 }).addTo(map);
+    updateVisibleMarkers();
 
+    // Mostrar/ocultar marcadores según distancia y filtros
     myMarkers.forEach(m => map.removeLayer(m));
 
-    trabajos.forEach(t => {
-        let distancia = calcDist(userLat, userLng, t.marker.getLatLng().lat, t.marker.getLatLng().lng);
-        if (distancia <= range && t.priceWorker >= priceMin && t.priceWorker <= priceMax && (cat === "" || t.category === cat)) {
-            t.marker.addTo(map);
+    allTrabajosDB.forEach((t, index) => {
+        const marker = myMarkers[index];
+        if (!marker) return;
+
+        const dist = calcDist(userLat, userLng, t.latitud, t.longitud);
+        const pagoFiltro = t.pago_cliente || 0;
+
+        const matchCat = cat === "" || (t.id_categoria && t.id_categoria.toLowerCase() === cat);
+        const matchRange = dist <= range;
+        const matchPrice = pagoFiltro >= priceMin && pagoFiltro <= priceMax;
+
+        if (matchCat && matchRange && matchPrice) {
+            marker.addTo(map);
         }
     });
 }
 
-/* DISTANCIA Haversine */
 function calcDist(lat1, lon1, lat2, lon2) {
     let R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
     let a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
+
+// Eventos de filtros
+document.getElementById("filter-range").addEventListener("input", function () {
+    document.getElementById("range-val").textContent = this.value;
+    updateVisibleMarkers();
+});
+
+document.getElementById("apply-filters-btn").addEventListener("click", aplicarFiltros);

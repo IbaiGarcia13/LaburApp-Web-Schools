@@ -1,72 +1,83 @@
+import { auth } from './firebase-config.js';
+import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsuarioPorId } from './database.js';
+
 // =====================================================
 // JS de la página de Postulaciones
 // Renderiza dos listas: trabajos donde te postulaste (izq)
 // y usuarios que se han postulado para tus tareas (der)
 // =====================================================
 
-// --- DATOS MOCK: Trabajos a los que el usuario se ha postulado ---
-const postulacionesTrabajos = [
-    { id: 1, titulo: "Cortar el césped", desc: "Necesito a una persona que me corte el césped, se requiere de maquinaria y...", loc: "Barakaldo, Bizkaia, Calle La Paz 21, 2ºF", tiempo: 5, cat: "Jardinería", xp: 307, pago: 30.75, estado: "pendiente" },
-    { id: 2, titulo: "Sacar al perro", desc: "Requiero de una persona para sacar a mi perro durante 2 horas por mi vecindario.", loc: "Castro Urdiales, Cantabria", tiempo: 2, cat: "Mascotas", xp: 205, pago: 20.5, estado: "aceptada" },
-    { id: 3, titulo: "Montar un Ordenador", desc: "Necesito que alguien me monte el ordenador, tengo los componentes...", loc: "Sestao, Bizkaia", tiempo: 4, cat: "Informática", xp: 450, pago: 40, estado: "pendiente" },
-    { id: 4, titulo: "Tarta Cumpleaños", desc: "Es el cumpleaños de mi hija, y necesito una tarta para su cumpleaños. La tarta des...", loc: "Sestao, Bizkaia", tiempo: 1, cat: "Informática", xp: 200, pago: 20, estado: "cancelada" },
-    { id: 5, titulo: "Limpieza de Garaje", desc: "Limpieza general de un garaje privado tras una pequeña obra.", loc: "Portugalete, Bizkaia", tiempo: 6, cat: "Limpieza", xp: 600, pago: 60, estado: "pendiente" },
-    { id: 6, titulo: "Poda de Setos", desc: "Recortar setos perimetrales de una finca de 800m2.", loc: "Laredo, Cantabria", tiempo: 4, cat: "Jardinería", xp: 400, pago: 40, estado: "aceptada" },
-    { id: 7, titulo: "Paseo diario perros", desc: "Paseo de 1 hora por la mañana para dos Golden Retriever.", loc: "Getxo, Bizkaia", tiempo: 1, cat: "Mascotas", xp: 150, pago: 15, estado: "cancelada" },
-    { id: 8, titulo: "Formatear Portátil", desc: "Instalación de sistema operativo y copia de seguridad de datos.", loc: "Santander, Cantabria", tiempo: 2, cat: "Informática", xp: 250, pago: 25, estado: "pendiente" },
-    { id: 9, titulo: "Cena de Empresa", desc: "Catering para 10 personas en una oficina pequeña.", loc: "Basauri, Bizkaia", tiempo: 3, cat: "Gastronomía", xp: 1200, pago: 120, estado: "aceptada" },
-    { id: 10, titulo: "Limpieza Ventanas", desc: "Limpieza de cristales en un piso de 3 habitaciones.", loc: "Barakaldo, Bizkaia", tiempo: 4, cat: "Limpieza", xp: 500, pago: 50, estado: "pendiente" },
-    { id: 11, titulo: "Desbrozar Terreno", desc: "Eliminar maleza de un terreno de 100m2 en las afueras.", loc: "Castro Urdiales, Cantabria", tiempo: 8, cat: "Jardinería", xp: 1000, pago: 100, estado: "cancelada" },
-    { id: 12, titulo: "Cuidado de Gatos", desc: "Visitar y alimentar a dos gatos durante el fin de semana.", loc: "Bilbao, Bizkaia", tiempo: 1, cat: "Mascotas", xp: 120, pago: 12, estado: "pendiente" }
-];
-
-// --- DATOS MOCK: Usuarios que se han postulado a tareas del perfil activo ---
-const postulacionesUsuarios = [
-    { id: 1, nombre: "Juan García Méndez", avatar: "../assets/img/Ibai.jpg", tarea: "Montar un armario" },
-    { id: 2, nombre: "María Isabel Gómez Martín", avatar: "../assets/img/Ibai.jpg", tarea: "Diseñar una web" },
-    { id: 3, nombre: "Carlos Rodríguez López", avatar: "../assets/img/Ibai.jpg", tarea: "Pasear al perro" },
-    { id: 4, nombre: "Ana Fernández Torres", avatar: "../assets/img/Ibai.jpg", tarea: "Limpiar la cocina" },
-    { id: 5, nombre: "Pedro Martínez Ruiz", avatar: "../assets/img/Ibai.jpg", tarea: "Cortar el césped" }
-];
-
-// --- PAGINACIÓN: solo para la columna de trabajos ---
+// Variables de estado
+let misPostulaciones = [];
+let postulantesParaMisTareas = [];
 const ITEMS_PER_PAGE = 5;
 let currentPage = 1;
-const totalPages = Math.ceil(postulacionesTrabajos.length / ITEMS_PER_PAGE);
+
+document.addEventListener("DOMContentLoaded", () => {
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            await loadAllData(user.uid);
+        } else {
+            window.location.href = '../index.html';
+        }
+    });
+
+    setupPaginationEvents();
+});
+
+async function loadAllData(uid) {
+    try {
+        // 1. Trabajos donde ME HE POSTULADO (Izquierda)
+        misPostulaciones = await obtenerMisPostulaciones(uid);
+        renderTrabajos();
+
+        // 2. Usuarios que SE HAN POSTULADO a mis tareas (Derecha)
+        postulantesParaMisTareas = await obtenerPostulacionesParaMisTareas(uid);
+        renderUsuarios();
+    } catch (e) {
+        console.error("Error cargando datos de postulaciones:", e);
+    }
+}
 
 // Renderiza la lista paginada de trabajos donde el usuario se ha postulado
 function renderTrabajos() {
     const container = document.getElementById('jobs-list');
+    if (!container) return;
     container.innerHTML = '';
 
+    const totalPages = Math.ceil(misPostulaciones.length / ITEMS_PER_PAGE) || 1;
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
-    const items = postulacionesTrabajos.slice(start, end);
+    const items = misPostulaciones.slice(start, end);
 
-    items.forEach(job => {
-        const estadoClass = `status-${job.estado}`;
-        const estadoText = job.estado.charAt(0).toUpperCase() + job.estado.slice(1);
-        const pagoText = Number.isInteger(job.pago) ? job.pago : Number(job.pago).toFixed(2);
+    if (items.length === 0) {
+        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>No te has postulado a ningún trabajo aún.</p>";
+    }
+
+    items.forEach(trabajo => {
+        const post = trabajo.postulacion;
+        const estadoClass = `status-${(post.estado_postulacion || 'pendiente').toLowerCase()}`;
+        const estadoText = (post.estado_postulacion || 'Pendiente');
+        const xp = trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10);
+        const img = trabajo.foto_trabajo || "../assets/img/trabajo-defecto.png";
 
         const card = document.createElement('article');
         card.className = 'job-card';
-        // Click en la tarjeta → trabajo.html
-        card.onclick = () => { window.location.href = `trabajo.html?id=${job.id}`; };
+        card.onclick = () => { window.location.href = `trabajo.html?id=${trabajo.id}`; };
 
         card.innerHTML = `
-            <img src="../assets/img/principal1.png" class="job-card-img" alt="${job.titulo}">
+            <img src="${img}" class="job-card-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
             <div class="job-card-info">
-                <h3 class="job-card-title">${job.titulo}</h3>
-                <p class="job-card-desc">${job.desc}</p>
+                <h3 class="job-card-title">${trabajo.titulo}</h3>
+                <p class="job-card-desc">${trabajo.descripcion || ""}</p>
                 <div class="job-card-meta">
-                    <span><img src="../assets/img/icons/icono-ubicacion.png" alt=""> ${job.loc}</span>
-                    <span><img src="../assets/img/icons/icono-relog.png" alt=""> Tiempo estimado: ${job.tiempo}h</span>
-                    <span><img src="../assets/img/icons/icono-categoria.png" alt=""> Categoría: ${job.cat} (+1)</span>
-                    <span><img src="../assets/img/icons/icono-xp.png" alt=""> Experiencia: <strong>${job.xp} XP</strong></span>
+                    <span><img src="../assets/img/icons/icono-ubicacion.png" alt=""> ${trabajo.direccion || "No especificada"}</span>
+                    <span><img src="../assets/img/icons/icono-relog.png" alt=""> Tiempo estimado: ${trabajo.tiempo_estimado_horas}h</span>
+                    <span><img src="../assets/img/icons/icono-xp.png" alt=""> Experiencia: <strong>${xp} XP</strong></span>
                 </div>
                 <div class="job-card-footer">
                     <span class="status-badge ${estadoClass}">${estadoText.toUpperCase()}</span>
-                    <span class="job-card-pago"><img src="../assets/img/icons/icono-dinero.png" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;" alt=""> Pago: <strong>${pagoText} €</strong></span>
+                    <span class="job-card-pago"><img src="../assets/img/icons/icono-dinero.png" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;" alt=""> Pago: <strong>${Number(trabajo.pago_cliente).toFixed(2)} €</strong></span>
                 </div>
             </div>
         `;
@@ -78,72 +89,71 @@ function renderTrabajos() {
     document.getElementById('next-page').style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
-// Renderiza la lista de usuarios postulantes (sin paginación, dato estático)
-function renderUsuarios() {
+// Renderiza la lista de usuarios postulantes (sin paginación, scroll vertical)
+async function renderUsuarios() {
     const container = document.getElementById('users-list');
+    if (!container) return;
     container.innerHTML = '';
 
-    postulacionesUsuarios.forEach(user => {
+    if (postulantesParaMisTareas.length === 0) {
+        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nadie se ha postulado a tus tareas todavía.</p>";
+        return;
+    }
+
+    for (const app of postulantesParaMisTareas) {
+        const user = await obtenerUsuarioPorId(app.id_usuario);
+        if (!user) continue;
+
+        const avatar = user.foto_perfil || "../assets/img/avatar-defecto.png";
+
         const card = document.createElement('div');
         card.className = 'user-app-card';
-        // Click en el card entero → perfil del usuario
         card.style.cursor = 'pointer';
-        card.onclick = () => { window.location.href = `usuario.html?id=${user.id}`; };
+        card.onclick = () => { window.location.href = `usuario.html?id=${user.uid}`; };
 
         card.innerHTML = `
-            <img src="${user.avatar}" class="user-app-img" alt="${user.nombre}">
+            <img src="${avatar}" class="user-app-img" onerror="this.src='../assets/img/avatar-defecto.png'">
             <div class="user-app-info">
                 <p class="user-app-name">${user.nombre}</p>
-                <p class="user-app-task">Ha postulado para tu realizar tu tarea:<br>
-                    <strong class="user-task-link">${user.tarea}</strong>
+                <p class="user-app-task">Ha postulado para realizar tu tarea:<br>
+                    <strong class="user-task-link" data-id="${app.id_trabajo}">${app.trabajo_titulo}</strong>
                 </p>
             </div>
-            <button class="user-chat-btn" data-user="${user.nombre}" title="Chatear con ${user.nombre}">
+            <button class="user-chat-btn" title="Chatear con ${user.nombre}">
                 <img src="../assets/img/icons/icono-chat-2.png" alt="Chat">
             </button>
         `;
         container.appendChild(card);
 
-        // Nombre de la tarea → mi-tarea.html (sin propagar al card)
+        // Click en el título de la tarea
         card.querySelector('.user-task-link').addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = 'mi-tarea.html';
+            window.location.href = `mi-tarea.html?id=${app.id_trabajo}`;
         });
-    });
 
-    // Vinculamos los botones de chat con el modal de confirmación
-    container.querySelectorAll('.user-chat-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // No propagar click al card
-            const nombre = btn.dataset.user;
-            showCustomConfirm(
-                "Chatear con usuario",
-                `¿Quieres chatear con este usuario?`,
-                () => { window.location.href = 'chat.html'; },
-                "Aceptar",
-                "Cancelar"
-            );
+        // Click en chat
+        card.querySelector('.user-chat-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.location.href = `chat.html?id=${app.id_trabajo}`;
         });
-    });
+    }
 }
 
-// Eventos de paginación
-document.getElementById('prev-page').addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTrabajos();
-        window.scrollTo(0, 0);
-    }
-});
+function setupPaginationEvents() {
+    document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTrabajos();
+            window.scrollTo(0, 0);
+        }
+    });
 
-document.getElementById('next-page').addEventListener('click', () => {
-    if (currentPage < totalPages) {
-        currentPage++;
-        renderTrabajos();
-        window.scrollTo(0, 0);
-    }
-});
-
-// Inicializar
-renderTrabajos();
-renderUsuarios();
+    document.getElementById('next-page').addEventListener('click', () => {
+        const totalPages = Math.ceil(misPostulaciones.length / ITEMS_PER_PAGE) || 1;
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTrabajos();
+            window.scrollTo(0, 0);
+        }
+    });
+}

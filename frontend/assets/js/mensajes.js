@@ -1,46 +1,76 @@
+import { auth } from './firebase-config.js';
+import { obtenerConversacionesActivas, obtenerUsuarioPorId } from './database.js';
+
 // =====================================================
 // MENSAJES - Lista de conversaciones activas
 // =====================================================
 
-// Datos mock: usuarios con los que hay conversación activa
-const mensajesData = [
-    { id: 1, nombre: "Juan García Méndez", avatar: "../assets/img/Ibai.jpg", trabajo: "Montar un armario" },
-    { id: 2, nombre: "María Isabel Gómez Martín", avatar: "../assets/img/Ibai.jpg", trabajo: "Diseñar una web" },
-    { id: 3, nombre: "Carlos Rodríguez López", avatar: "../assets/img/Ibai.jpg", trabajo: "Pasear al perro" },
-    { id: 4, nombre: "Ana Fernández Torres", avatar: "../assets/img/Ibai.jpg", trabajo: "Limpiar la cocina" },
-    { id: 5, nombre: "Pedro Martínez Ruiz", avatar: "../assets/img/Ibai.jpg", trabajo: "Cortar el césped" },
-    { id: 6, nombre: "Laura Sánchez Díaz", avatar: "../assets/img/Ibai.jpg", trabajo: "Pintar habitación" },
-    { id: 7, nombre: "Miguel Ángel Torres", avatar: "../assets/img/Ibai.jpg", trabajo: "Reparar ordenador" },
-    { id: 8, nombre: "Elena Pérez García", avatar: "../assets/img/Ibai.jpg", trabajo: "Cuidar mascotas" }
-];
-
-// Paginación
-const ITEMS_PER_PAGE = 4;
+// Variables de estado
+let allConversations = [];
+const ITEMS_PER_PAGE = 5;
 let currentPage = 1;
-const totalPages = Math.ceil(mensajesData.length / ITEMS_PER_PAGE);
+
+document.addEventListener("DOMContentLoaded", () => {
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            await loadConversations(user.uid);
+        } else {
+            window.location.href = '../index.html';
+        }
+    });
+
+    setupPaginationEvents();
+});
+
+async function loadConversations(uid) {
+    try {
+        allConversations = await obtenerConversacionesActivas(uid);
+        renderMensajes();
+    } catch (e) {
+        console.error("Error cargando conversaciones:", e);
+    }
+}
 
 // Renderiza las tarjetas de conversación
-function renderMensajes() {
+async function renderMensajes() {
     const container = document.getElementById('msgs-list');
+    if (!container) return;
     container.innerHTML = '';
 
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const items = mensajesData.slice(start, start + ITEMS_PER_PAGE);
+    const end = start + ITEMS_PER_PAGE;
+    const items = allConversations.slice(start, end);
 
-    items.forEach(user => {
+    if (items.length === 0) {
+        container.innerHTML = "<p style='color: white; text-align: center; padding: 20px; font-style: italic;'>No tienes chats activos aún.</p>";
+        updatePaginationUI(0);
+        return;
+    }
+
+    const currentUser = auth.currentUser;
+
+    for (const job of items) {
+        // El "otro" usuario es el publicador si yo soy el trabajador, o viceversa
+        const otherId = (currentUser.uid === job.id_publicador) ? job.id_trabajador : job.id_publicador;
+        const otherUser = await obtenerUsuarioPorId(otherId);
+
+        if (!otherUser) continue;
+
+        const avatar = otherUser.foto_perfil || "../assets/img/avatar-defecto.png";
+        const nombre = otherUser.nombre_completo || "Usuario Desconocido";
+
         const card = document.createElement('div');
         card.className = 'msg-card';
-        // Click en el card → perfil del usuario
-        card.onclick = () => { window.location.href = `usuario.html?id=${user.id}`; };
+        card.onclick = () => { window.location.href = `usuario.html?id=${otherId}`; };
 
         card.innerHTML = `
-            <img src="${user.avatar}" class="msg-avatar" alt="${user.nombre}">
+            <img src="${avatar}" class="msg-avatar" alt="${nombre}" onerror="this.src='../assets/img/avatar-defecto.png'">
             <div class="msg-info">
-                <p class="msg-name">${user.nombre}</p>
+                <p class="msg-name">${nombre}</p>
                 <p class="msg-label">Trabajo:</p>
-                <button class="msg-job-link">${user.trabajo}</button>
+                <button class="msg-job-link" data-id="${job.id}">${job.titulo}</button>
             </div>
-            <button class="msg-chat-btn" title="Abrir chat con ${user.nombre}">
+            <button class="msg-chat-btn" title="Abrir chat con ${nombre}">
                 <img src="../assets/img/icons/icono-chat-2.png" alt="Chat">
             </button>
         `;
@@ -49,33 +79,40 @@ function renderMensajes() {
         // Nombre del trabajo → trabajo.html (sin propagar al card)
         card.querySelector('.msg-job-link').addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = 'trabajo.html';
+            window.location.href = `trabajo.html?id=${job.id}`;
         });
 
-        // Botón chat → modal de confirmación → chat.html
+        // Botón chat → chat.html
         card.querySelector('.msg-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            showCustomConfirm(
-                "Abrir Chat",
-                "¿Quieres chatear con este usuario?",
-                () => { window.location.href = 'chat.html'; },
-                "Aceptar",
-                "Cancelar"
-            );
+            window.location.href = `chat.html?id=${job.id}`;
         });
-    });
+    }
 
+    updatePaginationUI(allConversations.length);
+}
+
+function updatePaginationUI(total) {
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1;
     document.getElementById('page-info').textContent = `${currentPage} - ${totalPages}`;
     document.getElementById('prev-page').style.opacity = currentPage === 1 ? '0.3' : '1';
     document.getElementById('next-page').style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
-// Paginación
-document.getElementById('prev-page').addEventListener('click', () => {
-    if (currentPage > 1) { currentPage--; renderMensajes(); window.scrollTo(0, 0); }
-});
-document.getElementById('next-page').addEventListener('click', () => {
-    if (currentPage < totalPages) { currentPage++; renderMensajes(); window.scrollTo(0, 0); }
-});
-
-renderMensajes();
+function setupPaginationEvents() {
+    document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderMensajes();
+            window.scrollTo(0, 0);
+        }
+    });
+    document.getElementById('next-page').addEventListener('click', () => {
+        const totalPages = Math.ceil(allConversations.length / ITEMS_PER_PAGE);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderMensajes();
+            window.scrollTo(0, 0);
+        }
+    });
+}

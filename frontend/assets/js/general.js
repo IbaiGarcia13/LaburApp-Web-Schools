@@ -1,5 +1,30 @@
+import { auth } from './firebase-config.js';
+import { obtenerPerfilUsuario } from './database.js';
+
 // Evento global que inicializa el menú lateral y las acciones comunes en la barra superior al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+    // -- LÓGICA DE USUARIO EN CABECERA --
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const perfil = await obtenerPerfilUsuario(user.uid);
+            if (perfil) {
+                const avatarUrl = perfil.foto_perfil || (window.location.pathname.includes('/pages/') ? '../assets/img/avatar-defecto.png' : 'frontend/assets/img/avatar-defecto.png');
+
+                // Actualizar avatars en la cabecera
+                const headerAvatar = document.getElementById('profileBtn');
+                const dropdownAvatar = document.querySelector('.dropdown-avatar');
+                if (headerAvatar) headerAvatar.src = avatarUrl;
+                if (dropdownAvatar) dropdownAvatar.src = avatarUrl;
+
+                // Actualizar nombre y email
+                const dropdownName = document.querySelector('.dropdown-name');
+                const dropdownEmail = document.querySelector('.dropdown-email');
+                if (dropdownName) dropdownName.innerText = perfil.nombre || "Usuario";
+                if (dropdownEmail) dropdownEmail.innerText = user.email;
+            }
+        }
+    });
+
     // Referencias al botón del menú hamburguesa y al contenedor del menú lateral
     const menuBtn = document.getElementById('menuBtn');
     const sideMenu = document.getElementById('sideMenu');

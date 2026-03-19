@@ -76,6 +76,22 @@
             <img src="../assets/img/principal1.png" alt="LaburApp Inicio">
         </section>
 
+        <!-- DASHBOARD DINAMICO (Se llena desde principal.js) -->
+        <section class="dashboard-stats" id="dashboardStats" style="display: none;">
+            <div class="stat-card">
+                <h3>Nivel</h3>
+                <p id="stat-nivel">...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Experiencia</h3>
+                <p id="stat-xp">...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Dinero Ganado</h3>
+                <p id="stat-dinero">...</p>
+            </div>
+        </section>
+
         <h2 class="main-title">LABURAPP - ACERCA DE NOSOTROS</h2>
 
         <div class="about-grid">
@@ -122,8 +138,8 @@
         </div>
     </main>
 
-    <script src="../assets/js/general.js"></script>
-    <script src="../assets/js/principal.js"></script>
+    <script type="module" src="../assets/js/general.js"></script>
+    <script type="module" src="../assets/js/principal.js"></script>
 </body>
 <footer>
     <p>&copy; 2026 LaburApp - Todos los derechos reservados.</p>

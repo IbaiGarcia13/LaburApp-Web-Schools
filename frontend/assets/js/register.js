@@ -12,6 +12,7 @@ const passwordInput = document.getElementById("password");
 const passwordRptInput = document.getElementById("passwordRpt");
 const nombreInput = document.getElementById("nombre");
 const apellidosInput = document.getElementById("apellidos");
+const fechaNacInput = document.getElementById("fechaNac");
 const dniInput = document.getElementById("dni");
 
 // Buttons & Error
@@ -95,11 +96,12 @@ if (formRegister) {
         const password = passwordInput.value;
         const nombre = nombreInput.value.trim();
         const apellidos = apellidosInput.value.trim();
+        const dNac = fechaNacInput ? fechaNacInput.value.trim() : "";
         const dni = dniInput.value.trim().toUpperCase();
 
         // Validaciones de la fase 2
-        if (!nombre || !apellidos || !dni) {
-            errorMsg.textContent = "Todos los campos de datos personales son obligatorios.";
+        if (!nombre || !apellidos || !dni || !dNac) {
+            errorMsg.textContent = "Todos los campos de datos personales (incluyendo Fecha Nac.) son obligatorios.";
             return;
         }
 
@@ -118,6 +120,13 @@ if (formRegister) {
             return;
         }
 
+        // Format date to DD-MM-YYYY if it comes from date input as YYYY-MM-DD
+        let formattedDate = dNac;
+        if (dNac.includes("-") && dNac.split("-")[0].length === 4) {
+            const parts = dNac.split("-");
+            formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
         try {
             // 4.1. Crear usuario en Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -127,9 +136,18 @@ if (formRegister) {
             // Usamos setDoc con el ID del usuario de Auth para enlazar los perfiles fácilmente
             await setDoc(doc(db, "usuarios", user.uid), {
                 nombre: nombre,
+                nombre_completo: nombre + " " + apellidos,
                 apellidos: apellidos,
                 dni: dni,
-                email: email
+                email: email,
+                fecha_ingreso: formattedDate,
+                nivel: 1,
+                experiencia_total: 0,
+                experiencia_nivel_actual: 0,
+                valoracion_media: 0,
+                dinero_ganado_total: 0,
+                id_suscripcion_trabajador: "ninguna",
+                id_suscripcion_cliente: "ninguna"
             });
 
             // 4.3. Éxito

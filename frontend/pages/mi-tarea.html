@@ -74,7 +74,7 @@
     <main class="main-content">
         <section class="job-header-section">
             <div class="job-image-wrapper">
-                <img src="../assets/img/principal1.png" alt="Cortar el césped" class="job-img">
+                <img src="../assets/img/trabajo-defecto.png" alt="Cortar el césped" class="job-img">
             </div>
 
             <div class="job-info-main">
@@ -135,6 +135,27 @@
             </div>
         </section>
 
+        <!-- SECCIÓN DE POSTULANTES -->
+        <section class="applicants-section" id="applicantsSection" style="margin-top: 30px; display: none;">
+            <h2 class="cat-title" style="margin-bottom: 20px;">Candidatos Postulados</h2>
+            <div id="applicantsList" class="applicants-grid">
+                <!-- Se rellena por JS -->
+                <p style="color: #666;">Cargando candidatos...</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE FINALIZACIÓN (Solo si está Aceptado) -->
+        <section id="finishSection" style="margin-top: 30px; display: none; text-align: center;">
+            <button id="btnFinishJob" class="modal-btn confirm"
+                style="padding: 15px 30px; font-size: 1.1rem; width: auto;">
+                <img src="../assets/img/icons/icono-check.png" alt=""
+                    style="width: 20px; vertical-align: middle; margin-right: 10px; filter: brightness(0);">
+                FINALIZAR TRABAJO
+            </button>
+            <p style="color: #888; margin-top: 10px; font-size: 0.9rem;">Marca este trabajo como completado para pagar
+                al trabajador y otorgarle XP.</p>
+        </section>
+
     </main>
 
     <!-- Modal 1: Editar Principal (Título, Descripción, Ubicación) -->
@@ -155,6 +176,11 @@
             <div class="input-group">
                 <label>Dirección:</label>
                 <input type="text" id="inputLoc">
+            </div>
+
+            <div class="input-group">
+                <label>Foto de la tarea:</label>
+                <input type="file" id="inputPhoto" accept="image/*">
             </div>
 
             <div class="modal-buttons">
@@ -223,8 +249,54 @@
         </div>
     </div>
 
-    <script src="../assets/js/general.js"></script>
-    <script src="../assets/js/mi-tarea.js"></script>
+    <!-- Modal 4: Valoración -->
+    <div id="modalRating" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Valorar Trabajador</h3>
+            <p>El trabajo ha finalizado. Por favor, valora la experiencia con el trabajador.</p>
+
+            <div class="input-group" style="text-align: center; margin: 20px 0;">
+                <div class="stars-rating" id="starsRating">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
+                </div>
+                <input type="hidden" id="inputRatingValue" value="5">
+            </div>
+
+            <div class="input-group">
+                <label>Comentario (opcional):</label>
+                <textarea id="inputReviewDesc" rows="3" placeholder="¿Cómo fue trabajar con él/ella?"></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="btnSkipReview" class="modal-btn cancel">Omitir</button>
+                <button id="btnSaveReview" class="modal-btn confirm">Enviar Valoración</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .stars-rating {
+            font-size: 2.5rem;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .star.active {
+            color: #ff9d00;
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+            transition: 0.2s;
+        }
+    </style>
+
+    <script type="module" src="../assets/js/general.js"></script>
+    <script type="module" src="../assets/js/mi-tarea.js"></script>
 </body>
 <footer>
     <p>&copy; 2026 LaburApp - Todos los derechos reservados.</p>

@@ -2,6 +2,7 @@
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
+    min-height: calc(100vh - 250px);
 }
 
 .main-title {
