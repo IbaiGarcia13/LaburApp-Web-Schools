@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - LaburApp</title>
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .contact-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .contact-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .email-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .email-box:hover {
+            background: #eef2f7;
+            border-color: #3498db;
+        }
+
+        .email-address {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #3498db;
+            display: block;
+        }
+
+        .copy-text {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .btn-home {
+            display: inline-block;
+            background: #2c3e50;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-home:hover {
+            background: #34495e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="contact-container">
+        <a href="principal.html" class="back-link">&larr; Volver</a>
+        <span class="contact-icon">📧</span>
+        <h1>Ponte en contacto</h1>
+        <p>¿Tienes alguna duda o problema? Estamos aquí para ayudarte. Puedes enviarnos un correo electrónico
+            directamente:</p>
+
+        <div class="email-box" id="copyEmail">
+            <span class="email-address">laburapp.web@gmail.com</span>
+            <span class="copy-text">Haz clic para copiar el correo</span>
+        </div>
+
+        <p style="font-size: 0.9rem; color: #888;">Te responderemos lo antes posible, normalmente en menos de 24 horas.
+        </p>
+
+        <a href="principal.html" class="btn-home">Ir al Inicio</a>
+    </div>
+
+    <script>
+        document.getElementById('copyEmail').onclick = function () {
+            const email = "laburapp.web@gmail.com";
+            navigator.clipboard.writeText(email).then(() => {
+                const copyText = this.querySelector('.copy-text');
+                const originalText = copyText.innerText;
+                copyText.innerText = "¡Copiado!";
+                copyText.style.color = "#27ae60";
+                setTimeout(() => {
+                    copyText.innerText = originalText;
+                    copyText.style.color = "#999";
+                }, 2000);
+            });
+        };
+    </script>
+    <script type="module" src="../assets/js/general.js"></script>
+</body>
+<footer>
+    <p>&copy; 2026 LaburApp - Todos los derechos reservados. | <a href="politica-privacidad.html">Privacidad</a> | <a
+            href="terminos-condiciones.html">Términos</a> | <a href="contacto.html">Contacto</a></p>
+</footer>
+
+</html>

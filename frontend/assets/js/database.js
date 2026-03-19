@@ -1025,9 +1025,9 @@ export async function gestionarBorradoTarea(idTrabajo, rol) {
     const diffLimDias = fechaLim ? (ahora - fechaLim) / (1000 * 60 * 60 * 24) : -1;
 
     const esElegibleParaPermanente =
-        (tarea.estado === 'Pendiente' && diffPubDias > 7) || // Pendiente + 7 días
-        (diffLimDias > 7) ||                                // > 7 días después de fecha límite
-        (tarea.estado === 'Completada');                      // Historial completado (se puede borrar si ambos quieren)
+        (tarea.estado === 'Pendiente' && diffPubDias > 7) || // Caso 1: Pendiente + 7 días desde publicación
+        (diffLimDias > 7) ||                                // Caso 2: > 7 días después de fecha límite (para Canceladas o en proceso)
+        (tarea.estado === 'Completada');                    // Caso 3: Tareas completadas (se borran si ambos quieren)
 
     const condicionUsuarios = (yaBorradaPorOtro === true || !tarea.id_trabajador);
 
