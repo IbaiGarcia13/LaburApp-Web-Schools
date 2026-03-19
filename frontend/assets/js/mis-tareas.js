@@ -111,7 +111,7 @@ function displayTareas() {
                         <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${tarea.tiempo_estimado_horas}h</p>
                         <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</p>
                         <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:16px" alt=""><strong>${Number(pagoCliente).toFixed(2)} €</strong></p>
+                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(pagoCliente).toFixed(2)} €</strong></p>
                     </div>
                 </div>
             </article>`;
@@ -163,7 +163,7 @@ window.confirmarEliminar = function (id) {
     const modalTitle = isCompletada ? "Eliminar del Historial" : "Eliminar Publicación";
     const modalDesc = isCompletada
         ? "¿Quieres eliminar esta tarea de tu historial? Solo desaparecerá para ti, el registro se mantiene para el trabajador."
-        : "¿Estás seguro de que quieres eliminar esta tarea? Se borrará permanentemente de la plataforma.";
+        : "¿Estás seguro de que quieres eliminar esta tarea? Se ocultará de tu lista y se borrará definitivamente tras el periodo de seguridad (7 días).";
 
     showCustomConfirm(
         modalTitle,

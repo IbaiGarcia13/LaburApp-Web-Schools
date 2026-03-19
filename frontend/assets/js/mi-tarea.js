@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('applicantsSection').style.display = 'none';
                 }
 
-                // Mostrar botón de completar solo si hay trabajador asignado y no está completada
+                // Mostrar botón de completar solo si está en curso o finalizada por el trabajador
                 const btnCompletar = document.getElementById('btnCompletar');
                 if (btnCompletar) {
                     if (tarea.estado === "En curso" && tarea.id_trabajador) {
@@ -108,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'applicant-card';
         card.innerHTML = `
-            <img src="${avatar}" class="applicant-avatar" alt="${user.nombre}">
+            <img src="${avatar}" class="applicant-avatar" alt="${user.nombre}" style="cursor:pointer;">
             <div class="applicant-info">
-                <span class="applicant-name">${user.nombre}</span>
+                <span class="applicant-name" style="cursor:pointer;">${user.nombre}</span>
                 <div class="applicant-actions">
                     <button class="app-btn btn-accept" title="Aceptar"><img src="../assets/img/icons/icono-si-blanco.png" alt=""></button>
                     <button class="app-btn btn-reject" title="Rechazar"><img src="../assets/img/icons/icono-no-blanco.png" alt=""></button>
@@ -118,6 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+
+        // Ir a perfil
+        const goToProfile = () => window.location.href = `usuario.html?id=${user.uid}`;
+        card.querySelector('.applicant-avatar').onclick = goToProfile;
+        card.querySelector('.applicant-name').onclick = goToProfile;
 
         // Eventos
         card.querySelector('.btn-accept').onclick = () => {
@@ -218,14 +223,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'applicant-card';
         card.innerHTML = `
-            <img src="${avatar}" class="applicant-avatar" alt="${user.nombre}">
+            <img src="${avatar}" class="applicant-avatar" alt="${user.nombre}" style="cursor:pointer;">
             <div class="applicant-info">
-                <span class="applicant-name">${user.nombre}</span>
+                <span class="applicant-name" style="cursor:pointer;">${user.nombre}</span>
                 <div class="applicant-actions">
                     <button class="app-btn btn-chat-small" title="Chat" style="width: 100%;"><img src="../assets/img/icons/icono-chat-2.png" alt=""> Chatear</button>
                 </div>
             </div>
         `;
+
+        // Ir a perfil
+        const goToProfile = () => window.location.href = `usuario.html?id=${user.uid}`;
+        card.querySelector('.applicant-avatar').onclick = goToProfile;
+        card.querySelector('.applicant-name').onclick = goToProfile;
 
         card.querySelector('.btn-chat-small').onclick = () => {
             window.location.href = `chat.html?id=${tareaId}&userId=${user.uid}`;
@@ -431,13 +441,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Botón de Completar Tarea: Abre el modal de valoración
+    // Botón de Completar Tarea: Confirmación de pago y luego valoración
     const btnCompletar = document.getElementById('btnCompletar');
     if (btnCompletar) {
         btnCompletar.addEventListener('click', () => {
             if (!currentTarea || !currentTarea.id_trabajador) return;
-            resetValoracionModal();
-            modalValoracion.classList.remove('hidden');
+
+            showCustomConfirm(
+                "¿Finalizar Tarea?",
+                "Al marcarla como completada, el pago que tenemos retenido (escrow) se enviará automáticamente al trabajador. ¿Quieres proceder?",
+                () => {
+                    resetValoracionModal();
+                    modalValoracion.classList.remove('hidden');
+                },
+                "Finalizar y Valorar",
+                "Cancelar"
+            );
         });
     }
 
@@ -475,97 +494,45 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     });
 
-    // --- LÓGICA DEL MODAL DE PAGO ---
-
-
-    async function cargarMetodosPago() {
-        const user = auth.currentUser;
-        if (!user) return;
-
-        try {
-            const metodos = await obtenerMetodosPago(user.uid);
-            selectMetodoPago.innerHTML = "";
-
-            if (metodos.length === 0) {
-                selectMetodoPago.style.display = 'none';
-                noPaymentMethods.classList.remove('hidden');
-                btnConfirmarPago.disabled = true;
-                btnConfirmarPago.style.opacity = '0.5';
-            } else {
-                selectMetodoPago.style.display = 'block';
-                noPaymentMethods.classList.add('hidden');
-                btnConfirmarPago.disabled = false;
-                btnConfirmarPago.style.opacity = '1';
-
-                metodos.forEach(m => {
-                    const opt = document.createElement('option');
-                    opt.value = m.id_metodo;
-                    opt.textContent = `${m.tipo}: ${m.detalle}`;
-                    selectMetodoPago.appendChild(opt);
-                });
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    if (btnCancelPago) {
-        btnCancelPago.onclick = () => modalPago.classList.add('hidden');
-    }
-
-    // Paso 1: Al confirmar valoración -> Abrir Pago
+    // --- ACCIÓN FINAL: Guardar valoración y completar tarea ---
     if (btnConfirmarValoracion) {
-        btnConfirmarValoracion.onclick = () => {
-            modalValoracion.classList.add('hidden');
-            document.getElementById('pagoMontoModal').textContent = Number(currentTarea.pago_cliente).toFixed(2);
-            cargarMetodosPago();
-            modalPago.classList.remove('hidden');
-        };
-    }
-
-    // Paso 2: Al confirmar pago -> Finalizar Todo
-    if (btnConfirmarPago) {
-        btnConfirmarPago.onclick = async () => {
+        btnConfirmarValoracion.onclick = async () => {
             if (!currentTarea || !currentTarea.id_trabajador) return;
 
-            showCustomConfirm(
-                "¿Confirmar Pago y Finalizar?",
-                "Se transferirá el importe al trabajador y la tarea se marcará como completada.",
-                async () => {
-                    try {
-                        btnConfirmarPago.disabled = true;
-                        btnConfirmarPago.textContent = "Procesando...";
+            try {
+                btnConfirmarValoracion.disabled = true;
+                btnConfirmarValoracion.textContent = "Procesando...";
 
-                        const puntuacion = currentRating;
-                        const comentario = inputComentario.value.trim();
+                const puntuacion = currentRating;
+                const comentario = inputComentario.value.trim();
 
-                        // 1. Guardar la valoración
-                        await dejarValoracion(currentTarea.id_trabajador, tareaId, puntuacion, comentario);
+                // 1. Guardar la valoración
+                await dejarValoracion(currentTarea.id_trabajador, tareaId, puntuacion, comentario);
 
-                        // 2. Marcar como completada y transferir dinero (en database.js)
-                        await completarTrabajo(tareaId, currentTarea.id_trabajador);
+                // 2. Marcar como completada y transferir dinero (liberar escrow)
+                await completarTrabajo(tareaId, currentTarea.id_trabajador);
 
-                        showCustomAlert("¡Tarea Finalizada!", "El pago se ha realizado y la tarea está ahora completada.");
+                showCustomAlert("¡Tarea Finalizada!", "El pago se ha liberado al trabajador y la tarea está ahora completada.");
 
-                        modalPago.classList.add('hidden');
-                        if (btnCompletar) btnCompletar.style.display = 'none';
+                modalValoracion.classList.add('hidden');
+                if (btnCompletar) btnCompletar.style.display = 'none';
 
-                        // Actualizar badge
-                        const badgeEl = document.getElementById('displayEstado');
-                        if (badgeEl) {
-                            badgeEl.textContent = 'Completada';
-                            badgeEl.className = 'estado-badge completada';
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        showCustomAlert("Error", "No se pudo procesar el pago.");
-                        btnConfirmarPago.disabled = false;
-                        btnConfirmarPago.textContent = "Confirmar y Finalizar";
-                    }
-                },
-                "Confirmar",
-                "Cancelar"
-            );
+                // Actualizar badge
+                const badgeEl = document.getElementById('displayEstado');
+                if (badgeEl) {
+                    badgeEl.textContent = 'Completada';
+                    badgeEl.className = 'estado-badge completada';
+                }
+
+                // Recargar para ver cambios
+                setTimeout(() => location.reload(), 1500);
+
+            } catch (e) {
+                console.error("Error al finalizar tarea:", e);
+                showCustomAlert("Error", "No se pudo completar el proceso final.");
+                btnConfirmarValoracion.disabled = false;
+                btnConfirmarValoracion.textContent = "Enviar Valoración";
+            }
         };
     }
 });

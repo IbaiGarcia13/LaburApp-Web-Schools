@@ -112,6 +112,10 @@
     cursor: pointer;
 }
 
+.msg-name:hover {
+    text-decoration: underline;
+}
+
 .msg-label {
     font-size: 0.85rem;
     color: var(--gray-5);
@@ -126,8 +130,7 @@
 
 .msg-job-link {
     font-size: 0.85rem;
-    color: var(--gray-11);
-    text-decoration: underline;
+    color: var(--gray-5);
     cursor: pointer;
     background: none;
     border: none;
@@ -138,7 +141,8 @@
 }
 
 .msg-job-link:hover {
-    color: var(--primary);
+    color: var(--gray-8);
+    text-decoration: underline;
 }
 
 .msg-stats {

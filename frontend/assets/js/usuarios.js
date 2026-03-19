@@ -29,6 +29,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Filtrar para no mostrarse a sí mismo
             filteredUsers = usuariosData.filter(u => u.uid !== currentUid);
+
+            // ORDENAR: Primero los CURRANTE (basado en actividad reciente)
+            filteredUsers.sort((a, b) => {
+                const subA = a.id_suscripcion_trabajador === 'currante';
+                const subB = b.id_suscripcion_trabajador === 'currante';
+
+                if (subA && !subB) return -1;
+                if (!subA && subB) return 1;
+
+                // Si ambos tienen o no tienen la misma prioridad de suscripción, ordenamos por último login
+                const timeA = a.ultimo_login_suscrito?.toMillis ? a.ultimo_login_suscrito.toMillis() : (a.ultimo_login_suscrito || 0);
+                const timeB = b.ultimo_login_suscrito?.toMillis ? b.ultimo_login_suscrito.toMillis() : (b.ultimo_login_suscrito || 0);
+
+                if (timeB !== timeA) return timeB - timeA;
+
+                // Si no hay actividad de suscripción, ordenamos por nivel para que no sea aleatorio
+                return (b.nivel || 1) - (a.nivel || 1);
+            });
+
             displayUsers();
         });
     } catch (e) {

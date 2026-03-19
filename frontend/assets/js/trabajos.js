@@ -32,8 +32,15 @@ async function loadJobs() {
             rawJobs = rawJobs.filter(j => j.id_publicador !== user.uid);
         }
 
-        // Ordenamos por fecha_publicacion descendente en el cliente (para evitar índices compuestos)
+        // Ordenamos por prioridad de suscripción (JEFE) y luego por fecha descendente
         allJobs = rawJobs.sort((a, b) => {
+            // 1. Prioridad por suscripción JEFE (basado en último login del publicador)
+            const prioA = a.prioridad_suscripcion?.toMillis ? a.prioridad_suscripcion.toMillis() : (a.prioridad_suscripcion || 0);
+            const prioB = b.prioridad_suscripcion?.toMillis ? b.prioridad_suscripcion.toMillis() : (b.prioridad_suscripcion || 0);
+
+            if (prioB !== prioA) return prioB - prioA;
+
+            // 2. Fecha de publicación normal
             const dateA = a.fecha_publicacion?.toDate ? a.fecha_publicacion.toDate() : (a.fecha_publicacion || 0);
             const dateB = b.fecha_publicacion?.toDate ? b.fecha_publicacion.toDate() : (b.fecha_publicacion || 0);
             return dateB - dateA;

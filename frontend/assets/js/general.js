@@ -1,5 +1,11 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, obtenerNotificaciones, marcarNotificacionesComoLeidas, eliminarNotificacion } from './database.js';
+import {
+    obtenerPerfilUsuario,
+    obtenerNotificaciones,
+    marcarNotificacionesComoLeidas,
+    eliminarNotificacion,
+    actualizarActividadSuscripcion
+} from './database.js';
 import { onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Evento global que inicializa el menú lateral y las acciones comunes en la barra superior al cargar la página
@@ -8,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             setupNotificationBadgeListener(user.uid);
+
             // Comprobar si han pasado más de 7 días (si se usó "Recordarme")
             const loginTimestamp = localStorage.getItem("loginTimestamp");
             if (loginTimestamp) {
@@ -16,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Sesión expirada (7 días). Cerrando sesión...");
                     localStorage.removeItem("loginTimestamp");
                     auth.signOut().then(() => {
-                        // Al estar en una subpágina, volvemos a la raíz
                         window.location.href = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
                     });
                     return;
@@ -25,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const perfil = await obtenerPerfilUsuario(user.uid);
             if (perfil) {
+                // Actualizar actividad si tiene suscripción activa (Prioridad en listas)
+                if (perfil.id_suscripcion_trabajador === 'currante' || perfil.id_suscripcion_cliente === 'jefe') {
+                    actualizarActividadSuscripcion(user.uid);
+                }
+
                 const avatarUrl = perfil.foto_perfil || (window.location.pathname.includes('/pages/') ? '../assets/img/avatar-defecto.png' : 'frontend/assets/img/avatar-defecto.png');
 
                 // Actualizar avatars en la cabecera
@@ -271,6 +282,9 @@ async function renderNotifications() {
                         break;
                     case 'tarea_empezada':
                         if (n.id_trabajo) targetUrl = prefix + `mi-tarea.html?id=${n.id_trabajo}`;
+                        break;
+                    case 'mensaje':
+                        targetUrl = prefix + 'mensajes.html';
                         break;
                 }
 

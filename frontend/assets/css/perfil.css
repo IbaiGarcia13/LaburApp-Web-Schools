@@ -331,6 +331,10 @@
     font-size: 14px;
 }
 
+.change-pass-action a:hover {
+    color: var(--gray-9);
+}
+
 /* Icono de editar */
 .edit-container {
     text-align: right;
@@ -376,12 +380,6 @@
     color: var(--red-1);
     font-weight: bold;
     cursor: pointer;
-}
-
-.change-pass-action a {
-    color: var(--gray-5);
-    text-decoration: underline;
-    font-size: 14px;
 }
 
 /* Estilos del Modal (Ventana emergente) */
@@ -458,13 +456,51 @@
 /* Añade esto para que el enlace no cambie de color */
 #displayPDF {
     color: var(--neutral-black);
+    text-decoration: none;
     text-decoration: underline;
     cursor: pointer;
 }
 
 #displayPDF:hover {
-    color: var(--gray-3);
-    /* Un ligero cambio al pasar el ratón */
+    color: var(--gray-9);
+}
+
+/* Nuevo botón Tu Usuario */
+.user-view-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+
+.btn-perfil-usuario {
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
+    padding: 16px 40px;
+    border: none;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+    text-transform: uppercase;
+}
+
+.btn-perfil-usuario:hover {
+    background-color: var(--gray-11);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-perfil-usuario:active {
+    transform: translateY(0);
 }
 
 /* --- RESPONSIVE --- */

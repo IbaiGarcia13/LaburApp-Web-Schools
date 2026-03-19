@@ -43,7 +43,7 @@
 .view-more-btn {
     background: none;
     border: none;
-    color: var(--primary-color, #ff385c);
+    color: var(--gray-8);
     font-weight: 600;
     cursor: pointer;
     font-size: 14px;
@@ -52,6 +52,7 @@
 
 .view-more-btn:hover {
     text-decoration: underline;
+    color: var(--neutral-black);
 }
 
 /* CARDS */
@@ -160,6 +161,14 @@
     font-size: 14px;
 }
 
+.change-pass-action a:hover {
+    color: var(--gray-9);
+}
+
+.right-action a:hover {
+    color: var(--gray-9);
+}
+
 .right-action {
     text-align: right;
     margin-top: 20px;
@@ -237,6 +246,10 @@
     color: var(--neutral-white);
     text-decoration: underline;
     font-size: 16px;
+}
+
+.delete-action a:hover {
+    color: var(--gray-2);
 }
 
 .icon-delete {

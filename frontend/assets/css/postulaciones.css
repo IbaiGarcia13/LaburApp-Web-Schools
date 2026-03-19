@@ -85,6 +85,10 @@
     position: relative;
 }
 
+.job-card:hover {
+    transform: translateY(-3px);
+}
+
 /* Edit/Delete buttons (similar to mis-trabajos.css) */
 .action-buttons {
     position: absolute;
@@ -238,7 +242,7 @@
 .user-app-card {
     background: var(--neutral-white);
     border-radius: 12px;
-    padding: 15px;
+    padding: 17.5px 15px;
     display: flex;
     gap: 15px;
     margin-bottom: 15px;
@@ -249,11 +253,13 @@
     height: 175px;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
 .user-app-card:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
 }
 
 .user-app-img {
@@ -276,6 +282,10 @@
     color: var(--gray-11);
     margin: 0 0 4px 0;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Espacio para botones de acción removido ya que se movieron al fondo */
 }
 
 .user-app-name:hover {
@@ -290,8 +300,11 @@
 
 .user-app-task strong {
     color: var(--gray-11);
-    text-decoration: underline;
     cursor: pointer;
+}
+
+.user-app-task strong:hover {
+    text-decoration: underline;
 }
 
 /* Botón de chat */
@@ -302,12 +315,11 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 5px;
     transition: transform 0.2s;
 }
 
 .user-chat-btn:hover {
-    transform: scale(1.15);
+    transform: scale(1.1);
 }
 
 .user-chat-btn img {
@@ -318,11 +330,17 @@
 /* Acciones rápidas para candidatos */
 .user-app-actions {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 17.5px;
+    left: 170px;
     display: flex;
     gap: 8px;
     z-index: 10;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.user-app-actions:hover {
+    transform: scale(1.1);
 }
 
 .btn-accept-small,
@@ -489,8 +507,10 @@
     }
 
     .user-app-actions {
-        top: 10px;
-        right: 10px;
+        top: auto;
+        bottom: 10px;
+        left: 10px;
+        right: auto;
     }
 
     .user-chat-btn {

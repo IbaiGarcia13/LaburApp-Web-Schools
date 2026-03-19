@@ -175,6 +175,7 @@
     width: 30px;
     cursor: pointer;
     transition: transform 0.2s;
+    margin-bottom: -3px;
 }
 
 .msg-icon:hover {
@@ -188,7 +189,8 @@
     justify-content: flex-start;
 }
 
-.btn-empezar {
+.btn-empezar,
+.btn-finalizar {
     background-color: var(--neutral-black);
     color: var(--neutral-white);
     padding: 15px 40px;
@@ -200,16 +202,21 @@
     transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     /* Controlado por JS */
 }
 
-.btn-empezar:hover {
+.btn-empezar:hover,
+.btn-finalizar:hover {
     background-color: var(--gray-11);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn-empezar:disabled {
+.btn-empezar:disabled,
+.btn-finalizar:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;

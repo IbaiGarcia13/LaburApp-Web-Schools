@@ -146,6 +146,24 @@
 
         <div class="job-actions">
             <button id="btn-empezar" class="btn-empezar">EMPEZAR</button>
+            <button id="btn-finalizar" class="btn-finalizar" style="display: none;">
+                <img src="../assets/img/icons/icono-foto.png" alt="" style="width: 20px; filter: invert(1);"> FINALIZAR
+            </button>
+        </div>
+
+        <!-- Modal: Cámara para Finalizar -->
+        <div class="modal-overlay hidden" id="modalCamera">
+            <div class="modal-content">
+                <h3>Prueba de Finalización</h3>
+                <p style="font-size: 14px; margin-bottom: 15px;">Captura una foto del trabajo terminado para poder finalizarlo.</p>
+                <video id="cameraStream" autoplay playsinline
+                    style="width:100%; border-radius:10px; max-height:300px; object-fit:cover; margin-bottom: 15px;"></video>
+                <canvas id="cameraCanvas" style="display:none;"></canvas>
+                <div class="modal-buttons">
+                    <button class="modal-btn cancel" id="btnCancelCamera">Cancelar</button>
+                    <button class="modal-btn confirm" id="btnCapture">📸 Capturar y Finalizar</button>
+                </div>
+            </div>
         </div>
 
         <!-- Mini Mapa de Ubicación -->

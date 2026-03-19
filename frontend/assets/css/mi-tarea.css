@@ -289,6 +289,10 @@
     display: block;
 }
 
+.applicant-name:hover {
+    text-decoration: underline;
+}
+
 .applicant-actions {
     display: flex;
     gap: 10px;

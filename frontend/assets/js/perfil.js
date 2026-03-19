@@ -314,6 +314,17 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // --- LÓGICA DEL BOTÓN TU USUARIO (Ver Perfil Público) ---
+    const btnViewMyUser = document.getElementById('btnViewMyUser');
+    if (btnViewMyUser) {
+        btnViewMyUser.onclick = () => {
+            const user = auth.currentUser;
+            if (user) {
+                window.location.href = `usuario.html?id=${user.uid}`;
+            }
+        };
+    }
+
     // Cerrar al hacer clic fuera del modal
     window.onclick = (event) => {
         if (event.target == modal) modal.style.display = "none";

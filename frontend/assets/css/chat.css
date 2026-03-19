@@ -78,11 +78,20 @@ body {
     object-fit: cover;
 }
 
+.chat-profile-link {
+    text-decoration: none !important;
+}
+
 .chat-header-left h3 {
     margin: 0;
     font-size: 1.1rem;
     color: var(--gray-5);
     font-weight: 600;
+    text-decoration: none !important;
+}
+
+.chat-header-left h3:hover {
+    text-decoration: underline !important;
 }
 
 .chat-header-right {
@@ -151,6 +160,11 @@ body {
     color: var(--gray-9);
     font-size: 1rem;
     text-align: center;
+    text-decoration: none;
+}
+
+.report-modal h4:hover {
+    text-decoration: underline;
 }
 
 .report-modal-subtitle {
@@ -179,11 +193,11 @@ body {
 }
 
 .btn-submit-report {
-    background: var(--neutral-white);
-    border: 1px solid var(--red);
-    color: var(--red);
+    background: var(--red-2);
+    border: 1px solid var(--red-2);
+    color: var(--neutral-white);
     padding: 8px 20px;
-    border-radius: 20px;
+    border-radius: 15px;
     font-weight: bold;
     cursor: pointer;
     font-size: 0.9rem;
@@ -191,7 +205,7 @@ body {
 }
 
 .btn-submit-report:hover {
-    background: var(--red);
+    background: var(--red-3);
     color: var(--neutral-white);
 }
 

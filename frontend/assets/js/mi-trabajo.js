@@ -1,4 +1,6 @@
-import { obtenerTrabajoPorId, actualizarTrabajo } from './database.js';
+import { auth, storage } from './firebase-config.js';
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { obtenerTrabajoPorId, actualizarTrabajo, enviarMensajeTrabajo, crearNotificacion } from './database.js';
 
 document.addEventListener("DOMContentLoaded", async function () {
     // 1. Obtener el ID del trabajo desde la URL
@@ -28,8 +30,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
             e.preventDefault();
-
-            // Como soy el trabajador, este botón me llevará al chat con el publicador
             showCustomConfirm(
                 "Chat",
                 "¿Quieres hablar con la persona que publicó esta oferta?",
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         btnEmpezar.innerText = "ACTUALIZANDO...";
                         await actualizarTrabajo(trabajoId, { estado: "En curso" });
                         showCustomAlert("¡A darle!", "El trabajo ahora está en curso. ¡Mucha suerte!");
-                        location.reload(); // Recarga para actualizar UI y estado
+                        location.reload();
                     } catch (err) {
                         console.error("Error al empezar trabajo:", err);
                         showCustomAlert("Error", "No se pudo actualizar el estado del trabajo.");
@@ -70,6 +70,99 @@ document.addEventListener("DOMContentLoaded", async function () {
                 "confirm"
             );
         });
+    }
+
+    // 5. Lógica de Finalizar con Cámara
+    const btnFinalizar = document.getElementById("btn-finalizar");
+    const modalCamera = document.getElementById('modalCamera');
+    const cameraStream = document.getElementById('cameraStream');
+    const cameraCanvas = document.getElementById('cameraCanvas');
+    const btnCapture = document.getElementById('btnCapture');
+    const btnCancelCamera = document.getElementById('btnCancelCamera');
+    let activeStream = null;
+
+    if (btnFinalizar) {
+        btnFinalizar.addEventListener('click', openCamera);
+    }
+
+    async function openCamera() {
+        modalCamera.classList.remove('hidden');
+        try {
+            activeStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            cameraStream.srcObject = activeStream;
+        } catch (err) {
+            showCustomAlert("Error", "No se pudo acceder a la cámara: " + err.message);
+            modalCamera.classList.add('hidden');
+        }
+    }
+
+    function stopCamera() {
+        if (activeStream) {
+            activeStream.getTracks().forEach(track => track.stop());
+            activeStream = null;
+        }
+        cameraStream.srcObject = null;
+        modalCamera.classList.add('hidden');
+    }
+
+    if (btnCancelCamera) btnCancelCamera.onclick = stopCamera;
+
+    if (btnCapture) {
+        btnCapture.onclick = async () => {
+            if (!cameraStream.srcObject) return;
+
+            try {
+                btnCapture.disabled = true;
+                btnCapture.innerText = "📦 Procesando...";
+
+                // 1. Capturar fotograma en canvas
+                cameraCanvas.width = cameraStream.videoWidth;
+                cameraCanvas.height = cameraStream.videoHeight;
+                cameraCanvas.getContext('2d').drawImage(cameraStream, 0, 0);
+                stopCamera();
+
+                // 2. Convertir a Blob
+                const blob = await new Promise(resolve => cameraCanvas.toBlob(resolve, 'image/jpeg', 0.85));
+                if (!blob) throw new Error("No se pudo generar la imagen.");
+
+                // 3. Subir a Storage
+                const fileName = `finalizacion_${trabajoId}_${Date.now()}.jpg`;
+                const storagePath = `pruebas_finalizacion/${trabajoId}/${fileName}`;
+                const fileRef = ref(storage, storagePath);
+                await uploadBytes(fileRef, blob);
+                const imageUrl = await getDownloadURL(fileRef);
+
+                // 4. Actualizar Estado en Firestore (NO cambiamos estado, solo añadimos la prueba)
+                await actualizarTrabajo(trabajoId, {
+                    prueba_finalizado: imageUrl
+                });
+
+                // 4.1 Notificar al publicador (usamos icono de tarea en curso como pidió el usuario)
+                const recipientId = currentTrabajo?.id_publicador;
+                if (recipientId) {
+                    await crearNotificacion(
+                        recipientId,
+                        "Trabajo Finalizado",
+                        `El trabajador ha finalizado el trabajo "${currentTrabajo.titulo}". Revisa el chat para ver la prueba.`,
+                        "tarea_empezada",
+                        { id_trabajo: trabajoId }
+                    );
+
+                    // 5. Enviar al chat automáticamente
+                    await enviarMensajeTrabajo(trabajoId, imageUrl, "imagen", recipientId);
+                    await enviarMensajeTrabajo(trabajoId, "¡He terminado el trabajo! Aquí tienes la foto de prueba.", "texto", recipientId);
+                }
+
+                showCustomAlert("¡Trabajo Finalizado!", "Has enviado la prueba. El publicador será notificado.");
+                location.reload();
+
+            } catch (err) {
+                console.error("Error al finalizar con foto:", err);
+                showCustomAlert("Error", "Hubo un problema al procesar la foto.");
+                btnCapture.disabled = false;
+                btnCapture.innerText = "📸 Capturar y Finalizar";
+            }
+        };
     }
 });
 
@@ -119,27 +212,38 @@ function renderTrabajo(trabajo) {
         infoTexts[2].innerText = fechaStr;
     }
 
-    // Mostrar botón Empezar solo si está Aceptado
-    const btnEmpezar = document.getElementById("btn-empezar");
-    if (btnEmpezar) {
-        if (trabajo.estado === "Aceptada") {
-            btnEmpezar.style.display = "block";
-        } else {
-            btnEmpezar.style.display = "none";
-        }
-    }
-
     // Actualizar badge de estado
     const badgeEl = document.getElementById('displayEstado');
     if (badgeEl) {
         let estado = trabajo.estado || 'Pendiente';
         // Normalización para visualización
         if (estado === "Aceptado") estado = "Aceptada";
-        if (estado.toLowerCase() === "finalizado") estado = "Completada";
 
         badgeEl.textContent = estado;
-        // La clase CSS debe coincidir con el texto para soportar selectores como .en.curso
-        badgeEl.className = `estado-badge ${estado.toLowerCase()}`;
+        badgeEl.className = `estado-badge ${estado.toLowerCase().replace(" ", "-")}`;
+    }
+
+    // Lógica de botones de acción
+    const btnEmpezar = document.getElementById("btn-empezar");
+    const btnFinalizar = document.getElementById("btn-finalizar");
+
+    if (btnEmpezar) btnEmpezar.style.display = (trabajo.estado === "Aceptada") ? "block" : "none";
+
+    if (btnFinalizar) {
+        if (trabajo.estado === "En curso") {
+            btnFinalizar.style.display = "flex";
+            if (trabajo.prueba_finalizado) {
+                // Ya envió la foto
+                btnFinalizar.disabled = true;
+                btnFinalizar.innerHTML = '<img src="../assets/img/icons/icono-si-blanco.png" style="width: 20px;"> FINALIZADO';
+            } else {
+                // No ha enviado la foto aún
+                btnFinalizar.disabled = false;
+                btnFinalizar.innerHTML = '<img src="../assets/img/icons/icono-foto.png" style="width: 20px; filter: invert(1);"> FINALIZAR';
+            }
+        } else {
+            btnFinalizar.style.display = "none";
+        }
     }
 
     // Inicializar Mini Mapa

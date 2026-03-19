@@ -153,10 +153,12 @@ async function renderUsuarios() {
         card.style.cursor = 'pointer';
         card.onclick = () => { window.location.href = `usuario.html?id=${user.uid}`; };
 
+        const nombreCompleto = user.nombre_completo || (user.nombre + (user.apellidos ? " " + user.apellidos : ""));
+
         card.innerHTML = `
             <img src="${avatar}" class="user-app-img" onerror="this.src='../assets/img/avatar-defecto.png'">
             <div class="user-app-info">
-                <p class="user-app-name">${user.nombre}</p>
+                <p class="user-app-name" title="${nombreCompleto}">${nombreCompleto}</p>
                 <p class="user-app-task">Ha postulado para realizar tu tarea:<br>
                     <strong class="user-task-link" data-id="${app.id_trabajo}">${app.trabajo_titulo}</strong>
                 </p>

@@ -79,6 +79,47 @@ export async function cancelarSuscripcionUsuario(uid, tipo) {
     return true;
 }
 
+/**
+ * Actualiza el timestamp de actividad para usuarios con suscripción activa.
+ * Esto permite el posicionamiento prioritario en las listas.
+ */
+export async function actualizarActividadSuscripcion(uid) {
+    const userRef = doc(db, "usuarios", uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) return;
+
+    const data = userSnap.data();
+    const now = serverTimestamp();
+    const updates = {};
+
+    // Si es trabajador PRO, actualizar su perfil
+    if (data.id_suscripcion_trabajador === "currante") {
+        updates.ultimo_login_suscrito = now;
+    }
+
+    // Si es cliente PRO, actualizar su perfil y sus trabajos PENDIENTES
+    if (data.id_suscripcion_cliente === "jefe") {
+        updates.ultimo_login_suscrito = now;
+
+        // Buscar trabajos pendientes de este usuario
+        const q = query(
+            collection(db, "trabajos"),
+            where("id_publicador", "==", uid),
+            where("estado", "==", "Pendiente")
+        );
+        const jobsSnap = await getDocs(q);
+        jobsSnap.forEach(async (jobDoc) => {
+            await updateDoc(doc(db, "trabajos", jobDoc.id), {
+                prioridad_suscripcion: now
+            });
+        });
+    }
+
+    if (Object.keys(updates).length > 0) {
+        await updateDoc(userRef, updates);
+    }
+}
+
 export async function obtenerTodosLosUsuarios() {
     const q = query(collection(db, "usuarios"));
     const snapshot = await getDocs(q);
@@ -402,21 +443,32 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
     // 3. Incrementar recompensas en el perfil del trabajador
     const trabajadorRef = doc(db, "usuarios", uidTrabajador);
     const trabajadorSnap = await getDoc(trabajadorRef);
-    const updateTrabajador = {
-        tareas_realizadas: increment(1),
-        experiencia_total: increment(xpRecompensa)
-    };
 
-    if (trabajoSnap.exists()) {
-        const data = trabajoSnap.data();
-        const pagoT = data.pago_trabajador || 0;
-        updateTrabajador.saldo = increment(pagoT);
-        updateTrabajador.dinero_ganado_total = increment(pagoT);
-    }
+    let pagoFinalTrabajador = (trabajoSnap.exists() ? trabajoSnap.data().pago_trabajador : 0) || (xpRecompensa / 10 * 0.9);
 
-    // Lógica simple de nivel (opcional, si queremos que se guarde en DB)
+    // APLICAR VENTAJAS DE SUSCRIPCIÓN CURRANTE
     if (trabajadorSnap.exists()) {
         const tData = trabajadorSnap.data();
+        if (tData.id_suscripcion_trabajador === "currante") {
+            xpRecompensa *= 2; // x2 Experiencia
+            // 5% comisión (el trabajador recibe el 95% del pago_cliente)
+            if (trabajoSnap.exists()) {
+                pagoFinalTrabajador = trabajoSnap.data().pago_cliente * 0.95;
+            }
+        }
+    }
+
+    const updateTrabajador = {
+        tareas_realizadas: increment(1),
+        experiencia_total: increment(xpRecompensa),
+        saldo: increment(pagoFinalTrabajador),
+        dinero_ganado_total: increment(pagoFinalTrabajador)
+    };
+
+    // Lógica de niveles
+    if (trabajadorSnap.exists()) {
+        const tData = trabajadorSnap.data();
+        let oldLvl = tData.nivel || 1;
         let currentLvl = tData.nivel || 1;
         let currentXP = tData.experiencia_nivel_actual || 0;
         let newXP = currentXP + xpRecompensa;
@@ -429,15 +481,18 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
         }
         updateTrabajador.nivel = currentLvl;
         updateTrabajador.experiencia_nivel_actual = newXP;
+
+        if (currentLvl > oldLvl) {
+            await crearNotificacion(uidTrabajador, "¡Subida de Nivel!", `¡Enhorabuena! Has alcanzado el nivel ${currentLvl}.`, "nivel");
+        }
     }
 
     await updateDoc(trabajadorRef, updateTrabajador);
 
     // Notificación de completada y pago
-    const data = trabajoSnap.data();
-    const pagoT = data.pago_trabajador || 0;
-    await crearNotificacion(uidTrabajador, "Trabajo Completado", `Has finalizado "${data.titulo}".`, "aceptado");
-    await crearNotificacion(uidTrabajador, "Pago Recibido", `Has recibido ${Number(pagoT).toFixed(2)}€ por "${data.titulo}".`, "pago");
+    const tituloTarea = trabajoSnap.exists() ? trabajoSnap.data().titulo : "Trabajo";
+    await crearNotificacion(uidTrabajador, "Trabajo Completado", `Has finalizado "${tituloTarea}".`, "aceptado");
+    await crearNotificacion(uidTrabajador, "Pago Recibido", `Has recibido ${Number(pagoFinalTrabajador).toFixed(2)}€ por "${tituloTarea}".`, "pago");
 
     // Lógica simple de nivel (opcional, si queremos que se guarde en DB)
     if (trabajadorSnap.exists()) {
@@ -510,12 +565,23 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
     if (!user) throw new Error("Debes iniciar sesión.");
     if (puntuacion < 1 || puntuacion > 5) throw new Error("Puntuación inválida.");
 
-    // 1. Guardar la valoración en la subcolección
+    // 1. Obtener título del trabajo para persistencia
+    let tituloTrabajo = "Trabajo";
+    try {
+        const trabajoRef = doc(db, "trabajos", idTrabajo);
+        const trabajoSnap = await getDoc(trabajoRef);
+        if (trabajoSnap.exists()) {
+            tituloTrabajo = trabajoSnap.data().titulo;
+        }
+    } catch (e) { console.error("Error al obtener título para valoración:", e); }
+
+    // 2. Guardar la valoración en la subcolección
     await addDoc(collection(db, "usuarios", uidReceptor, "valoraciones_recibidas"), {
         puntuacion: puntuacion,
         comentario: comentario || "",
         fecha: serverTimestamp(),
         id_trabajo: idTrabajo,
+        titulo_trabajo: tituloTrabajo, // Denormalización para persistencia
         id_usuario_emisor: user.uid
     });
 
@@ -550,6 +616,28 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
 export async function crearNotificacion(uid, titulo, mensaje, tipo = "info", metadata = {}) {
     try {
         const notifRef = collection(db, "usuarios", uid, "notificaciones");
+
+        // Regla: Solo una notificación de mensaje sin leer por chat
+        if (tipo === "mensaje" && metadata.id_chat) {
+            const q = query(
+                notifRef,
+                where("tipo", "==", "mensaje"),
+                where("id_chat", "==", metadata.id_chat),
+                where("leida", "==", false)
+            );
+            const existing = await getDocs(q);
+            if (!existing.empty) {
+                // Actualizar la existente con el nuevo mensaje y fecha para que suba en la lista
+                const docId = existing.docs[0].id;
+                await updateDoc(doc(db, "usuarios", uid, "notificaciones", docId), {
+                    mensaje,
+                    fecha: serverTimestamp(),
+                    ...metadata
+                });
+                return;
+            }
+        }
+
         await addDoc(notifRef, {
             titulo,
             mensaje,
@@ -615,8 +703,8 @@ export async function obtenerValoracionesRecibidas(uid) {
             } catch (_) { /* Si falla, continuamos sin datos del emisor */ }
         }
 
-        // Buscar título del trabajo valorado
-        if (v.id_trabajo) {
+        // Buscar título del trabajo valorado (con fallback al persistido)
+        if (!v.titulo_trabajo && v.id_trabajo) {
             try {
                 const trabajoRef = doc(db, "trabajos", v.id_trabajo);
                 const trabajoSnap = await getDoc(trabajoRef);
@@ -754,8 +842,12 @@ export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto", idR
         fecha_envio: serverTimestamp()
     });
 
-    // 3. Notificar al receptor
-    await crearNotificacion(idReceptor, "Nuevo Mensaje", `Has recibido un nuevo mensaje.`, "mensaje");
+    // 2. Registrar/Actualizar conversación activa para ambos
+    await registrarConversacionActiva(user.uid, idReceptor, idChat, idTrabajo);
+    await registrarConversacionActiva(idReceptor, user.uid, idChat, idTrabajo);
+
+    // 3. Notificar al receptor (Deduplicado por id_chat)
+    await crearNotificacion(idReceptor, "Nuevo Mensaje", `Has recibido un nuevo mensaje.`, "mensaje", { id_chat: idChat });
 }
 
 import { limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -825,6 +917,9 @@ export async function enviarMensajeDirecto(uidOtro, texto, tipo = "texto") {
     // 2. Actualizar metadatos de conversación para ambos
     await registrarConversacionActiva(user.uid, uidOtro, idChat, null);
     await registrarConversacionActiva(uidOtro, user.uid, idChat, null);
+
+    // 3. Notificar al receptor (Deduplicado por id_chat)
+    await crearNotificacion(uidOtro, "Nuevo Mensaje", "Has recibido un nuevo mensaje directo.", "mensaje", { id_chat: idChat });
 }
 
 // --- 9. OBTENER CONVERSACIONES ---
@@ -918,45 +1013,62 @@ export async function gestionarBorradoTarea(idTrabajo, rol) {
 
     const yaBorradaPorOtro = (rol === 'publicador') ? tarea.borrado_por_trabajador : tarea.borrado_por_publicador;
 
-    if (yaBorradaPorOtro === true || !tarea.id_trabajador) {
+    // --- REGLAS DE BORRADO PERMANENTE ---
+    // 1. Si ya la borró el otro O no tenía trabajador asignado, podríamos borrar...
+    // 2. PERO solo si se cumplen las condiciones de seguridad (7 días):
+
+    const ahora = new Date();
+    const fechaPub = (tarea.fecha_publicacion?.toDate ? tarea.fecha_publicacion.toDate() : (tarea.fecha_publicacion ? new Date(tarea.fecha_publicacion) : ahora));
+    const fechaLim = (tarea.fecha_limite?.toDate ? tarea.fecha_limite.toDate() : (tarea.fecha_limite ? new Date(tarea.fecha_limite) : null));
+
+    const diffPubDias = (ahora - fechaPub) / (1000 * 60 * 60 * 24);
+    const diffLimDias = fechaLim ? (ahora - fechaLim) / (1000 * 60 * 60 * 24) : -1;
+
+    const esElegibleParaPermanente =
+        (tarea.estado === 'Pendiente' && diffPubDias > 7) || // Pendiente + 7 días
+        (diffLimDias > 7) ||                                // > 7 días después de fecha límite
+        (tarea.estado === 'Completada');                      // Historial completado (se puede borrar si ambos quieren)
+
+    const condicionUsuarios = (yaBorradaPorOtro === true || !tarea.id_trabajador);
+
+    if (condicionUsuarios && esElegibleParaPermanente) {
         // Notificar al otro si todavía existe y no la ha borrado
         if (!yaBorradaPorOtro && tarea.id_trabajador) {
             const targetUid = (rol === 'publicador') ? tarea.id_trabajador : tarea.id_publicador;
-            const msg = (rol === 'publicador') ? `El publicador ha cancelado el trabajo "${tarea.titulo}".` : `El trabajador ha abandonado el trabajo "${tarea.titulo}".`;
-            await crearNotificacion(targetUid, "Trabajo Cancelado", msg, "rechazado");
+            const msg = (rol === 'publicador') ? `El publicador ha eliminado el trabajo "${tarea.titulo}".` : `El trabajador ha eliminado de su lista el trabajo "${tarea.titulo}".`;
+            await crearNotificacion(targetUid, "Trabajo Eliminado", msg, "rechazado");
         }
 
-        // Si ya la borró el otro O no tenía trabajador asignado (nadie más que la vea), borramos permanentemente
+        // Borrado permanente de chats y postulaciones
         await eliminarChatDeTrabajo(idTrabajo, tarea.id_publicador, tarea.id_trabajador);
 
-        // --- NUEVO: Borrar subcolección de postulaciones ---
         const postsRef = collection(db, "trabajos", idTrabajo, "postulaciones");
         const snapshotPosts = await getDocs(postsRef);
         for (const docPost of snapshotPosts.docs) {
+            const uidPostulante = docPost.id;
+            // Notificar que la postulación ha sido cancelada porque el trabajo se eliminó
+            await crearNotificacion(
+                uidPostulante,
+                "Postulación Cancelada",
+                `El trabajo "${tarea.titulo}" ha sido eliminado y tu postulación ha sido cancelada.`,
+                "info"
+            );
             await deleteDoc(docPost.ref);
         }
 
         await deleteDoc(trabajoRef);
         return { permanent: true };
     } else {
-        // --- 1. Si el trabajador abandona, reembolsamos al publicador ---
+        // --- 1. Reembolso si el trabajador abandona ---
         if (rol === 'trabajador' && tarea.pago_retenido === true) {
             const monto = Number(tarea.pago_cliente || 0);
             const publicadorRef = doc(db, "usuarios", tarea.id_publicador);
-
-            await updateDoc(publicadorRef, {
-                saldo: increment(monto)
-            });
+            await updateDoc(publicadorRef, { saldo: increment(monto) });
             await registrarPagoHistorial(tarea.id_publicador, "Saldo LaburApp", monto, `Reembolso por abandono: ${tarea.titulo}`);
-
-            // Marcamos como no retenido para no reembolsar dos veces
             await updateDoc(trabajoRef, { pago_retenido: false });
         }
 
-        // Si el publicador cancela (rol === 'publicador'), NO reembolsamos automáticamente
-        // tal como pidió el usuario ("seguir reteniendo por si acaso").
-
-        // --- 2. Si no, solo marcamos ---
+        // --- 2. Simplemente ocultar (marcar borrado) ---
         const updateData = {};
         if (rol === 'publicador') updateData.borrado_por_publicador = true;
         else updateData.borrado_por_trabajador = true;
