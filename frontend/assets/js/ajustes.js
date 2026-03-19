@@ -161,22 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             showCustomPrompt(
                 "Cambiar Contraseña",
-                "Introduce tu nueva contraseña (mín. 6 caracteres):",
-                async (nuevaPass) => {
-                    if (nuevaPass && nuevaPass.trim().length >= 6) {
-                        try {
-                            await cambiarContrasena(nuevaPass);
-                            showCustomAlert("Éxito", "Contraseña actualizada correctamente en Firebase.");
-                            if (passLabel) passLabel.textContent = "*".repeat(nuevaPass.length);
-                        } catch (err) {
-                            if (err.code === 'auth/requires-recent-login') {
-                                showCustomAlert("Sesión Caducada", "Por seguridad, debes cerrar sesión y volver a entrar para cambiar la contraseña.");
-                            } else {
-                                showCustomAlert("Error", "No se pudo cambiar la contraseña: " + err.message);
-                            }
-                        }
-                    } else {
-                        showCustomAlert("Error", "La contraseña es demasiado corta.");
+                "Introduce tu nueva contraseña:",
+                (nuevaPass) => {
+                    if (nuevaPass && nuevaPass.trim() !== "") {
+                        showCustomAlert("Éxito", "Contraseña actualizada correctamente.");
+                        if (passLabel) passLabel.textContent = "*".repeat(nuevaPass.length);
                     }
                 },
                 "Actualizar",
@@ -193,18 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             showCustomConfirm(
                 "Borrar Cuenta",
-                "¿Estás seguro de que quieres borrar tu cuenta? Todos tus datos se perderán de forma permanente en la base de datos.",
-                async () => {
-                    try {
-                        await borrarCuentaUsuario();
-                        window.location.href = "../index.html";
-                    } catch (err) {
-                        if (err.code === 'auth/requires-recent-login') {
-                            showCustomAlert("Sesión Caducada", "Por seguridad, debes cerrar sesión y volver a entrar para borrar tu cuenta.");
-                        } else {
-                            showCustomAlert("Error", "No se pudo borrar la cuenta: " + err.message);
-                        }
-                    }
+                "¿Estás seguro de que quieres borrar tu cuenta? Todos tus datos se perderán de forma permanente.",
+                () => {
+                    window.location.href = "../index.html"; // Redirigir por ahora
                 },
                 "Borrar definitivamente",
                 "Cancelar",

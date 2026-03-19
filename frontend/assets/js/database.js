@@ -368,88 +368,10 @@ export async function enviarMensajeTrabajo(idTrabajo, texto, tipo = "texto") {
 
 import { limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-import { updatePassword, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { deleteDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-/**
- * Cambia la contraseña del usuario actual.
- */
-export async function cambiarContrasena(nuevaPass) {
-    const user = auth.currentUser;
-    if (!user) throw new Error("No hay usuario autenticado.");
-    try {
-        await updatePassword(user, nuevaPass);
-        return true;
-    } catch (error) {
-        console.error("Error al cambiar contraseña:", error);
-        throw error;
-    }
-}
-
-/**
- * Borra la cuenta del usuario actual y sus datos de Firestore.
- */
-export async function borrarCuentaUsuario() {
-    const user = auth.currentUser;
-    if (!user) throw new Error("No hay usuario autenticado.");
-
-    const uid = user.uid;
-    try {
-        // 1. Borrar datos de Firestore
-        await deleteDoc(doc(db, "usuarios", uid));
-        // Nota: Las subcolecciones no se borran automáticamente en Firestore Client SDK, 
-        // pero para esta demo es suficiente. En prod se usaría una Cloud Function.
-
-        // 2. Borrar de Auth
-        await deleteUser(user);
-        return true;
-    } catch (error) {
-        console.error("Error al borrar cuenta:", error);
-        throw error;
-    }
-}
-
-/**
- * Finaliza un trabajo, otorga XP al trabajador y registra el pago.
- */
-export async function finalizarTrabajo(idTrabajo) {
-    const trabajo = await obtenerTrabajoPorId(idTrabajo);
-    if (!trabajo) throw new Error("Trabajo no encontrado.");
-    if (trabajo.estado !== "Aceptado") throw new Error("El trabajo no está en estado aceptado.");
-
-    const uidTrabajador = trabajo.id_trabajador;
-    const xp = trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10);
-    const pago = trabajo.pago_trabajador || (trabajo.pago_cliente * 0.9);
-    const categoria = trabajo.id_categoria || "otros";
-
-    const batch = []; // No hay Batch directo en cliente igual de fácil, usamos promesas
-
-    // 1. Actualizar estado del trabajo
-    const trabajoRef = doc(db, "trabajos", idTrabajo);
-    await updateDoc(trabajoRef, { estado: "Finalizado" });
-
-    // 2. Sumar XP al trabajador (Global)
-    const trabajadorRef = doc(db, "usuarios", uidTrabajador);
-    await updateDoc(trabajadorRef, {
-        experiencia_total: increment(xp),
-        experiencia_nivel_actual: increment(xp),
-        dinero_ganado_total: increment(pago)
-    });
-
-    // 3. Sumar XP por categoría
-    await sumarPuntosCategoria(uidTrabajador, categoria, xp);
-
-    // 4. Registrar en historial de pagos
-    await registrarPagoHistorial(uidTrabajador, "Pago por trabajo: " + trabajo.titulo, pago);
-
-    return true;
-}
-
 /**
  * Obtiene todos los trabajos donde el usuario actual participa Y ya hay mensajes.
  */
 export async function obtenerConversacionesActivas(uid) {
-    // ... (resto de la función igual)
     // 1. Trabajos publicados por mí que tienen un trabajador asignado
     const qPub = query(collection(db, "trabajos"), where("id_publicador", "==", uid), where("id_trabajador", "!=", null));
     const snapPub = await getDocs(qPub);

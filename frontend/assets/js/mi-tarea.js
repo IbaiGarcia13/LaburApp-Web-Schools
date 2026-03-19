@@ -1,91 +1,18 @@
-import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion, finalizarTrabajo, dejarValoracion } from './database.js';
+import { auth, db } from './firebase-config.js';
+import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion } from './database.js';
+import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ... (resto de variables igual hasta line 15)
+    // 1. Obtener el ID de la tarea desde la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tareaId = urlParams.get('id');
+
+    if (!tareaId) {
+        console.error("No se proporcionó ID de tarea");
+        return;
+    }
+
     let currentTarea = null;
-    let workerId = null;
-
-    // ... (referencias UI igual)
-
-    async function loadTareaData(id) {
-        try {
-            const tarea = await obtenerTrabajoPorId(id);
-            if (tarea) {
-                currentTarea = tarea;
-                workerId = tarea.id_trabajador;
-                renderTarea(tarea);
-
-                const finishSection = document.getElementById('finishSection');
-
-                // Lógica de secciones según estado
-                if (tarea.estado === "Pendiente") {
-                    loadApplicants(id);
-                } else {
-                    document.getElementById('applicantsSection').style.display = 'none';
-                    if (tarea.estado === "Aceptado") {
-                        if (finishSection) finishSection.style.display = 'block';
-                    } else if (tarea.estado === "Finalizado") {
-                        if (finishSection) {
-                            finishSection.style.display = 'block';
-                            finishSection.innerHTML = "<p style='color: #4CAF50; font-weight: bold; font-size: 1.2rem;'>¡TRABAJO COMPLETADO!</p>";
-                        }
-                    }
-                }
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    // --- LÓGICA FINALIZAR TRABAJO ---
-    const btnFinishJob = document.getElementById('btnFinishJob');
-    const modalRating = document.getElementById('modalRating');
-
-    if (btnFinishJob) {
-        btnFinishJob.onclick = async () => {
-            showCustomConfirm("Finalizar Trabajo", "¿Confirmas que el trabajo se ha realizado correctamente? Se procesará el pago y la XP.", async () => {
-                try {
-                    await finalizarTrabajo(tareaId);
-                    showCustomAlert("¡Éxito!", "Trabajo finalizado. El trabajador ha recibido su recompensa.");
-                    modalRating.classList.remove('hidden');
-                } catch (e) {
-                    showCustomAlert("Error", "No se pudo finalizar el trabajo: " + e.message);
-                }
-            });
-        };
-    }
-
-    // --- LÓGICA VALORACIÓN ---
-    const stars = document.querySelectorAll('.star');
-    const inputRatingValue = document.getElementById('inputRatingValue');
-
-    stars.forEach(star => {
-        star.onclick = () => {
-            const val = parseInt(star.getAttribute('data-value'));
-            inputRatingValue.value = val;
-            stars.forEach((s, idx) => {
-                if (idx < val) s.classList.add('active');
-                else s.classList.remove('active');
-            });
-        };
-    });
-
-    // Activar 5 estrellas por defecto
-    stars.forEach(s => s.classList.add('active'));
-
-    document.getElementById('btnSkipReview').onclick = () => location.reload();
-    document.getElementById('btnSaveReview').onclick = async () => {
-        const puntuacion = parseInt(inputRatingValue.value);
-        const comentario = document.getElementById('inputReviewDesc').value.trim();
-        try {
-            if (workerId) {
-                await dejarValoracion(workerId, tareaId, puntuacion, comentario);
-                showCustomAlert("Gracias", "Tu valoración ha sido guardada.");
-            }
-            location.reload();
-        } catch (e) {
-            showCustomAlert("Error", "No se pudo guardar la valoración.");
-            location.reload();
-        }
-    };
 
     // --- ELEMENTOS DE PANTALLA ---
     const displayTitle = document.getElementById('displayTitle');
