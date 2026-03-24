@@ -1,6 +1,6 @@
 // Esperamos a que la página se cargue totalmente antes de vincular eventos
 import { auth } from './firebase-config.js';
-import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 // Referencias a los contenedores y los dos campos clave del login
 const formulario = document.getElementById("formLogin");
@@ -90,6 +90,37 @@ if (formulario) {
             } else {
                 mensajeError.textContent = "Error al iniciar sesión. Inténtalo de nuevo.";
             }
+        }
+    });
+}
+
+// 2. ¿Has olvidado tu contraseña?
+const olvidarLink = document.getElementById("olvidar");
+if (olvidarLink) {
+    olvidarLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const email = usuarioInput.value.trim();
+
+        if (!email) {
+            mensajeError.textContent = "Introduce tu correo para restablecer la contraseña.";
+            mensajeError.style.color = "var(--red-2)";
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, email);
+            mensajeError.textContent = "Se ha enviado un correo de recuperación a " + email;
+            mensajeError.style.color = "var(--green-1)";
+        } catch (error) {
+            console.error("Error al enviar email de recuperación:", error);
+            if (error.code === 'auth/user-not-found') {
+                mensajeError.textContent = "No hay ningún usuario registrado con ese correo.";
+            } else if (error.code === 'auth/invalid-email') {
+                mensajeError.textContent = "Formato de correo inválido.";
+            } else {
+                mensajeError.textContent = "Error al enviar el email. Inténtalo de nuevo.";
+            }
+            mensajeError.style.color = "var(--red-2)";
         }
     });
 }

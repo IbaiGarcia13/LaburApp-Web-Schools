@@ -230,7 +230,8 @@ function renderTrabajo(trabajo) {
     if (btnEmpezar) btnEmpezar.style.display = (trabajo.estado === "Aceptada") ? "block" : "none";
 
     if (btnFinalizar) {
-        if (trabajo.estado === "En curso" || trabajo.estado === "Cancelada") {
+        const haEmpezado = !!trabajo.fecha_inicio;
+        if (trabajo.estado === "En curso" || (trabajo.estado === "Cancelada" && haEmpezado)) {
             btnFinalizar.style.display = "flex";
             if (trabajo.prueba_finalizado) {
                 // Ya envió la foto

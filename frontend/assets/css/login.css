@@ -107,7 +107,7 @@ form {
 
 label {
     display: block;
-    font-size: 14px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--gray-7);
     margin-bottom: 8px;
@@ -148,7 +148,7 @@ input:focus {
 
 .remember-me label {
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: 0.85rem;
     font-weight: normal;
     cursor: pointer;
 }
@@ -223,7 +223,6 @@ button:hover {
 
 #olvidar {
     display: inline-block;
-    margin-top: 15px;
     color: var(--gray-5);
     font-size: 14px;
     padding: 5px 10px;
@@ -231,9 +230,8 @@ button:hover {
 }
 
 #olvidar:hover {
-    background-color: var(--gray-1);
-    color: var(--neutral-black);
-    text-decoration: none;
+    color: var(--primary);
+    text-decoration: underline;
 }
 
 .error {

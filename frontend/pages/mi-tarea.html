@@ -44,8 +44,8 @@
                     <a href="perfil.html">
                         <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
                     </a>
-                    <p class="dropdown-name">Ibai García</p>
-                    <p class="dropdown-email">ibai@mail.com</p>
+                    <p class="dropdown-name">Cargando...</p>
+                    <p class="dropdown-email">Cargando...</p>
                     <div class="dropdown-footer">
                         <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
                         <a href="../index.html">Cerrar Sesión</a>
@@ -87,17 +87,14 @@
             </div>
 
             <div class="job-info-main">
-                <h1 class="job-title" id="displayTitle">Cortar el césped</h1>
+                <h1 class="job-title" id="displayTitle">Cargando...</h1>
 
-                <p class="job-description" id="displayDesc">Necesito a una persona que me corte el césped, se requiere
-                    de maquinaria y experiencia con esta maquinaria. Son 200 metros cuadrados de terreno, solo césped y
-                    no hay ningún árbol o arbusto.</p>
+                <p class="job-description" id="displayDesc">Cargando...</p>
                 <div class="job-info-footer">
                     <div class="contact-links">
                         <div class="link-row">
                             <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
-                            <span class="italic truncate-text" id="displayLoc">Barakaldo, Bizkaia, Calle La Paz 21,
-                                2ºF</span>
+                            <span class="italic truncate-text" id="displayLoc">Cargando...</span>
                         </div>
                     </div>
                     <div class="edit-container">
@@ -110,13 +107,13 @@
             <div class="job-stats-container">
                 <div class="stat-box-large">
                     <span class="stat-label">Pago:</span>
-                    <span class="stat-value"><span id="displayPay">30.75</span> €</span>
+                    <span class="stat-value"><span id="displayPay">---</span> €</span>
                     <img src="../assets/img/icons/icono-editar.png" alt="Editar Pago" class="icon-edit-small"
                         id="btnEditPay">
                 </div>
                 <div class="stat-box-large" style="opacity: 0.85;">
                     <span class="stat-label">Experiencia:</span>
-                    <span class="stat-value"><span id="displayExp">307</span> XP</span>
+                    <span class="stat-value"><span id="displayExp">---</span> XP</span>
                 </div>
             </div>
         </section>
@@ -132,17 +129,17 @@
                 <div class="info-item">
                     <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-categoria.png"
                             class="icon-img-small" alt="Cerebro"></span>
-                    <strong>Categoría:</strong> <span class="info-text" id="displayCat">Jardinería (+1)</span>
+                    <strong>Categoría:</strong> <span class="info-text" id="displayCat">Cargando...</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-relog.png"
                             class="icon-img-small" alt="Reloj"></span>
-                    <strong>Tiempo estimado:</strong> <span class="info-text" id="displayTime">5h</span>
+                    <strong>Tiempo estimado:</strong> <span class="info-text" id="displayTime">--- h</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-fecha.png"
                             class="icon-img-small" alt="Calendario"></span>
-                    <strong>Fecha límite:</strong> <span class="info-text" id="displayDate">20/08/2026</span>
+                    <strong>Fecha límite:</strong> <span class="info-text" id="displayDate">Cargando...</span>
                 </div>
             </div>
         </section>
@@ -152,15 +149,15 @@
             style="margin-top: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
             <span id="displayEstado" class="estado-badge">Cargando...</span>
             <button id="btnCompletar"
-                style="display: none; align-items: center; gap: 8px; background: linear-gradient(135deg, #27ae60, #1e8449); color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 3px 10px rgba(39,174,96,0.35); transition: opacity 0.2s;"
+                style="display: none; align-items: center; gap: 8px; background: var(--green-1); color: var(--neutral-white); border: none; border-radius: 10px; padding: 10px 22px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 3px 10px rgba(39,174,96,0.35); transition: opacity 0.2s;"
                 onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-                ✓ Marcar como Completada
+                MARCAR COMO COMPLETADA
             </button>
         </section>
 
         <!-- SECCIÓN DE TRABAJADOR ASIGNADO -->
         <section class="applicants-section" id="workerSection" style="margin-top: 30px; display: none;">
-            <h2 class="cat-title" style="margin-bottom: 20px;">Trabajador Asignado</h2>
+            <h2 class="cat-title" style="margin-bottom: 20px; color: var(--neutral-white);">Trabajador Asignado</h2>
             <div id="workerList" class="applicants-grid">
                 <!-- Se rellena por JS -->
             </div>
@@ -168,10 +165,11 @@
 
         <!-- SECCIÓN DE POSTULANTES -->
         <section class="applicants-section" id="applicantsSection" style="margin-top: 30px; display: none;">
-            <h2 class="cat-title" style="margin-bottom: 20px;">Candidatos Postulados</h2>
+            <h2 class="cat-title" style="margin-bottom: 20px; color: var(--neutral-white); border-bottom: 1px solid var(--gray-1);
+    padding-bottom: 10px;">Candidatos Postulados</h2>
             <div id="applicantsList" class="applicants-grid">
                 <!-- Se rellena por JS -->
-                <p style="color: #666;">Cargando candidatos...</p>
+                <p style="color: var(--gray-3); font-style: italic;">Cargando candidatos...</p>
             </div>
         </section>
 
@@ -217,7 +215,7 @@
             <div class="input-group">
                 <label>Pago (€):</label>
                 <input type="number" step="0.01" id="inputPay">
-                <small style="color: #888; font-size: 12px;">La experiencia se calculará como Pago x 10</small>
+                <small style="color: var(--gray-5); font-size: 0.75rem;">La experiencia se calculará como Pago x 10</small>
             </div>
 
             <div class="modal-buttons">
@@ -272,7 +270,7 @@
     <div id="modalValoracion" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Valorar al Trabajador</h3>
-            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 20px;">Antes de marcar la tarea como
+            <p style="color: var(--gray-5); font-size: 0.85rem; margin-bottom: 20px;">Antes de marcar la tarea como
                 completada, puntúa el trabajo realizado.</p>
 
             <div class="star-rating-wrapper">
@@ -294,7 +292,7 @@
 
             <div class="modal-buttons">
                 <button id="btnCancelValoracion" class="modal-btn cancel">Cancelar</button>
-                <button id="btnConfirmarValoracion" class="modal-btn confirm" disabled>Continuar al Pago</button>
+                <button id="btnConfirmarValoracion" class="modal-btn confirm" disabled>Continuar</button>
             </div>
         </div>
     </div>
@@ -309,7 +307,7 @@
             <div class="stat-box-large"
                 style="margin-bottom: 20px; background: var(--gray-1); border: 2px solid var(--gray-2);">
                 <span class="stat-label">Importe a Pagar:</span>
-                <span class="stat-value" style="color: var(--gray-11);"><span id="pagoMontoModal">0.00</span> €</span>
+                <span class="stat-value" style="color: var(--gray-11);"><span id="pagoMontoModal">---</span> €</span>
             </div>
 
             <div class="input-group">
@@ -337,8 +335,8 @@
 
             <div class="stat-box-large"
                 style="margin-bottom: 20px; background: var(--gray-1); border: 2px solid var(--gray-2);">
-                <span class="stat-label">Importe a Retener:</span>
-                <span class="stat-value" style="color: var(--gray-11);"><span id="montoRetenerModal">0.00</span>
+                <span class="stat-label">Importe total:</span>
+                <span class="stat-value" style="color: var(--gray-11);"><span id="montoRetenerModal">---</span>
                     €</span>
             </div>
 
@@ -351,7 +349,7 @@
                 </div>
             </div>
 
-            <p style="font-size: 12px; color: var(--gray-6); margin-top: 15px; font-style: italic;">
+            <p style="font-size: 0.75rem; color: var(--gray-6); margin-top: 15px; font-style: italic;">
                 * El dinero solo se entregará al trabajador cuando marques la tarea como completada. De lo contrario,
                 será reembolsado.
             </p>

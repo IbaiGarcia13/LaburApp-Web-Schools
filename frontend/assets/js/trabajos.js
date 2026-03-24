@@ -20,10 +20,10 @@ let currentFilters = {
  * Carga inicial y obtención de datos desde Firestore
  */
 async function loadJobs() {
+    const container = document.getElementById('jobs-list');
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando trabajos...</p>";
+
     try {
-        // Obtenemos los trabajos pendientes de la base de datos
-        // Si la categoría es "construccion", intentamos buscar ambas variaciones si fuera necesario, 
-        // pero por ahora dependemos de obtenerTrabajos que hace query directa.
         let rawJobs = await obtenerTrabajos(currentFilters.cat);
 
         // Filtrar para que no salgan los trabajos propios
@@ -32,17 +32,20 @@ async function loadJobs() {
             rawJobs = rawJobs.filter(j => j.id_publicador !== user.uid);
         }
 
-        // Ordenamos por prioridad de suscripción (JEFE) y luego por fecha descendente
+        // Ordenamos: Primero los JEFE, luego por fecha (más reciente primero)
         allJobs = rawJobs.sort((a, b) => {
-            // 1. Prioridad por suscripción JEFE (basado en último login del publicador)
-            const prioA = a.prioridad_suscripcion?.toMillis ? a.prioridad_suscripcion.toMillis() : (a.prioridad_suscripcion || 0);
-            const prioB = b.prioridad_suscripcion?.toMillis ? b.prioridad_suscripcion.toMillis() : (b.prioridad_suscripcion || 0);
+            const hasPrioA = (a.prioridad_suscripcion || 0) !== 0;
+            const hasPrioB = (b.prioridad_suscripcion || 0) !== 0;
 
-            if (prioB !== prioA) return prioB - prioA;
+            if (hasPrioA !== hasPrioB) {
+                // Si uno es JEFE y el otro no, el JEFE va primero
+                return hasPrioA ? -1 : 1;
+            }
 
-            // 2. Fecha de publicación normal
+            // Si ambos son JEFE o ninguno lo es, ordenamos por fecha de publicación
             const dateA = a.fecha_publicacion?.toDate ? a.fecha_publicacion.toDate() : (a.fecha_publicacion || 0);
             const dateB = b.fecha_publicacion?.toDate ? b.fecha_publicacion.toDate() : (b.fecha_publicacion || 0);
+
             return dateB - dateA;
         });
 
@@ -90,23 +93,33 @@ function displayJobs() {
     const pageItems = filteredJobs.slice(start, end);
 
     if (pageItems.length === 0) {
-        container.innerHTML = "<p style='color:white; text-align:center; margin-top: 20px;'>No hay trabajos disponibles con estos criterios.</p>";
+        container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron trabajos.</p>";
     }
 
     // Crear e inyectar cada tarjeta de trabajo para la página activa
     pageItems.forEach((job) => {
+        const dateObj = job.fecha_publicacion?.toDate ? job.fecha_publicacion.toDate() : (job.fecha_publicacion ? new Date(job.fecha_publicacion) : null);
+        const dateStr = dateObj ? dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Reciente";
+        const hasPrio = (job.prioridad_suscripcion || 0) !== 0;
+
         const card = `
             <article class="job-card" onclick="window.location.href='trabajo.html?id=${job.id}'">
                 <img src="${job.foto_trabajo || '../assets/img/trabajo-defecto.png'}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">
-                    <h3>${job.titulo}</h3>
+                    <div class="job-card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3 style="display: flex; align-items: center; gap: 8px;">
+                            ${job.titulo}
+                            ${(job.prioridad_suscripcion || 0) !== 0 ? '<span class="priority-badge" style="background: var(--blue-2); color: #fff; font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
+                        </h3>
+                        <span class="job-date" style="font-size: 0.85rem; color: var(--gray-4); white-space: nowrap; margin-left: 10px;">${dateStr}</span>
+                    </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción"}</p>
                     <div class="job-details">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "Ubicación no especificada"}</p>
                         <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</p>
                         <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${getStandardName(job.id_categoria)}</p>
-                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</strong></p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(job.pago_cliente).toFixed(2)} €</strong></p>
+                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: ${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</p>
+                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""> <strong> ${Number(job.pago_cliente).toFixed(2)} €</strong></p>
                     </div>
                 </div>
             </article>`;
@@ -196,6 +209,29 @@ if (btnPrev) {
 }
 
 // Inicio
+// Escuchar clic en botón de filtros para versión móvil
+const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+const sidebar = document.getElementById('sidebar');
+if (mobileFilterBtn && sidebar) {
+    mobileFilterBtn.addEventListener('click', () => {
+        const isOpening = !sidebar.classList.contains('show-mobile-filters');
+        if (isOpening) {
+            const sideMenu = document.getElementById('sideMenu');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const menuBtn = document.getElementById('menuBtn');
+            const notificationsPanel = document.getElementById('notificationsPanel');
+
+            if (sideMenu) sideMenu.classList.remove('active');
+            if (menuBtn) menuBtn.classList.remove('active');
+            if (profileDropdown) profileDropdown.classList.remove('show');
+            if (notificationsPanel) notificationsPanel.classList.remove('active');
+        }
+        sidebar.classList.toggle('show-mobile-filters');
+        mobileFilterBtn.classList.toggle('active');
+        mobileFilterBtn.style.opacity = '1';
+    });
+}
+
 auth.onAuthStateChanged(user => {
     loadJobs();
 });

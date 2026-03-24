@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajosPublicadosPorMi, gestionarBorradoTarea } from './database.js';
+import { obtenerTrabajosPublicadosPorMi, gestionarBorradoTarea, cancelarTrabajo } from './database.js';
 
 /**
  * MIS TAREAS: Tareas que el usuario HA COLGADO (Publicador/Cliente)
@@ -21,6 +21,29 @@ let currentFilters = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Escuchar clic en botón de filtros para versión móvil
+    const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+    const sidebar = document.getElementById('sidebar');
+    if (mobileFilterBtn && sidebar) {
+        mobileFilterBtn.addEventListener('click', () => {
+            const isOpening = !sidebar.classList.contains('show-mobile-filters');
+            if (isOpening) {
+                const sideMenu = document.getElementById('sideMenu');
+                const profileDropdown = document.getElementById('profileDropdown');
+                const menuBtn = document.getElementById('menuBtn');
+                const notificationsPanel = document.getElementById('notificationsPanel');
+
+                if (sideMenu) sideMenu.classList.remove('active');
+                if (menuBtn) menuBtn.classList.remove('active');
+                if (profileDropdown) profileDropdown.classList.remove('show');
+                if (notificationsPanel) notificationsPanel.classList.remove('active');
+            }
+            sidebar.classList.toggle('show-mobile-filters');
+            mobileFilterBtn.classList.toggle('active');
+            mobileFilterBtn.style.opacity = '1';
+        });
+    }
+
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             await loadMyPostedTasks(user.uid);
@@ -30,6 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadMyPostedTasks(uid) {
+    const container = document.getElementById('tareas-list');
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando mis tareas...</p>";
+
     try {
         // Obtenemos lo que YO HE PUBLICADO
         const rawTareas = await obtenerTrabajosPublicadosPorMi(uid);
@@ -82,7 +108,7 @@ function displayTareas() {
     const pageItems = filteredTareas.slice(start, end);
 
     if (pageItems.length === 0) {
-        container.innerHTML = "<p style='color:white; text-align:center;'>No tienes tareas publicadas que coincidan.</p>";
+        container.innerHTML = "<p style='color:var(--gray-4); font-style: italic; text-align:center; margin-top: 20px;'>No tienes tareas publicadas que coincidan.</p>";
     }
 
     pageItems.forEach(tarea => {
@@ -92,12 +118,18 @@ function displayTareas() {
         const img = tarea.foto_trabajo || "../assets/img/trabajo-defecto.png";
 
         const isCompletada = (tarea.estado || "").toLowerCase() === "completada";
-        const deleteTitle = isCompletada ? "Eliminar Historial" : "Eliminar Publicación";
+        const canDelete = isCompletada || (tarea.estado || "").toLowerCase() === "cancelada";
+        const actionIcon = canDelete ? "../assets/img/icons/icono-eliminar-blanco.png" : "../assets/img/icons/icono-no-blanco.png";
+        const actionTitle = canDelete ? "Eliminar Tarea" : "Cancelar Tarea";
+        const actionBtnClass = canDelete ? "delete-btn" : "cancel-btn";
+        const actionFn = canDelete ? `confirmarEliminar('${tarea.id}')` : `confirmarCancelarTarea('${tarea.id}')`;
 
         const card = `
             <article class="job-card" data-id="${tarea.id}" onclick="window.location.href='mi-tarea.html?id=${tarea.id}'">
                 <div class="action-buttons">
-                    <button class="action-btn delete-btn" title="${deleteTitle}" onclick="event.stopPropagation(); confirmarEliminar('${tarea.id}')"><img src="../assets/img/icons/icono-eliminar.png" alt="Eliminar"></button>
+                    <button class="action-btn ${actionBtnClass}" title="${actionTitle}" onclick="event.stopPropagation(); ${actionFn}">
+                        <img src="${actionIcon}" alt="${actionTitle}">
+                    </button>
                 </div>
                 <img src="${img}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">
@@ -110,7 +142,7 @@ function displayTareas() {
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${tarea.direccion || "No especificada"}</p>
                         <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${tarea.tiempo_estimado_horas}h</p>
                         <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</p>
-                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></p>
+                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: ${xp} XP</p>
                         <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(pagoCliente).toFixed(2)} €</strong></p>
                     </div>
                 </div>
@@ -160,10 +192,10 @@ window.confirmarEliminar = function (id) {
     const tarea = allTareas.find(t => t.id === id);
     const isCompletada = tarea && (tarea.estado || "").toLowerCase() === "completada";
 
-    const modalTitle = isCompletada ? "Eliminar del Historial" : "Eliminar Publicación";
+    const modalTitle = isCompletada ? "Eliminar del Historial" : "Borrar Permanentemente";
     const modalDesc = isCompletada
         ? "¿Quieres eliminar esta tarea de tu historial? Solo desaparecerá para ti, el registro se mantiene para el trabajador."
-        : "¿Estás seguro de que quieres eliminar esta tarea? Se ocultará de tu lista y se borrará definitivamente tras el periodo de seguridad (7 días).";
+        : "¿Estás seguro de que quieres borrar esta tarea definitivamente? El registro se eliminará de la base de datos y se procesará el reembolso de la garantía si corresponde.";
 
     showCustomConfirm(
         modalTitle,
@@ -173,10 +205,8 @@ window.confirmarEliminar = function (id) {
                 const { permanent } = await gestionarBorradoTarea(id, 'publicador');
 
                 if (permanent) {
-                    // Si se borró de la DB, lo quitamos de la lista local
                     allTareas = allTareas.filter(t => t.id !== id);
                 } else {
-                    // Si solo se marcó, actualizamos localmente para ocultar
                     const idx = allTareas.findIndex(t => t.id === id);
                     if (idx !== -1) allTareas[idx].borrado_por_publicador = true;
                 }
@@ -185,7 +215,34 @@ window.confirmarEliminar = function (id) {
                 console.error("Error al procesar eliminación:", e);
             }
         },
-        "Eliminar",
-        "Cancelar"
+        "Borrar",
+        "Cerrar",
+        "delete"
+    );
+};
+
+window.confirmarCancelarTarea = function (id) {
+    const tarea = allTareas.find(t => t.id === id);
+    if (!tarea) return;
+
+    showCustomConfirm(
+        "Cancelar Tarea",
+        `¿Estás seguro de que quieres cancelar "${tarea.titulo}"? La tarea se detendrá y no se podrán aceptar más candidatos. El dinero de la garantía se retendrá hasta que la tarea sea borrada de tu lista.`,
+        async () => {
+            try {
+                await cancelarTrabajo(id);
+                // Actualizar localmente para reflejar el cambio sin recargar todo
+                const idx = allTareas.findIndex(t => t.id === id);
+                if (idx !== -1) allTareas[idx].estado = "Cancelada";
+                applyClientFilters();
+                showCustomAlert("Tarea Cancelada", "La tarea ha sido cancelada con éxito.");
+            } catch (e) {
+                console.error("Error al cancelar tarea:", e);
+                showCustomAlert("Error", "No se pudo cancelar la tarea.");
+            }
+        },
+        "Cancelar Tarea",
+        "Cerrar",
+        "delete"
     );
 };

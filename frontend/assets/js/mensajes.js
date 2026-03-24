@@ -84,6 +84,29 @@ function getEspecialidadPrincipal(ptsCat) {
 // =====================================================
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Escuchar clic en botón de filtros para versión móvil
+    const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+    const sidebar = document.getElementById('sidebar');
+    if (mobileFilterBtn && sidebar) {
+        mobileFilterBtn.addEventListener('click', () => {
+            const isOpening = !sidebar.classList.contains('show-mobile-filters');
+            if (isOpening) {
+                const sideMenu = document.getElementById('sideMenu');
+                const profileDropdown = document.getElementById('profileDropdown');
+                const menuBtn = document.getElementById('menuBtn');
+                const notificationsPanel = document.getElementById('notificationsPanel');
+
+                if (sideMenu) sideMenu.classList.remove('active');
+                if (menuBtn) menuBtn.classList.remove('active');
+                if (profileDropdown) profileDropdown.classList.remove('show');
+                if (notificationsPanel) notificationsPanel.classList.remove('active');
+            }
+            sidebar.classList.toggle('show-mobile-filters');
+            mobileFilterBtn.classList.toggle('active');
+            mobileFilterBtn.style.opacity = '1';
+        });
+    }
+
     let unreadListener = null;
 
     auth.onAuthStateChanged(async (user) => {
@@ -155,8 +178,8 @@ async function initFechas(uid) {
 async function loadAllConversations(uid) {
     console.log("Cargando todas las conversaciones para:", uid);
     const container = document.getElementById('msgs-list');
-    if (container && container.innerHTML === '') {
-        container.innerHTML = '<p class="msgs-empty">Cargando conversaciones…</p>';
+    if (container) {
+        container.innerHTML = '<p class="loading-text">Cargando conversaciones...</p>';
     }
 
     try {

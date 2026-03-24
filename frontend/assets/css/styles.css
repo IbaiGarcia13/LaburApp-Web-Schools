@@ -93,7 +93,7 @@ header nav a {
     display: flex;
     align-items: center;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 1rem;
     transition: all 0.3s ease;
 }
 
@@ -297,17 +297,23 @@ header nav a:hover {
 
 .side-menu-footer {
     margin-top: auto;
-    padding: 20px 30px 0px 30px;
+    padding: 20px 30px 20px 30px;
     display: flex;
     align-items: center;
     gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.side-menu-footer:hover {
+    background-color: var(--gray-1);
 }
 
 .side-menu-footer a {
     color: var(--red-1);
     text-decoration: none;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
 }
 
 .side-menu-footer img {
@@ -478,6 +484,7 @@ footer {
     text-align: center;
     color: var(--gray-6);
     padding: 40px 20px;
+    font-style: italic;
 }
 
 /* Badge de notificaciones en el side menu */
@@ -596,12 +603,20 @@ footer {
     background: var(--red-2);
 }
 
+.notif-item.type-trabajo_cancelado .notif-icon-box {
+    background: var(--red-2);
+}
+
+.notif-item.type-tarea_abandonada .notif-icon-box {
+    background: var(--red-2);
+}
+
 .notif-item.type-aceptado .notif-icon-box {
     background: var(--green-1);
 }
 
 .notif-item.type-info .notif-icon-box {
-    background: #ccc;
+    background: var(--gray-3);
 }
 
 .notif-icon-box img {
@@ -642,6 +657,17 @@ footer {
     text-align: center;
     padding: 30px;
     color: var(--gray-6);
+}
+
+/* --- INDICADORES DE CARGA --- */
+.loading-text {
+    color: var(--gray-4);
+    font-style: italic;
+    text-align: center;
+    margin: 40px auto;
+    width: 100%;
+    font-size: 1.1rem;
+    display: block;
 }
 
 /* --- RESPONSIVE --- */
@@ -859,5 +885,9 @@ footer {
 
     .notif-date {
         font-size: 0.7rem;
+    }
+
+    .notif-empty {
+        font-size: 0.8rem !important;
     }
 }

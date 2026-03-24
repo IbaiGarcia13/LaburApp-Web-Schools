@@ -40,7 +40,7 @@
 }
 
 .stat-card h3 {
-    color: var(--gray-5);
+    color: var(--gray-7);
     margin-bottom: 10px;
     font-size: 1.1rem;
     text-transform: uppercase;
@@ -105,15 +105,15 @@
 }
 
 .text-card h3 {
-    color: var(--gray-9);
+    color: var(--neutral-black);
     margin-bottom: 20px;
     font-size: 1.8rem;
 }
 
 .text-card p {
-    color: var(--gray-6);
+    color: var(--gray-7);
     line-height: 1.7;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
 }
 
 .image-card {

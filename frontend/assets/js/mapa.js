@@ -12,6 +12,29 @@ let userMarker = null, userCircle = null;
 let userLat = 0, userLng = 0;
 
 /* ===== UBICACIÓN REAL USUARIO ===== */
+// Escuchar clic en botón de filtros para versión móvil
+const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+const filterPanel = document.getElementById('filter-panel');
+if (mobileFilterBtn && filterPanel) {
+    mobileFilterBtn.addEventListener('click', () => {
+        const isOpening = !filterPanel.classList.contains('show-mobile-filters');
+        if (isOpening) {
+            const sideMenu = document.getElementById('sideMenu');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const menuBtn = document.getElementById('menuBtn');
+            const notificationsPanel = document.getElementById('notificationsPanel');
+
+            if (sideMenu) sideMenu.classList.remove('active');
+            if (menuBtn) menuBtn.classList.remove('active');
+            if (profileDropdown) profileDropdown.classList.remove('show');
+            if (notificationsPanel) notificationsPanel.classList.remove('active');
+        }
+        filterPanel.classList.toggle('show-mobile-filters');
+        mobileFilterBtn.classList.toggle('active');
+        mobileFilterBtn.style.opacity = '1';
+    });
+}
+
 // Cargar trabajos cuando el usuario esté listo (para poder filtrar sus propios trabajos)
 auth.onAuthStateChanged(user => {
     loadRealJobs();
@@ -78,7 +101,10 @@ async function loadRealJobs() {
 
                 const popupContent = `
             <div style="font-family: inherit; min-width: 180px;">
-                <h3 style="margin: 0 0 8px; color: #333; font-size: 16px;">${t.titulo}</h3>
+                <h3 style="margin: 0 0 8px; color: #333; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    ${t.titulo}
+                    ${(t.prioridad_suscripcion || 0) !== 0 ? '<span style="background: var(--blue-2); color: #fff; font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
+                </h3>
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
                     <img src="../assets/img/icons/icono-categoria-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;">
                     <span style="font-size: 13px; color: #666;"><b>${getStandardName(t.id_categoria)}</b></span>
@@ -195,8 +221,13 @@ document.getElementById("save-job-btn").addEventListener("click", async () => {
     try {
         const metodos = await obtenerMetodosPago(user.uid);
         if (metodos.length === 0) {
-            showCustomAlert("Método de Pago Requerido", "Para publicar un trabajo debes tener al menos un método de pago guardado.");
-            window.location.href = "ajustes.html";
+            showCustomConfirm(
+                "Método de Pago Requerido",
+                "Para publicar un trabajo debes tener al menos un método de pago guardado.",
+                () => { window.location.href = "ajustes.html"; },
+                "Ir a Ajustes",
+                "Cancelar"
+            );
             return;
         }
     } catch (error) {
@@ -302,10 +333,13 @@ if (btnAdd) {
             // Verificar si el usuario tiene métodos de pago antes de dejarle añadir un marcador
             const tienePago = await usuarioTieneMetodoPago(user.uid);
             if (!tienePago) {
-                showCustomAlert("Atención", "Antes de publicar trabajos en el mapa, necesitas añadir un método de pago en los ajustes.", "Ir a Ajustes");
-                setTimeout(() => {
-                    window.location.href = "ajustes.html";
-                }, 2000);
+                showCustomConfirm(
+                    "Atención",
+                    "Antes de publicar trabajos en el mapa, necesitas añadir un método de pago en los ajustes.",
+                    () => { window.location.href = "ajustes.html"; },
+                    "Ir a Ajustes",
+                    "Cancelar"
+                );
                 return;
             }
 

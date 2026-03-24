@@ -171,7 +171,6 @@
 
 .right-action {
     text-align: right;
-    margin-top: 20px;
 }
 
 /* PAYMENTS AND LISTS */
@@ -182,15 +181,48 @@
 }
 
 .payment-methods li {
-    margin: 10px 0;
     font-size: 15px;
     color: var(--gray-5);
     display: flex;
     align-items: center;
+    padding: 10px 10px 10px 0;
+    /* No left padding */
+    background: transparent;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.payment-methods li:hover {
+    background: #f9f9f9;
 }
 
 .payment-methods li strong {
     margin-right: 5px;
+}
+
+.icon-star-favorite {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+}
+
+.btn-delete-payment {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    /* Red filter for white icon (icono-no-blanco.png) */
+    filter: brightness(0) saturate(100%) invert(27%) sepia(91%) saturate(2351%) hue-rotate(346deg) brightness(101%) contrast(106%);
+    transition: transform 0.2s, opacity 0.2s ease;
+    opacity: 0;
+}
+
+.payment-methods li:hover .btn-delete-payment {
+    opacity: 1;
+}
+
+.btn-delete-payment:hover {
+    transform: scale(1.2);
 }
 
 .payment-history {
@@ -219,13 +251,11 @@
 }
 
 .positive-amount {
-    color: #2ecc71 !important;
-    /* Verde */
+    color: var(--green-1) !important;
 }
 
 .negative-amount {
-    color: #e74c3c !important;
-    /* Rojo */
+    color: var(--red-2) !important;
 }
 
 /* DELETE ACCOUNT */
@@ -318,8 +348,15 @@
 
     .page-title {
         font-size: 1.2rem;
-        text-align: center;
+        text-align: left;
         margin-bottom: 20px;
+    }
+
+    .page-title img {
+        width: 25px !important;
+        vertical-align: middle;
+        margin-right: 5px !important;
+        margin-top: -5px !important;
     }
 
     .settings-card {
@@ -354,12 +391,12 @@
     }
 
     .delete-account-container {
-        text-align: center;
+        text-align: left;
         margin-top: 20px;
     }
 
     .delete-action {
-        justify-content: center;
+        justify-content: left;
     }
 
     .modal-content {

@@ -46,7 +46,8 @@ async function loadChatMeta() {
                 if (chatMode === 'job') {
                     const trabajo = await obtenerTrabajoPorId(idTrabajo);
                     if (trabajo) {
-                        jobTitle.textContent = `Trabajo: ${trabajo.titulo}`;
+                        const url = (user.uid === trabajo.id_publicador) ? `mi-tarea.html?id=${idTrabajo}` : `trabajo.html?id=${idTrabajo}`;
+                        jobTitle.innerHTML = `Trabajo: <a href="${url}" class="job-link">${trabajo.titulo}</a>`;
                         // If otherId wasn't in URL, we find it from the job
                         if (!otherId) {
                             otherId = (user.uid === trabajo.id_publicador) ? trabajo.id_trabajador : trabajo.id_publicador;

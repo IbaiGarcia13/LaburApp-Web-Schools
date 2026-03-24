@@ -8,7 +8,36 @@ let filteredUsers = [];
 let currentPage = 1;
 const itemsPerPage = 5;
 
+// Escuchar clic en botón de filtros para versión móvil
+const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+const sidebar = document.getElementById('sidebar');
+if (mobileFilterBtn && sidebar) {
+    mobileFilterBtn.addEventListener('click', () => {
+        const isOpening = !sidebar.classList.contains('show-mobile-filters');
+        if (isOpening) {
+            // Cerrar otros menús si están abiertos
+            const sideMenu = document.getElementById('sideMenu');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const menuBtn = document.getElementById('menuBtn');
+            const notificationsPanel = document.getElementById('notificationsPanel');
+
+            if (sideMenu) sideMenu.classList.remove('active');
+            if (menuBtn) menuBtn.classList.remove('active');
+            if (profileDropdown) profileDropdown.classList.remove('show');
+            if (notificationsPanel) notificationsPanel.classList.remove('active');
+        }
+        sidebar.classList.toggle('show-mobile-filters');
+        mobileFilterBtn.classList.toggle('active');
+        // El botón ahora es siempre opaco
+        mobileFilterBtn.style.opacity = '1';
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+
+    const container = document.getElementById('users-list');
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando usuarios...</p>";
+
     try {
         usuariosData = await obtenerTodosLosUsuarios();
 
@@ -30,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Filtrar para no mostrarse a sí mismo
             filteredUsers = usuariosData.filter(u => u.uid !== currentUid);
 
-            // ORDENAR: Primero los CURRANTE (basado en actividad reciente)
+            // ORDENAR: Primero los CURRANTE, luego todos por actividad reciente (ultimo_login)
             filteredUsers.sort((a, b) => {
                 const subA = a.id_suscripcion_trabajador === 'currante';
                 const subB = b.id_suscripcion_trabajador === 'currante';
@@ -38,13 +67,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (subA && !subB) return -1;
                 if (!subA && subB) return 1;
 
-                // Si ambos tienen o no tienen la misma prioridad de suscripción, ordenamos por último login
-                const timeA = a.ultimo_login_suscrito?.toMillis ? a.ultimo_login_suscrito.toMillis() : (a.ultimo_login_suscrito || 0);
-                const timeB = b.ultimo_login_suscrito?.toMillis ? b.ultimo_login_suscrito.toMillis() : (b.ultimo_login_suscrito || 0);
+                // Para todos (sub y no sub), ordenamos por ultimo_login (actividad real)
+                const timeA = a.ultimo_login?.toMillis ? a.ultimo_login.toMillis() : (a.ultimo_login || 0);
+                const timeB = b.ultimo_login?.toMillis ? b.ultimo_login.toMillis() : (b.ultimo_login || 0);
 
                 if (timeB !== timeA) return timeB - timeA;
 
-                // Si no hay actividad de suscripción, ordenamos por nivel para que no sea aleatorio
+                // Fallback por nivel si coinciden tiempos o son 0
                 return (b.nivel || 1) - (a.nivel || 1);
             });
 
@@ -86,7 +115,7 @@ function displayUsers() {
     const pageItems = filteredUsers.slice(start, end);
 
     if (pageItems.length === 0) {
-        container.innerHTML = "<p style='color:white; text-align:center;'>No se encontraron usuarios.</p>";
+        container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron usuarios.</p>";
     }
 
     // Bucle para iterar y pintar cada uno de los elementos de la página actual
@@ -96,7 +125,10 @@ function displayUsers() {
             <article class="user-card" onclick="window.location.href='usuario.html?id=${user.uid}'">
                 <img src="${avatar}" class="user-img">
                 <div class="user-info">
-                    <h3>${user.nombre}</h3>
+                    <h3 style="display: flex; align-items: center; gap: 8px;">
+                        ${user.nombre}
+                        ${user.id_suscripcion_trabajador === 'currante' ? '<span class="priority-badge" title="Trabajador CURRANTE" style="background: var(--blue-3); color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">CURRANTE</span>' : ''}
+                    </h3>
                     <p class="user-desc">${user.desc}</p>
                     <div class="user-stats">
                         <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${user.loc}</p>

@@ -106,6 +106,17 @@ body {
     font-size: 0.95rem;
 }
 
+.job-link {
+    color: var(--gray-5);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.job-link:hover {
+    text-decoration: underline !important;
+    color: var(--gray-10);
+}
+
 .report-wrapper {
     position: relative;
     display: flex;
@@ -300,13 +311,11 @@ body {
 }
 
 .msg-status--read {
-    color: #4fc3a1;
-    /* verde-azulado: doble ✓✓ leído */
+    color: var(--green-3);
 }
 
 .msg-status--unread {
     color: rgba(255, 255, 255, 0.55);
-    /* blanco suave: ✓ pendiente */
 }
 
 /* Input Area */

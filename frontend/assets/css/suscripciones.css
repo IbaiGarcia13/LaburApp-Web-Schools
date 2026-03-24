@@ -213,8 +213,15 @@
 
     .section-title {
         font-size: 1.2rem;
-        text-align: center;
+        text-align: left;
         margin-bottom: 20px;
+    }
+
+    .section-title img {
+        width: 25px !important;
+        vertical-align: middle;
+        margin-right: 5px !important;
+        margin-top: -5px !important;
     }
 
     .subscriptions-grid {
@@ -225,11 +232,11 @@
 
     .sub-card {
         width: 100%;
+        min-width: 350px;
         max-width: 350px;
         height: auto;
         padding: 30px 20px;
         padding-bottom: 120px;
-        /* Espacio para el footer absoluto */
     }
 
     .sub-card h3 {

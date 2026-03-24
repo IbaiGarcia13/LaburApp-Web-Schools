@@ -6,7 +6,7 @@
     padding: 0 20px;
     color: var(--neutral-black);
     width: 100%;
-    min-width: 900px;
+    min-width: 960px;
     max-width: 1000px;
 }
 
@@ -37,11 +37,11 @@
 
 .job-title {
     margin: 0 0 10px 0;
-    font-size: 32px;
+    font-size: 2rem;
 }
 
 .job-description {
-    font-size: 15px;
+    font-size: 0.95rem;
     line-height: 1.4;
     padding-bottom: 20px;
 }
@@ -72,7 +72,7 @@
 
 .job-stats-container {
     border-left: 3px solid var(--neutral-white);
-    padding: 15px 25px;
+    padding: 15px 0px 15px 25px;
     min-width: 300px;
     display: flex;
     flex-direction: column;
@@ -90,15 +90,16 @@
     justify-content: center;
     gap: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
 .stat-label {
-    font-size: 28px;
+    font-size: 1.5rem;
     color: var(--gray-4);
 }
 
 .stat-value {
-    font-size: 28px;
+    font-size: 1.5rem;
     font-weight: bold;
     color: var(--gray-5);
 }
@@ -120,7 +121,7 @@
 .cat-title {
     color: var(--gray-3);
     margin: 0 0 20px 0;
-    font-size: 24px;
+    font-size: 1.5rem;
     border-bottom: 2px solid var(--gray-1);
     padding-bottom: 15px;
     font-weight: bold;
@@ -137,7 +138,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--gray-5);
 }
 
@@ -239,7 +240,7 @@
     display: inline-block;
     padding: 6px 16px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     background: var(--gray-2);

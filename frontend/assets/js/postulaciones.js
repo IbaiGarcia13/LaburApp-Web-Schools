@@ -26,13 +26,28 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadAllData(uid) {
+    const jobsContainer = document.getElementById('jobs-list');
+    const usersContainer = document.getElementById('users-list');
+    if (jobsContainer) jobsContainer.innerHTML = "<p class='loading-text'>Cargando mis postulaciones...</p>";
+    if (usersContainer) usersContainer.innerHTML = "<p class='loading-text'>Cargando interesados...</p>";
+
     try {
         // 1. Trabajos donde ME HE POSTULADO (Izquierda)
-        misPostulaciones = await obtenerMisPostulaciones(uid);
+        const rawMisPost = await obtenerMisPostulaciones(uid);
+        misPostulaciones = rawMisPost.sort((a, b) => {
+            const dateA = a.postulacion?.fecha_postulacion?.toDate ? a.postulacion.fecha_postulacion.toDate() : (a.postulacion?.fecha_postulacion || 0);
+            const dateB = b.postulacion?.fecha_postulacion?.toDate ? b.postulacion.fecha_postulacion.toDate() : (b.postulacion?.fecha_postulacion || 0);
+            return dateB - dateA;
+        });
         renderTrabajos();
 
         // 2. Usuarios que SE HAN POSTULADO a mis tareas (Derecha)
-        postulantesParaMisTareas = await obtenerPostulacionesParaMisTareas(uid);
+        const rawPostParaMi = await obtenerPostulacionesParaMisTareas(uid);
+        postulantesParaMisTareas = rawPostParaMi.sort((a, b) => {
+            const dateA = a.fecha_postulacion?.toDate ? a.fecha_postulacion.toDate() : (a.fecha_postulacion || 0);
+            const dateB = b.fecha_postulacion?.toDate ? b.fecha_postulacion.toDate() : (b.fecha_postulacion || 0);
+            return dateB - dateA;
+        });
         renderUsuarios();
     } catch (e) {
         console.error("Error cargando datos de postulaciones:", e);
@@ -102,7 +117,7 @@ function renderTrabajos() {
         card.innerHTML = `
             <div class="action-buttons">
                 <button class="action-btn delete-btn" title="Cancelar Postulación" onclick="event.stopPropagation(); confirmarCancelarPostulacion('${trabajo.id}')">
-                    <img src="../assets/img/icons/icono-eliminar.png" alt="Eliminar">
+                    <img src="../assets/img/icons/icono-eliminar-blanco.png" alt="Eliminar">
                 </button>
             </div>
             <img src="${img}" class="job-card-img" onerror="this.src='../assets/img/trabajo-defecto.png'">

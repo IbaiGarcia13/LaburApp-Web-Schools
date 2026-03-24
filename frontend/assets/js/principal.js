@@ -1,11 +1,12 @@
 import { auth } from './firebase-config.js';
-import { obtenerPerfilUsuario } from './database.js';
+import { obtenerPerfilUsuario, obtenerTrabajosPublicadosPorMi } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 
     const statNivel = document.getElementById('stat-nivel');
     const statTareas = document.getElementById('stat-tareas');
+    const statTareasTitulo = document.getElementById('stat-tareas-titulo');
     const statDinero = document.getElementById('stat-dinero');
     const dashboardStats = document.getElementById('dashboardStats');
 
@@ -26,7 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // 3. Rellenar los datos en formato visual
                     if (statNivel) statNivel.textContent = perfil.nivel || 1;
-                    if (statTareas) statTareas.textContent = (perfil.tareas_realizadas || 0).toLocaleString();
+
+                    // Lógica para mostrar lo que más tenga (Subidas vs Realizadas)
+                    const trabajosSubidos = await obtenerTrabajosPublicadosPorMi(user.uid);
+                    const numSubidas = trabajosSubidos ? trabajosSubidos.length : 0;
+                    const numRealizadas = perfil.tareas_realizadas || 0;
+
+                    if (numSubidas > numRealizadas) {
+                        if (statTareasTitulo) statTareasTitulo.textContent = "Tareas Subidas";
+                        if (statTareas) statTareas.textContent = numSubidas.toLocaleString();
+                    } else {
+                        if (statTareasTitulo) statTareasTitulo.textContent = "Tareas Realizadas";
+                        if (statTareas) statTareas.textContent = numRealizadas.toLocaleString();
+                    }
 
                     // Formatear el dinero como moneda (Euros)
                     const dinero = perfil.dinero_ganado_total || 0;

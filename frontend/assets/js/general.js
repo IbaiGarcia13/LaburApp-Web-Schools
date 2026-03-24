@@ -32,9 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const perfil = await obtenerPerfilUsuario(user.uid);
             if (perfil) {
                 // Actualizar actividad si tiene suscripción activa (Prioridad en listas)
-                if (perfil.id_suscripcion_trabajador === 'currante' || perfil.id_suscripcion_cliente === 'jefe') {
-                    actualizarActividadSuscripcion(user.uid);
-                }
+                // Actualizar siempre la actividad para refrescar prioridad o quitarla si ya no es suscriptor
+                actualizarActividadSuscripcion(user.uid).catch(e => {
+                    console.error("Error actualizando actividad suscripción:", e);
+                });
 
                 const avatarUrl = perfil.foto_perfil || (window.location.pathname.includes('/pages/') ? '../assets/img/avatar-defecto.png' : 'frontend/assets/img/avatar-defecto.png');
 
@@ -57,6 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuBtn = document.getElementById('menuBtn');
     const sideMenu = document.getElementById('sideMenu');
 
+    // Función auxiliar global para cerrar filtros móviles si existen en la página
+    function closeMobileFilters() {
+        const filters = document.querySelectorAll('.show-mobile-filters');
+        filters.forEach(f => f.classList.remove('show-mobile-filters'));
+        const filterBtn = document.getElementById('mobile-filter-btn');
+        if (filterBtn) {
+            filterBtn.classList.remove('active');
+            filterBtn.style.opacity = '1';
+        }
+    }
+
     if (menuBtn && sideMenu) {
         menuBtn.addEventListener('click', (e) => {
             const isOpening = !sideMenu.classList.contains('active');
@@ -64,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Cerrar otros si estamos abriendo este
                 if (profileDropdown) profileDropdown.classList.remove('show');
                 toggleNotificationsPanel(false);
+                closeMobileFilters();
             }
 
             // Alterna la clase 'active' en el menú lateral para abrirlo
@@ -100,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (menuBtn) menuBtn.classList.remove('active');
                 }
                 toggleNotificationsPanel(false);
+                closeMobileFilters();
             }
             profileDropdown.classList.toggle('show');
             e.stopPropagation();
@@ -113,35 +127,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA GLOBAL DE CERRAR SESIÓN ---
-    // Seleccionar todos los enlaces que apuntan a index.html o ../index.html y contienen texto o icono de cerrar sesión
-    const logoutLinks = document.querySelectorAll('a[href="../index.html"], a[href="index.html"]');
+    function procesarCerrarSesion(href) {
+        showCustomConfirm(
+            "Cerrar Sesión",
+            "¿Estás seguro de que quieres cerrar sesión?",
+            () => {
+                localStorage.removeItem("loginTimestamp");
+                auth.signOut().then(() => {
+                    window.location.href = href;
+                }).catch((error) => {
+                    console.error("Error al cerrar sesión:", error);
+                    window.location.href = href;
+                });
+            },
+            "Cerrar Sesión",
+            "Cancelar",
+            "delete", // Se le pasa la clase 'delete' para que sea rojo
+            true
+        );
+    }
 
+    // 1. Enlaces individuales (en el dropdown del perfil, etc.)
+    const logoutLinks = document.querySelectorAll('a[href="../index.html"], a[href="index.html"]');
     logoutLinks.forEach(link => {
-        // Verificar que sea efectivamente el enlace de cerrar sesión (por texto o cercanía a un icono)
         if (link.textContent.toLowerCase().includes('cerrar sesi') || link.parentElement.innerHTML.includes('icono-cerrar-sesion')) {
             link.addEventListener('click', (e) => {
-                e.preventDefault(); // Evitar la redirección inmediata
-
-                showCustomConfirm(
-                    "Cerrar Sesión",
-                    "¿Estás seguro de que quieres cerrar sesión?",
-                    () => {
-                        localStorage.removeItem("loginTimestamp");
-                        auth.signOut().then(() => {
-                            window.location.href = link.getAttribute('href');
-                        }).catch((error) => {
-                            console.error("Error al cerrar sesión:", error);
-                            window.location.href = link.getAttribute('href');
-                        });
-                    },
-                    "Cerrar Sesión",
-                    "Cancelar",
-                    "delete", // Se le pasa la clase 'delete' para que sea rojo
-                    true
-                );
+                e.preventDefault();
+                procesarCerrarSesion(link.getAttribute('href'));
             });
         }
     });
+
+    // 2. Caja completa del Side Menu Footer
+    const sideMenuFooter = document.querySelector('.side-menu-footer');
+    if (sideMenuFooter) {
+        sideMenuFooter.addEventListener('click', (e) => {
+            // Buscamos el enlace dentro para saber a dónde redirigir
+            const link = sideMenuFooter.querySelector('a');
+            const href = link ? link.getAttribute('href') : (window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html');
+            procesarCerrarSesion(href);
+        });
+    }
 
     // --- LÓGICA DE NOTIFICACIONES ---
     injectNotificationsHtml();
@@ -337,6 +363,15 @@ async function renderNotifications() {
                     case 'tarea_empezada':
                         if (n.id_trabajo) targetUrl = prefix + `mi-tarea.html?id=${n.id_trabajo}`;
                         break;
+                    case 'trabajo_cancelado':
+                        if (n.id_trabajo) targetUrl = prefix + `mi-trabajo.html?id=${n.id_trabajo}`;
+                        break;
+                    case 'tarea_abandonada':
+                        if (n.id_trabajo) targetUrl = prefix + `mi-tarea.html?id=${n.id_trabajo}`;
+                        break;
+                    case 'pago':
+                        targetUrl = prefix + 'ajustes.html#paymentHistoryContainer';
+                        break;
                     case 'mensaje':
                         targetUrl = prefix + 'mensajes.html';
                         break;
@@ -373,6 +408,8 @@ function getNotifIcon(tipo) {
         case 'tarea_empezada': return base + 'noti/icono-noti-tarea-empezada.png';
         case 'nuevo_trabajo': return base + 'noti/icono-noti-nuevo-trabajo.png';
         case 'nueva_postulacion': return base + 'noti/icono-noti-nueva-postulacion.png';
+        case 'trabajo_cancelado': return base + 'icono-no-blanco.png';
+        case 'tarea_abandonada': return base + 'icono-no-blanco.png';
         case 'rechazado': return base + 'icono-no-blanco.png';
         case 'aceptado': return base + 'icono-si-blanco.png';
         // Base / Otros

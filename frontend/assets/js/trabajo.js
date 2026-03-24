@@ -64,10 +64,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                         // VERIFICAR MÉTODO DE PAGO
                         const tienePago = await usuarioTieneMetodoPago(user.uid);
                         if (!tienePago) {
-                            showCustomAlert("Acción Requerida", "Para poder postularte a un trabajo, primero debes añadir un método de pago en los ajustes.", "Ir a Ajustes");
-                            setTimeout(() => {
-                                window.location.href = "ajustes.html";
-                            }, 3000);
+                            showCustomConfirm(
+                                "Acción Requerida",
+                                "Para poder postularte a un trabajo, primero debes añadir un método de pago en los ajustes.",
+                                () => { window.location.href = "ajustes.html"; },
+                                "Ir a Ajustes",
+                                "Cancelar"
+                            );
                             return;
                         }
 

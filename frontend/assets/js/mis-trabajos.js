@@ -21,6 +21,29 @@ let currentFilters = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Escuchar clic en botón de filtros para versión móvil
+    const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+    const sidebar = document.getElementById('sidebar');
+    if (mobileFilterBtn && sidebar) {
+        mobileFilterBtn.addEventListener('click', () => {
+            const isOpening = !sidebar.classList.contains('show-mobile-filters');
+            if (isOpening) {
+                const sideMenu = document.getElementById('sideMenu');
+                const profileDropdown = document.getElementById('profileDropdown');
+                const menuBtn = document.getElementById('menuBtn');
+                const notificationsPanel = document.getElementById('notificationsPanel');
+
+                if (sideMenu) sideMenu.classList.remove('active');
+                if (menuBtn) menuBtn.classList.remove('active');
+                if (profileDropdown) profileDropdown.classList.remove('show');
+                if (notificationsPanel) notificationsPanel.classList.remove('active');
+            }
+            sidebar.classList.toggle('show-mobile-filters');
+            mobileFilterBtn.classList.toggle('active');
+            mobileFilterBtn.style.opacity = '1';
+        });
+    }
+
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             await loadMyAcceptedJobs(user.uid);
@@ -30,11 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadMyAcceptedJobs(uid) {
+    const container = document.getElementById('jobs-list');
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando mis trabajos...</p>";
+
     try {
         const rawJobs = await obtenerTrabajosAceptadosPorMi(uid);
         allJobs = rawJobs.sort((a, b) => {
-            const dateA = a.fecha_publicacion?.toDate ? a.fecha_publicacion.toDate() : (a.fecha_publicacion || 0);
-            const dateB = b.fecha_publicacion?.toDate ? b.fecha_publicacion.toDate() : (b.fecha_publicacion || 0);
+            const dateA = a.fecha_aceptacion?.toDate ? a.fecha_aceptacion.toDate() : (a.fecha_aceptacion || a.fecha_publicacion?.toDate?.() || a.fecha_publicacion || 0);
+            const dateB = b.fecha_aceptacion?.toDate ? b.fecha_aceptacion.toDate() : (b.fecha_aceptacion || b.fecha_publicacion?.toDate?.() || b.fecha_publicacion || 0);
             return dateB - dateA;
         });
         applyClientFilters();
@@ -81,7 +107,7 @@ function displayJobs() {
     const pageItems = filteredJobs.slice(start, end);
 
     if (pageItems.length === 0) {
-        container.innerHTML = "<p style='color:white; text-align:center;'>No has aceptado trabajos aún que coincidan.</p>";
+        container.innerHTML = "<p style='color:var(--gray-4); font-style: italic; text-align:center; margin-top: 20px;'>No has aceptado trabajos aún que coincidan.</p>";
     }
 
     pageItems.forEach(job => {
@@ -92,12 +118,16 @@ function displayJobs() {
         const estadoNorm = (job.estado || 'Pendiente');
 
         const isCompletada = estadoNorm.toLowerCase() === "completada";
+        const actionIcon = isCompletada ? "../assets/img/icons/icono-eliminar-blanco.png" : "../assets/img/icons/icono-no-blanco.png";
+        const actionBtnClass = isCompletada ? "delete-btn" : "cancel-btn";
         const deleteTitle = isCompletada ? "Eliminar Historial" : "Abandonar Trabajo";
 
         const card = `
             <article class="job-card" onclick="window.location.href='mi-trabajo.html?id=${job.id}'">
                 <div class="action-buttons">
-                     <button class="action-btn delete-btn" title="${deleteTitle}" onclick="event.stopPropagation(); confirmarAbandonar('${job.id}')"><img src="../assets/img/icons/icono-eliminar.png" alt="X"></button>
+                     <button class="action-btn ${actionBtnClass}" title="${deleteTitle}" onclick="event.stopPropagation(); confirmarAbandonar('${job.id}')">
+                        <img src="${actionIcon}" alt="X">
+                     </button>
                 </div>
                 <img src="${img}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">

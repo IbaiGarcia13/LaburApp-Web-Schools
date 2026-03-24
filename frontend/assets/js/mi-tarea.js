@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const applicantsShort = await obtenerPostulacionesDeUnTrabajo(id);
             if (applicantsShort.length === 0) {
-                list.innerHTML = "<p style='color: #888; grid-column: 1/-1; text-align: center; padding: 40px;'>No hay candidatos todavía.</p>";
+                list.innerHTML = "<p style='color: #888; grid-column: 1/-1; text-align: center; padding: 40px; font-style: italic;'>No hay candidatos todavía.</p>";
                 return;
             }
 

@@ -5,7 +5,7 @@
     margin: 40px auto;
     padding: 0 20px;
     width: 100%;
-    min-width: 900px;
+    min-width: 960px;
     max-width: 1000px;
 }
 
@@ -36,11 +36,11 @@
 
 .profile-info h1 {
     margin: 0 0 10px 0;
-    font-size: 32px;
+    font-size: 2rem;
 }
 
 .description {
-    font-size: 15px;
+    font-size: 0.95rem;
     line-height: 1.4;
     padding-bottom: 10px;
     /* Reduced from 50px to remove the "hueco" */
@@ -93,7 +93,6 @@
     text-overflow: ellipsis;
     display: inline-block;
     max-width: 350px;
-    /* Adjust according to spacing */
 }
 
 .msg-icon {
@@ -131,12 +130,13 @@
 
 .lvl-val {
     display: block;
-    font-size: 28px;
+    font-size: 1.75rem;
     font-weight: bold;
+    color: var(--gray-6);
 }
 
 .lvl-label {
-    font-size: 10px;
+    font-size: 0.65rem;
     font-weight: bold;
 }
 
@@ -147,7 +147,7 @@
 .xp-header {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 0.75rem;
     margin-bottom: 5px;
 }
 
@@ -169,7 +169,7 @@
 
 .stat-item {
     margin: 10px 0;
-    font-size: 15px;
+    font-size: 0.95rem;
 }
 
 /* Categorías */
@@ -185,7 +185,7 @@
 .cat-title {
     color: var(--gray-3);
     margin: 0 0 20px 0;
-    font-size: 24px;
+    font-size: 1.5rem;
     border-bottom: 1px solid var(--gray-1);
     padding-bottom: 10px;
 }
@@ -193,14 +193,14 @@
 .cat-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px 30px;
+    gap: 15px 100px;
 }
 
 .cat-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 15px;
+    font-size: 1rem;
     color: var(--gray-5);
 }
 
@@ -287,13 +287,10 @@
     background: var(--neutral-white);
     border-radius: 18px;
     border-bottom-left-radius: 4px;
-    /* Cola de la burbuja */
     padding: 16px 20px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     max-width: 80%;
-    /* Para que no ocupe todo el ancho, como un mensaje */
     align-self: flex-start;
-    /* Se alinea a la izquierda */
 }
 
 .review-header {
@@ -317,7 +314,7 @@
 }
 
 .review-user-info strong {
-    font-size: 15px;
+    font-size: 0.95rem;
     color: var(--gray-9);
     margin-bottom: 2px;
 }
@@ -329,12 +326,12 @@
 }
 
 .review-date {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--gray-4);
 }
 
 .review-body p {
-    font-size: 14.5px;
+    font-size: 0.9rem;
     color: var(--gray-7);
     line-height: 1.4;
     margin: 0;

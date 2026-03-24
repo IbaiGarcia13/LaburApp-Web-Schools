@@ -44,8 +44,8 @@
                     <a href="perfil.html">
                         <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
                     </a>
-                    <p class="dropdown-name">Ibai García</p>
-                    <p class="dropdown-email">ibai@mail.com</p>
+                    <p class="dropdown-name">Cargando...</p>
+                    <p class="dropdown-email">Cargando...</p>
                     <div class="dropdown-footer">
                         <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
                         <a href="../index.html">Cerrar Sesión</a>
@@ -84,9 +84,16 @@
 
         <!-- SECCIÓN IZQUIERDA: Lista de conversaciones -->
         <section id="content">
-            <h2 class="section-title">
-                <img src="../assets/img/icons/icono-mensajes-blanco.png" alt=""> MENSAJES - USUARIOS
-            </h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 class="section-title" style="margin-bottom: 0;"><img
+                        src="../assets/img/icons/icono-mensajes-blanco.png" alt=""> MENSAJES - USUARIOS</h2>
+                <button id="mobile-filter-btn" class="filter-toggle-btn"
+                    style="display: none; background: none; border: none; cursor: pointer; padding: 5px;">
+                    <img src="../assets/img/icons/icono-filtros.png" alt="Filtros"
+                        onerror="this.src='../assets/img/icons/icono-ajustes.png'"
+                        style="width: 25px; height: 25px; background-color: var(--neutral-white); border-radius: 5px; padding: 5px;">
+                </button>
+            </div>
 
             <!-- Lista generada por JS -->
             <div id="msgs-list"></div>

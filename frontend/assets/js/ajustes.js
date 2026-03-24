@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial } from './database.js';
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial, eliminarCuentaUsuario, eliminarMetodoPago } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -80,31 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // --- 2. RENDER MÉTODOS DE PAGO ---
                 if (paymentsList) {
-                    const metodos = await obtenerMetodosPago(user.uid);
-                    paymentsList.innerHTML = "";
-
-                    if (metodos.length === 0) {
-                        paymentsList.innerHTML = "<p style='color: #666; font-style: italic;'>No tienes métodos de pago registrados.</p>";
-                    } else {
-                        // Separar por tipos y encontrar favorito
-                        const tarjetas = metodos.filter(m => m.tipo === "Tarjeta Bancaria");
-                        const plataformas = metodos.filter(m => m.tipo !== "Tarjeta Bancaria");
-
-                        const renderMetodo = (m) => {
-                            const favor = m.favorito ? `<img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt="Favorito"> ` : "";
-                            const li = document.createElement('li');
-                            li.innerHTML = `${favor} <strong>${m.tipo}:</strong> ${m.detalle}`;
-                            return li;
-                        };
-
-                        tarjetas.forEach(m => paymentsList.appendChild(renderMetodo(m)));
-                        plataformas.forEach(m => {
-                            const p = document.createElement('p');
-                            const favor = m.favorito ? `<img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt="Favorito"> ` : "";
-                            p.innerHTML = `${favor} <strong>${m.tipo}:</strong> ${m.detalle}`;
-                            paymentsList.appendChild(p);
-                        });
-                    }
+                    await renderizarMetodosPago(user.uid);
                 }
 
                 // --- 3. RENDER HISTORIAL DE PAGOS ---
@@ -158,15 +134,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA PARA BORRAR LA CUENTA ---
-    const btnDeleteAccount = document.getElementById('btnDeleteAccount');
     if (btnDeleteAccount) {
         btnDeleteAccount.addEventListener('click', (e) => {
             e.preventDefault();
             showCustomConfirm(
                 "Borrar Cuenta",
-                "¿Estás seguro de que quieres borrar tu cuenta? Todos tus datos se perderán de forma permanente.",
-                () => {
-                    window.location.href = "../index.html"; // Redirigir por ahora
+                "¿Estás ABSOLUTAMENTE seguro de borrar tu cuenta? Todos tus datos, historial y saldo se perderán de forma permanente. Esta acción no se puede deshacer.",
+                async () => {
+                    try {
+                        await eliminarCuentaUsuario();
+                        window.location.href = "../index.html";
+                    } catch (error) {
+                        console.error("Error al borrar cuenta:", error);
+                        if (error.code === 'auth/requires-recent-login') {
+                            showCustomAlert(
+                                "Seguridad",
+                                "Por razones de seguridad, debes haber iniciado sesión recientemente para borrar tu cuenta. Por favor, cierra sesión y vuelve a entrar antes de intentarlo de nuevo."
+                            );
+                        } else {
+                            showCustomAlert("Error", "No se pudo borrar la cuenta. Inténtalo de nuevo más tarde.");
+                        }
+                    }
                 },
                 "Borrar definitivamente",
                 "Cancelar",
@@ -344,16 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     showCustomAlert("Éxito", "Método de pago añadido correctamente.");
                     paymentModal.classList.add('hidden');
 
-                    const list = document.querySelector('.payment-methods');
-                    if (list && listEntry) {
-                        // Si el texto de "No hay metodos" existe, lo borramos
-                        if (list.querySelector('p') && list.querySelector('p').textContent.includes('No tienes')) {
-                            list.innerHTML = "";
-                        }
-
-                        const li = document.createElement('li');
-                        li.innerHTML = listEntry;
-                        list.appendChild(li);
+                    if (paymentsList) {
+                        await renderizarMetodosPago(user.uid);
                     }
 
                     if (historyContainer) {
@@ -428,6 +408,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderHistorialPagos(historial, true);
             });
         }
+    }
+
+    async function renderizarMetodosPago(uid) {
+        if (!paymentsList) return;
+        const metodos = await obtenerMetodosPago(uid);
+        paymentsList.innerHTML = "";
+
+        if (metodos.length === 0) {
+            paymentsList.innerHTML = "<p style='color: #666; font-style: italic;'>No tienes métodos de pago registrados.</p>";
+            return;
+        }
+
+        metodos.forEach(m => {
+            const li = document.createElement('li');
+            const favorStar = m.favorito
+                ? `<img src="../assets/img/icons/icono-estrella.png" class="icon-star-favorite" title="Favorito">`
+                : ``; // No spacer here
+
+            li.innerHTML = `
+                ${favorStar}
+                <span><strong>${m.tipo}:</strong> ${m.detalle}</span>
+                <img src="../assets/img/icons/icono-no-blanco.png" class="btn-delete-payment" title="Eliminar método" data-id="${m.id_metodo}">
+            `;
+            paymentsList.appendChild(li);
+        });
+
+        // Event listeners para borrar
+        paymentsList.querySelectorAll('.btn-delete-payment').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idMetodo = e.target.getAttribute('data-id');
+                confirmarBorradoMetodo(uid, idMetodo);
+            });
+        });
+    }
+
+    function confirmarBorradoMetodo(uid, idMetodo) {
+        obtenerMetodosPago(uid).then(metodos => {
+            if (metodos.length <= 1) {
+                showCustomAlert("Acceso Restringido", "Debes tener al menos un método de pago. Añade uno nuevo antes de borrar este.");
+                return;
+            }
+
+            const metodo = metodos.find(m => m.id_metodo === idMetodo);
+            showCustomConfirm(
+                "Borrar Método de Pago",
+                `¿Estás seguro de que quieres eliminar tu ${metodo.tipo} (${metodo.detalle})?`,
+                async () => {
+                    try {
+                        await eliminarMetodoPago(uid, idMetodo);
+                        showCustomAlert("Éxito", "Método de pago eliminado.");
+                        await renderizarMetodosPago(uid);
+                    } catch (err) {
+                        console.error("Error eliminando método:", err);
+                        showCustomAlert("Error", "No se pudo eliminar el método.");
+                    }
+                },
+                "Eliminar",
+                "Cancelar",
+                "delete"
+            );
+        });
     }
 
     window.addEventListener('click', (event) => {

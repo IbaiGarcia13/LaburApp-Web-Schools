@@ -77,12 +77,15 @@
     cursor: pointer;
     transition: transform 0.2s ease;
     overflow: hidden;
-    width: 600px;
-    height: 175px;
+    width: 100%;
+    max-width: 500px;
+    min-height: 175px;
+    height: auto;
     box-sizing: border-box;
     align-items: center;
-    padding: 15px;
     position: relative;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .job-card:hover {
@@ -104,15 +107,27 @@
     transition: transform 0.2s;
 }
 
-.action-btn:hover {
+.action-btn:hover,
+.user-chat-btn:hover {
     transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+.job-card .delete-btn {
+    background-color: var(--red-2);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
 }
 
 .delete-btn img {
-    width: 16px;
-    height: 16px;
-    margin-top: 12px;
-    margin-right: 5px;
+    width: 17px;
+    height: 17px;
+    display: block;
 }
 
 /* Notificación de estado actualizado (punto rojo) */
@@ -152,8 +167,8 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 5px;
-    padding-right: 20px;
+    margin-bottom: 10px;
+    padding-right: 45px;
     /* Espacio para el botón de acción */
 }
 
@@ -177,9 +192,10 @@
 .job-card-meta {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 6px;
     font-size: 0.75rem;
     color: var(--gray-5);
+    margin-bottom: -10px;
 }
 
 .job-card-meta span {
@@ -206,6 +222,7 @@
     font-weight: bold;
     padding: 2px 6px;
     border-radius: 5px;
+    margin-right: -15px;
 }
 
 .status-pendiente {
@@ -232,7 +249,7 @@
 .job-card-pago {
     font-size: 0.9rem;
     color: var(--gray-8);
-    margin-top: -15px;
+    margin-top: -17px;
     margin-right: 20px;
 }
 
@@ -247,14 +264,15 @@
     gap: 15px;
     margin-bottom: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    transition: box-shadow 0.2s ease;
+    transition: transform 0.2s;
     position: relative;
-    width: 420px;
-    height: 175px;
+    width: 100%;
+    max-width: 420px;
+    min-height: 175px;
+    height: auto;
     box-sizing: border-box;
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.2s;
 }
 
 .user-app-card:hover {
@@ -312,10 +330,16 @@
     position: absolute;
     right: 15px;
     bottom: 15px;
-    background: none;
+    background-color: var(--neutral-black);
     border: none;
     cursor: pointer;
     transition: transform 0.2s;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .user-chat-btn:hover {
@@ -323,8 +347,10 @@
 }
 
 .user-chat-btn img {
-    width: 28px;
-    height: 28px;
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+    display: block;
 }
 
 /* Acciones rápidas para candidatos */
@@ -458,64 +484,136 @@
 
     /* Tarjetas de Trabajo */
     .job-card {
-        flex-direction: column;
-        width: 100%;
+        display: grid;
+        grid-template-columns: 80px minmax(0, 1fr);
+        grid-template-areas:
+            "img info"
+            "meta meta"
+            "footer footer";
+        width: auto;
+        max-width: 500px;
+        margin: 0 auto 15px auto;
         height: auto;
-        min-height: 420px;
-        /* Unified minimum height for smaller detail cards */
+        min-height: auto;
         padding: 15px;
         gap: 12px;
         align-items: flex-start;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
     .job-card-img {
-        width: 100%;
-        height: 150px;
+        grid-area: img;
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+    }
+
+    .job-card-info {
+        grid-area: info;
+        display: contents;
     }
 
     .job-card-header {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
         flex-direction: column;
         gap: 5px;
         padding-right: 0;
     }
 
+    .job-card-header h3 {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    .job-card-desc {
+        grid-column: 2;
+        grid-row: 1;
+        margin-top: 50px;
+        font-size: 0.8rem;
+    }
+
+    .job-card-meta {
+        grid-area: meta;
+        border-top: 1px solid var(--gray-1);
+        padding-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+    }
+
     .job-card-footer {
+        grid-area: footer;
         width: 100%;
-        justify-content: flex-start;
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 5px;
     }
 
     .job-card-pago {
-        text-align: left;
-        margin-top: 5px;
-        margin-right: 0;
+        text-align: right;
+        font-size: 1rem;
+        font-weight: bold;
     }
 
     /* Tarjetas de Usuario */
     .user-app-card {
-        flex-direction: column;
-        width: 100%;
+        display: grid;
+        grid-template-columns: 80px minmax(0, 1fr);
+        grid-template-areas:
+            "img info"
+            "actions actions";
+        width: auto;
+        max-width: 420px;
+        margin: 0 auto 15px auto;
         height: auto;
-        min-height: 400px;
-        /* Slightly smaller for user cards */
+        min-height: auto;
         padding: 15px;
         gap: 12px;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
     .user-app-img {
-        width: 100%;
-        height: 150px;
+        grid-area: img;
+        width: 80px;
+        height: 80px;
+    }
+
+    .user-app-info {
+        grid-area: info;
+        padding-top: 5px;
+    }
+
+    .user-app-name {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .user-app-task {
+        font-size: 0.8rem;
     }
 
     .user-app-actions {
-        top: auto;
-        bottom: 10px;
-        left: 10px;
-        right: auto;
+        grid-area: actions;
+        position: static;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--gray-1);
+        padding-top: 10px;
+    }
+
+    .user-app-actions div {
+        display: flex;
+        gap: 10px;
     }
 
     .user-chat-btn {
-        right: 10px;
-        bottom: 10px;
+        position: static;
     }
 
     .pagination {

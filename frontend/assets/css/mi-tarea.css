@@ -6,7 +6,7 @@
     padding: 0 20px;
     color: var(--neutral-black);
     width: 100%;
-    min-width: 900px;
+    min-width: 960px;
     max-width: 1000px;
 }
 
@@ -37,12 +37,12 @@
 
 .job-title {
     margin: 0 0 10px 0;
-    font-size: 32px;
+    font-size: 2rem;
     font-weight: bold;
 }
 
 .job-description {
-    font-size: 15px;
+    font-size: 0.95rem;
     line-height: 1.4;
     padding-bottom: 20px;
 }
@@ -77,7 +77,7 @@
 
 .job-stats-container {
     border-left: 3px solid var(--neutral-white);
-    padding: 15px 25px;
+    padding: 15px 0px 15px 25px;
     min-width: 300px;
     display: flex;
     flex-direction: column;
@@ -96,7 +96,6 @@
     gap: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     position: relative;
-    /* For absolutely positioning the edit icon */
 }
 
 .stat-label {
@@ -132,14 +131,14 @@
 .cat-title {
     color: var(--gray-3);
     margin: 0;
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
 .info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 120px;
     align-items: center;
 }
 
@@ -147,7 +146,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--gray-5);
 }
 
@@ -303,7 +302,6 @@
 
 .app-btn {
     padding: 10px;
-    /* More uniform square-ish padding for icons */
     border-radius: 10px;
     border: none;
     cursor: pointer;
@@ -315,7 +313,6 @@
     gap: 5px;
     transition: 0.2s;
     min-width: 44px;
-    /* Default size for icon buttons */
     min-height: 44px;
 }
 
@@ -359,7 +356,7 @@
     display: inline-block;
     padding: 6px 16px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     background: var(--gray-2);
@@ -403,9 +400,8 @@
     display: flex;
     justify-content: center;
     gap: 10px;
-    font-size: 40px;
+    font-size: 2.5rem;
     direction: rtl;
-    /* Para el hover right-to-left */
 }
 
 .star-rating .star {
@@ -418,12 +414,11 @@
 .star-rating .star:hover~.star,
 .star-rating .star.selected,
 .star-rating .star.selected~.star {
-    color: #FFD700;
-    /* Dorado */
+    color: var(--yellow-2);
 }
 
 .star-hint {
-    font-size: 14px;
+    font-size: 0.85rem;
     color: var(--gray-5);
     margin-top: 10px;
 }
