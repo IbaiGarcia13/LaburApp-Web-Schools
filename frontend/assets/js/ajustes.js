@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial, eliminarCuentaUsuario, eliminarMetodoPago } from './database.js';
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial, eliminarCuentaUsuario, eliminarMetodoPago, cancelarSuscripcionUsuario } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -61,20 +61,48 @@ document.addEventListener('DOMContentLoaded', () => {
                         const sTrabajador = perfil.id_suscripcion_trabajador || "ninguna";
                         const sCliente = perfil.id_suscripcion_cliente || "ninguna";
 
-                        let tHtml = `<strong>Suscripcion Trabajador:</strong> `;
-                        if (sTrabajador.toLowerCase() !== "ninguna") {
-                            tHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
-                        } else {
-                            tHtml += `Ninguna`;
+                        const workerSubRow = document.getElementById('workerSubRow');
+                        const clientSubRow = document.getElementById('clientSubRow');
+
+                        if (workerSubRow) {
+                            let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
+                            if (sTrabajador.toLowerCase() !== "ninguna") {
+                                workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
+                                workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
+                            } else {
+                                workerHtml += `Ninguna</p>`;
+                            }
+                            workerSubRow.innerHTML = workerHtml;
                         }
 
-                        let cHtml = `<strong>Suscripción Cliente:</strong> `;
-                        if (sCliente.toLowerCase() !== "ninguna") {
-                            cHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
-                        } else {
-                            cHtml += `Ninguna`;
+                        if (clientSubRow) {
+                            let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
+                            if (sCliente.toLowerCase() !== "ninguna") {
+                                clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
+                                clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
+                            } else {
+                                clientHtml += `Ninguna</p>`;
+                            }
+                            clientSubRow.innerHTML = clientHtml;
                         }
-                        subsBody.innerHTML = `<p>${tHtml}</p><p>${cHtml}</p>`;
+
+                        // Eventos para cancelar suscripción
+                        document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
+                            btn.onclick = async () => {
+                                const tipo = btn.dataset.tipo;
+                                const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`);
+                                if (!confirmCancel) return;
+
+                                try {
+                                    await cancelarSuscripcionUsuario(user.uid, tipo);
+                                    window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
+                                    location.reload();
+                                } catch (error) {
+                                    console.error("Error al cancelar:", error);
+                                    window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
+                                }
+                            };
+                        });
                     }
                 }
 
@@ -95,41 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- LÓGICA DE CERRAR SESIÓN ---
-    const btnLogout = document.getElementById("btnLogout");
-    if (btnLogout) {
-        btnLogout.addEventListener("click", () => {
-            showCustomConfirm(
-                "Cerrar Sesión",
-                "¿Estás seguro de que quieres cerrar sesión?",
-                () => {
-                    auth.signOut().then(() => window.location.href = "../index.html");
-                },
-                "Cerrar Sesión",
-                "Cancelar",
-                "delete",
-                true
-            );
-        });
-    }
+    // --- LÓGICA DE CERRAR SESIÓN (Manejada globalmente por general.js clase .logout-action) ---
+
 
     // --- LÓGICA PARA CAMBIAR LA CONTRASEÑA ---
     if (btnChangePass) {
         btnChangePass.addEventListener('click', (e) => {
             e.preventDefault();
-            showCustomPrompt(
-                "Cambiar Contraseña",
-                "Introduce tu nueva contraseña:",
-                (nuevaPass) => {
-                    if (nuevaPass && nuevaPass.trim() !== "") {
-                        showCustomAlert("Éxito", "Contraseña actualizada correctamente.");
-                        if (passLabel) passLabel.textContent = "*".repeat(nuevaPass.length);
-                    }
-                },
-                "Actualizar",
-                "Cancelar",
-                "password"
-            );
+            showChangePasswordModal((nuevaPass) => {
+                showCustomAlert("¡Éxito!", "Contraseña actualizada correctamente.");
+                if (passLabel) passLabel.textContent = " " + "*".repeat(nuevaPass.length);
+            });
         });
     }
 
@@ -338,21 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (historyContainer) {
                         const historial = await obtenerHistorialPagos(user.uid);
-                        if (historial.length > 0) {
-                            let html = '<div class="payment-history">';
-                            historial.forEach(p => {
-                                const fecha = p.fecha_emision?.toDate ? p.fecha_emision.toDate().toLocaleDateString() : "Reciente";
-                                html += `
-                                    <div class="payment-row" style="background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #f9fafb;">
-                                        <p><strong>Pago: ${p.monto}€</strong></p>
-                                        <p><strong>Fecha Emisión:</strong> ${fecha}</p>
-                                        <p><strong>Detalle:</strong> ${p.detalle_pago || 'Transacción de LaburApp'}</p>
-                                    </div>
-                                `;
-                            });
-                            html += '</div>';
-                            historyContainer.innerHTML = html;
-                        }
+                        renderHistorialPagos(historial, false);
                     }
                 } catch (e) {
                     console.error("Error al guardar método de pago:", e);
@@ -466,7 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 "Eliminar",
                 "Cancelar",
-                "delete"
+                "delete",
+                true
             );
         });
     }

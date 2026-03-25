@@ -186,6 +186,7 @@ export async function crearTrabajo(datosTrabajo) {
         latitud: datosTrabajo.latitud || 0,
         longitud: datosTrabajo.longitud || 0,
         fecha_publicacion: serverTimestamp(),
+        fecha_actividad: serverTimestamp(), // Seguimiento de actividad reciente
         // fecha_limite deberí­a venir como un objeto Date
         fecha_limite: datosTrabajo.fecha_limite,
         tiempo_estimado_horas: datosTrabajo.tiempo_estimado_horas || null,
@@ -196,7 +197,7 @@ export async function crearTrabajo(datosTrabajo) {
         id_categoria: datosTrabajo.id_categoria,
         id_publicador: user.uid,
         id_trabajador: null,
-        prioridad_suscripcion: esJefe ? 1 : 0,
+        prioridad_suscripcion: esJefe ? serverTimestamp() : 0,
         es_tarea_premium: esJefe ? true : false
     });
 
@@ -231,6 +232,9 @@ export async function actualizarTrabajo(idTrabajo, datosNuevos) {
             await crearNotificacion(trabajo.id_publicador, "Tarea en Curso", `El trabajador ha empezado el trabajo "${trabajo.titulo}".`, "tarea_empezada", { id_trabajo: idTrabajo });
         }
     }
+
+    // Siempre actualizar fecha_actividad en cualquier cambio
+    datosNuevos.fecha_actividad = serverTimestamp();
 
     await updateDoc(docRef, datosNuevos);
     return true;
@@ -405,7 +409,8 @@ export async function aceptarPostulacion(idTrabajo, uidTrabajador) {
         id_trabajador: uidTrabajador,
         estado: "Aceptada",
         pago_retenido: true,
-        fecha_aceptacion: serverTimestamp()
+        fecha_aceptacion: serverTimestamp(),
+        fecha_actividad: serverTimestamp()
     });
 
     // 1.1 Descontar saldo al publicador (Escrow)
@@ -445,7 +450,8 @@ export async function rechazarPostulacion(idTrabajo, uidTrabajador) {
     const trabajo = await obtenerTrabajoPorId(idTrabajo);
     const postRef = doc(db, "trabajos", idTrabajo, "postulaciones", uidTrabajador);
     await updateDoc(postRef, {
-        estado_postulacion: "Rechazada"
+        estado_postulacion: "Rechazada",
+        fecha_actividad: serverTimestamp()
     });
 
     // Notificar al trabajador
@@ -466,17 +472,20 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
     const trabajoSnap = await getDoc(trabajoRef);
     let idCategoria = "otros";
     let xpRecompensa = 0;
+    let tituloTrabajo = "Trabajo";
 
     if (trabajoSnap.exists()) {
         const data = trabajoSnap.data();
         idCategoria = data.id_categoria || data.categoria || "otros";
         xpRecompensa = data.xp_otorgada || Math.round((data.pago_cliente || 0) * 10);
+        tituloTrabajo = data.titulo || "Trabajo";
     }
 
     // 2. Cambiar el estado del trabajo a Completada y liberar retención
     await updateDoc(trabajoRef, {
         estado: "Completada",
         fecha_completada: serverTimestamp(),
+        fecha_actividad: serverTimestamp(),
         pago_retenido: false
     });
 
@@ -498,73 +507,27 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
         }
     }
 
-    const updateTrabajador = {
+    // 3. Aplicar XP y recompensas usando el nuevo helper
+    await aplicarXPTrabajador(uidTrabajador, xpRecompensa, idCategoria);
+
+    // 3.1 Sumar exactamente 1 punto a la categoría correspondiente (Contador de trabajos)
+    if (idCategoria && idCategoria !== "ninguna") {
+        await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);
+    }
+
+    // 4. Actualizar otros datos estadísticos y saldo
+    await updateDoc(trabajadorRef, {
         tareas_realizadas: increment(1),
-        experiencia_total: increment(xpRecompensa),
         saldo: increment(pagoFinalTrabajador),
         dinero_ganado_total: increment(pagoFinalTrabajador)
-    };
+    });
 
-    // Lógica de niveles
-    if (trabajadorSnap.exists()) {
-        const tData = trabajadorSnap.data();
-        let oldLvl = tData.nivel || 1;
-        let currentLvl = tData.nivel || 1;
-        let currentXP = tData.experiencia_nivel_actual || 0;
-        let newXP = currentXP + xpRecompensa;
-        let maxXP = 50 * (currentLvl + 1);
-
-        while (newXP >= maxXP) {
-            newXP -= maxXP;
-            currentLvl++;
-            maxXP = 50 * (currentLvl + 1);
-        }
-        updateTrabajador.nivel = currentLvl;
-        updateTrabajador.experiencia_nivel_actual = newXP;
-
-        if (currentLvl > oldLvl) {
-            await crearNotificacion(uidTrabajador, "¡Subida de Nivel!", `¡Enhorabuena! Has alcanzado el nivel ${currentLvl}.`, "nivel");
-        }
-    }
-
-    await updateDoc(trabajadorRef, updateTrabajador);
-
-    // Notificación de completada y pago
-    const tituloTarea = trabajoSnap.exists() ? trabajoSnap.data().titulo : "Trabajo";
-    await crearNotificacion(uidTrabajador, "Trabajo Completado", `Has finalizado "${tituloTarea}".`, "aceptado");
-    await crearNotificacion(uidTrabajador, "Pago Recibido", `Has recibido ${Number(pagoFinalTrabajador).toFixed(2)}€ por "${tituloTarea}".`, "pago");
-
-    // Lógica simple de nivel (opcional, si queremos que se guarde en DB)
-    if (trabajadorSnap.exists()) {
-        const tData = trabajadorSnap.data();
-        let oldLvl = tData.nivel || 1;
-        let currentLvl = tData.nivel || 1;
-        let currentXP = tData.experiencia_nivel_actual || 0;
-        let newXP = currentXP + xpRecompensa;
-        let maxXP = 50 * (currentLvl + 1);
-
-        while (newXP >= maxXP) {
-            newXP -= maxXP;
-            currentLvl++;
-            maxXP = 50 * (currentLvl + 1);
-        }
-
-        if (currentLvl > oldLvl) {
-            await crearNotificacion(uidTrabajador, "¡Subida de Nivel!", `¡Enhorabuena! Has alcanzado el nivel ${currentLvl}.`, "nivel");
-        }
-    }
-
-    // 4. Sumar 1 punto a la categoría correspondiente
-    await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);
+    // 4. Notificar completada y pago
+    await crearNotificacion(uidTrabajador, "Trabajo Completado", `Has finalizado "${tituloTrabajo}".`, "aceptado");
+    await crearNotificacion(uidTrabajador, "Pago Recibido", `Has recibido ${Number(pagoFinalTrabajador).toFixed(2)}€ por "${tituloTrabajo}".`, "pago");
 
     // 5. Registrar pagos en el historial
-    // Al publicador (empleador) YA se le descontó al aceptar la postulación (Escrow),
-    // así que NO lo volvemos a hacer aquí. Solo registramos la confirmación si queremos,
-    // pero para evitar saldos duplicados negativos, omitimos la deducción de saldo extra.
-
-    // Al trabajador le sale positivo
-    const titulo = data.titulo || "Trabajo";
-    await registrarPagoHistorial(uidTrabajador, "Saldo LaburApp", Math.abs(pagoT), `Cobro por trabajo: ${titulo}`);
+    await registrarPagoHistorial(uidTrabajador, "Saldo LaburApp", Math.abs(pagoFinalTrabajador), `Cobro por trabajo: ${tituloTrabajo}`);
 
     return true;
 }
@@ -592,9 +555,115 @@ export async function sumarPuntosCategoria(uid, idCategoria, puntosASumar) {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-        await updateDoc(docRef, { puntos: docSnap.data().puntos + puntosASumar });
+        await updateDoc(docRef, { puntos: increment(puntosASumar) });
     } else {
-        await setDoc(docRef, { puntos: puntosASumar });
+        await setDoc(docRef, {
+            puntos: puntosASumar,
+            fecha_creacion: serverTimestamp()
+        });
+    }
+
+    // Tras sumar puntos, recalculamos cuál es su especialidad principal
+    await recalcularEspecialidadPrincipal(uid);
+}
+
+/**
+ * Helper centralizado para aplicar XP (positivo o negativo) a un trabajador.
+ * Maneja: experiencia total, nivel, experiencia actual, puntos de categoría y especialidad principal.
+ */
+export async function aplicarXPTrabajador(uid, xpDelta, idCategoria) {
+    if (!uid || xpDelta === 0) return;
+
+    const trabajadorRef = doc(db, "usuarios", uid);
+    const trabajadorSnap = await getDoc(trabajadorRef);
+
+    if (!trabajadorSnap.exists()) return;
+
+    const tData = trabajadorSnap.data();
+    let oldLvl = tData.nivel || 1;
+    let currentLvl = tData.nivel || 1;
+    let currentXP = tData.experiencia_nivel_actual || 0;
+
+    // Calculamos el nuevo XP acumulado
+    let newXP = currentXP + xpDelta;
+    let maxXP = 100 + (currentLvl - 1) * 50;
+
+    // Lógica de SUBIDA de nivel
+    while (newXP >= maxXP) {
+        newXP -= maxXP;
+        currentLvl++;
+        maxXP = 100 + (currentLvl - 1) * 50;
+    }
+
+    // Lógica de BAJADA de nivel (opcional, pero para evitar XP negativo excesivo)
+    // Si newXP es negativo, intentamos bajar nivel o dejarlo en 0 del nivel actual
+    while (newXP < 0 && currentLvl > 1) {
+        currentLvl--;
+        maxXP = 100 + (currentLvl - 1) * 50;
+        newXP += maxXP;
+    }
+
+    // Suelo de seguridad (Nivel 1, 0 XP)
+    if (newXP < 0) newXP = 0;
+
+    const updateData = {
+        experiencia_total: increment(xpDelta),
+        nivel: currentLvl,
+        experiencia_nivel_actual: newXP
+    };
+
+    await updateDoc(trabajadorRef, updateData);
+
+    // Notificar si sube de nivel
+    if (currentLvl > oldLvl) {
+        await crearNotificacion(uid, "¡Subida de Nivel!", `¡Enhorabuena! Has alcanzado el nivel ${currentLvl}.`, "nivel");
+    }
+}
+
+/**
+ * Calcula la categoría con más puntos del usuario (y la más antigua en caso de empate)
+ * y actualiza el documento principal del usuario.
+ */
+export async function recalcularEspecialidadPrincipal(uid) {
+    try {
+        const ptsCat = await obtenerTodosPuntosCategorias(uid);
+        if (ptsCat.length === 0) return;
+
+        // Necesitamos las fechas de creación para desempatar, así que las obtenemos
+        const catDocs = [];
+        const q = query(collection(db, "usuarios", uid, "puntuaciones_categorias"));
+        const snapshot = await getDocs(q);
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            catDocs.push({
+                id_categoria: docSnap.id,
+                puntos: data.puntos || 0,
+                fecha_creacion: data.fecha_creacion?.toDate ? data.fecha_creacion.toDate() : (data.fecha_creacion || 0)
+            });
+        });
+
+        if (catDocs.length === 0) return;
+
+        // Ordenar: 1º Puntos (DESC), 2º Fecha (ASC - más antigua)
+        catDocs.sort((a, b) => {
+            if (b.puntos !== a.puntos) {
+                return b.puntos - a.puntos;
+            }
+            return a.fecha_creacion - b.fecha_creacion;
+        });
+
+        const mejorCat = catDocs[0];
+
+        // Actualizar el documento principal del usuario
+        const userRef = doc(db, "usuarios", uid);
+        await updateDoc(userRef, {
+            especialidad_principal: mejorCat.id_categoria,
+            puntos_especialidad: mejorCat.puntos
+        });
+
+    } catch (e) {
+        console.error("Error recalculando especialidad principal:", e);
     }
 }
 
@@ -644,6 +713,44 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
             valoracion_media: Number(newMedia.toFixed(2)),
             num_valoraciones: newCount
         });
+    }
+
+    // 3. Escalado de XP por valoración (Solo si el receptor es el trabajador del trabajo asociado)
+    try {
+        const trabajoRef = doc(db, "trabajos", idTrabajo);
+        const trabajoSnap = await getDoc(trabajoRef);
+
+        if (trabajoSnap.exists()) {
+            const tData = trabajoSnap.data();
+
+            // Verificamos: receptor es trabajador Y el XP no ha sido ajustado aún
+            if (tData.id_trabajador === uidReceptor && !tData.xp_ajustado_por_valoracion) {
+                const xpBase = tData.xp_otorgada || 0;
+
+                // Multiplicadores: 1=0.8, 2=0.9, 3=1.0, 4=1.1, 5=1.2
+                // Delta: 1=-0.2, 2=-0.1, 3=0, 4=+0.1, 5=+0.2
+                const multiMap = {
+                    1: -0.2,
+                    2: -0.1,
+                    3: 0,
+                    4: 0.1,
+                    5: 0.2
+                };
+
+                const deltaMod = multiMap[puntuacion] || 0;
+                const xpDelta = Math.round(xpBase * deltaMod);
+
+                if (xpDelta !== 0) {
+                    const idCat = tData.id_categoria || tData.categoria || "otros";
+                    await aplicarXPTrabajador(uidReceptor, xpDelta, idCat);
+                }
+
+                // Marcar como ajustado para evitar re-procesamiento
+                await updateDoc(trabajoRef, { xp_ajustado_por_valoracion: true });
+            }
+        }
+    } catch (e) {
+        console.error("Error aplicando escalado de XP por valoración:", e);
     }
 
     return true;
@@ -1262,6 +1369,10 @@ export async function cancelarTrabajo(idTrabajo) {
             console.error("Error en reembolso por cancelación:", e);
         }
     }
+
+    // Siempre actualizar fecha_actividad al cancelar
+    updateData.fecha_actividad = serverTimestamp();
+
     await updateDoc(trabajoRef, updateData);
 
     // 2. Notificar al trabajador si hay uno
@@ -1276,4 +1387,173 @@ export async function cancelarTrabajo(idTrabajo) {
     }
 
     return true;
+}
+
+/**
+ * ==========================================
+ * SISTEMA DE CONFIRMACIÓN DE TRABAJO
+ * ==========================================
+ */
+
+/**
+ * Obtiene trabajos que han pasado su fecha límite y requieren confirmación de alguna de las partes.
+ * Crucial para el flujo de "Has completado el trabajo?" tras el vencimiento.
+ */
+export async function obtenerTareasPendientesConfirmacion(uid) {
+    const ahora = new Date();
+
+    // Buscamos trabajos donde el usuario participe y estén activos
+    const q1 = query(collection(db, "trabajos"), where("id_publicador", "==", uid), where("estado", "in", ["Aceptada", "En curso"]));
+    const q2 = query(collection(db, "trabajos"), where("id_trabajador", "==", uid), where("estado", "in", ["Aceptada", "En curso"]));
+
+    const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+    const tareas = [];
+    const idsVistos = new Set();
+
+    const procesarSnap = (snap, esPublicador) => {
+        snap.forEach(docSnap => {
+            const data = docSnap.data();
+            const fechaLim = data.fecha_limite?.toDate ? data.fecha_limite.toDate() : (data.fecha_limite ? new Date(data.fecha_limite) : null);
+
+            // Si ha pasado la fecha límite y no hay resolución final
+            if (fechaLim && fechaLim < ahora && !data.resolucion_finalizada) {
+                const respuestaUsuario = esPublicador ? data.confirmacion_publicador : data.confirmacion_trabajador;
+
+                // Mostrar solo si no ha contestado 'si' o 'no' (el 'espera' permite volver a preguntar mañana)
+                if (!respuestaUsuario || respuestaUsuario === 'pendiente' || respuestaUsuario === 'espera') {
+                    if (!idsVistos.has(docSnap.id)) {
+                        idsVistos.add(docSnap.id);
+                        tareas.push({ id: docSnap.id, ...data, es_publicador: esPublicador });
+                    }
+                }
+            }
+        });
+    };
+
+    procesarSnap(snap1, true);
+    procesarSnap(snap2, false);
+
+    return tareas;
+}
+
+/**
+ * Registra la respuesta (si, no, espera) de un usuario para una tarea vencida.
+ */
+export async function registrarRespuestaConfirmacion(idTarea, uid, respuesta) {
+    const trabajoRef = doc(db, "trabajos", idTarea);
+    const snap = await getDoc(trabajoRef);
+    if (!snap.exists()) return;
+    const tarea = snap.data();
+
+    const esPublicador = tarea.id_publicador === uid;
+    const updateData = {
+        fecha_actividad: serverTimestamp()
+    };
+
+    if (esPublicador) {
+        updateData.confirmacion_publicador = respuesta;
+    } else {
+        updateData.confirmacion_trabajador = respuesta;
+    }
+
+    // Inicializar el periodo de 7 días si es la primera interacción tras el vencimiento
+    if (!tarea.fecha_inicio_disputa) {
+        updateData.fecha_inicio_disputa = serverTimestamp();
+    }
+
+    await updateDoc(trabajoRef, updateData);
+
+    // Intentar resolver automáticamente si es posible
+    await ejecutarResolucionTarea(idTarea);
+}
+
+/**
+ * Lógica central de resolución: decide si se paga, se reembolsa o se entra en disputa.
+ */
+export async function ejecutarResolucionTarea(idTarea) {
+    const trabajoRef = doc(db, "trabajos", idTarea);
+    const snap = await getDoc(trabajoRef);
+    if (!snap.exists()) return;
+    const tarea = snap.data();
+
+    if (tarea.resolucion_finalizada) return;
+
+    const resP = tarea.confirmacion_publicador || 'pendiente';
+    const resW = tarea.confirmacion_trabajador || 'pendiente';
+
+    const ahora = new Date();
+    const fechaLim = tarea.fecha_limite?.toDate ? tarea.fecha_limite.toDate() : (tarea.fecha_limite ? new Date(tarea.fecha_limite) : null);
+    if (!fechaLim) return;
+    const diasTranscurridos = (ahora - fechaLim) / (1000 * 60 * 60 * 24);
+
+    // A) COINCIDENCIA (Sí/Sí o No/No)
+    if (resP === 'si' && resW === 'si') {
+        await completarTrabajo(idTarea, tarea.id_trabajador);
+        await updateDoc(trabajoRef, { resolucion_finalizada: true });
+        return;
+    }
+    if (resP === 'no' && resW === 'no') {
+        await reembolsarTrabajo(idTarea);
+        await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+        return;
+    }
+
+    // B) CONTRADICCIÓN INMEDIATA (Investigación)
+    if ((resP === 'si' && resW === 'no') || (resP === 'no' && resW === 'si')) {
+        await updateDoc(trabajoRef, { estado: 'En disputa', resolucion_finalizada: true });
+        const msg = `Hay discrepancias en la confirmación de "${tarea.titulo}". Se ha abierto una investigación manual.`;
+        await crearNotificacion(tarea.id_publicador, "Investigación Abierta", msg, "info");
+        await crearNotificacion(tarea.id_trabajador, "Investigación Abierta", msg, "info");
+        return;
+    }
+
+    // C) EXPIRACIÓN (7 días)
+    if (diasTranscurridos >= 7) {
+        // Alguien respondió y el otro no (dar razón al que habló)
+        if ((resP === 'si' || resP === 'no') && (resW === 'pendiente' || resW === 'espera')) {
+            await reembolsarTrabajo(idTarea); // Publisher gana -> Reembolso
+            await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+        }
+        else if ((resW === 'si' || resW === 'no') && (resP === 'pendiente' || resP === 'espera')) {
+            if (resW === 'si') {
+                await completarTrabajo(idTarea, tarea.id_trabajador); // Worker gana -> Pago
+            } else {
+                await reembolsarTrabajo(idTarea); // Worker dice que NO -> Reembolso
+            }
+            await updateDoc(trabajoRef, { resolucion_finalizada: true });
+        }
+        else {
+            // Nadie respondió o ambos pulsaron espera -> Reembolso y borrar
+            await reembolsarTrabajo(idTarea);
+            await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+            // Intentar borrado permanente (gestionarBorradoTarea ya tiene lógica de >7 días)
+            await gestionarBorradoTarea(idTarea, 'publicador').catch(console.error);
+        }
+    }
+}
+
+/**
+ * Devuelve los fondos retenidos al publicador por una tarea no completada o cancelada.
+ */
+export async function reembolsarTrabajo(idTarea) {
+    const trabajoRef = doc(db, "trabajos", idTarea);
+    const snap = await getDoc(trabajoRef);
+    if (!snap.exists()) return;
+    const tarea = snap.data();
+
+    if (tarea.pago_retenido === true) {
+        const monto = Number(tarea.pago_cliente || 0);
+        const publicadorRef = doc(db, "usuarios", tarea.id_publicador);
+
+        await updateDoc(publicadorRef, { saldo: increment(monto) });
+        await registrarPagoHistorial(tarea.id_publicador, "Saldo LaburApp", monto, `Reembolso por resolución de tarea: ${tarea.titulo}`);
+        await updateDoc(trabajoRef, { pago_retenido: false });
+
+        await crearNotificacion(
+            tarea.id_publicador,
+            "Reembolso Procesado",
+            `Se te han devuelto ${monto.toFixed(2)}€ a tu saldo por la tarea "${tarea.titulo}".`,
+            "pago"
+        );
+    }
 }

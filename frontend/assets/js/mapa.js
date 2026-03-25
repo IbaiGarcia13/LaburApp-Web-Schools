@@ -33,6 +33,17 @@ if (mobileFilterBtn && filterPanel) {
         mobileFilterBtn.classList.toggle('active');
         mobileFilterBtn.style.opacity = '1';
     });
+
+    // Cerrar panel de filtros al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (filterPanel.classList.contains('show-mobile-filters') &&
+            !filterPanel.contains(e.target) &&
+            !mobileFilterBtn.contains(e.target)) {
+
+            filterPanel.classList.remove('show-mobile-filters');
+            mobileFilterBtn.classList.remove('active');
+        }
+    });
 }
 
 // Cargar trabajos cuando el usuario esté listo (para poder filtrar sus propios trabajos)

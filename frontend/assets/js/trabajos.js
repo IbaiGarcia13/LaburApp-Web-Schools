@@ -32,19 +32,18 @@ async function loadJobs() {
             rawJobs = rawJobs.filter(j => j.id_publicador !== user.uid);
         }
 
-        // Ordenamos: Primero los JEFE, luego por fecha (más reciente primero)
+        // Ordenamos: Primero por prioridad de suscripción (actividad reciente), luego por fecha de publicación
         allJobs = rawJobs.sort((a, b) => {
-            const hasPrioA = (a.prioridad_suscripcion || 0) !== 0;
-            const hasPrioB = (b.prioridad_suscripcion || 0) !== 0;
+            const prioA = a.prioridad_suscripcion?.toMillis ? a.prioridad_suscripcion.toMillis() : (Number(a.prioridad_suscripcion) || 0);
+            const prioB = b.prioridad_suscripcion?.toMillis ? b.prioridad_suscripcion.toMillis() : (Number(b.prioridad_suscripcion) || 0);
 
-            if (hasPrioA !== hasPrioB) {
-                // Si uno es JEFE y el otro no, el JEFE va primero
-                return hasPrioA ? -1 : 1;
+            if (prioB !== prioA) {
+                return prioB - prioA;
             }
 
-            // Si ambos son JEFE o ninguno lo es, ordenamos por fecha de publicación
-            const dateA = a.fecha_publicacion?.toDate ? a.fecha_publicacion.toDate() : (a.fecha_publicacion || 0);
-            const dateB = b.fecha_publicacion?.toDate ? b.fecha_publicacion.toDate() : (b.fecha_publicacion || 0);
+            // Si ambos coinciden (p.ej. ambos 0), se ordena por fecha de publicación (más reciente primero)
+            const dateA = a.fecha_publicacion?.toMillis ? a.fecha_publicacion.toMillis() : (a.fecha_publicacion || 0);
+            const dateB = b.fecha_publicacion?.toMillis ? b.fecha_publicacion.toMillis() : (b.fecha_publicacion || 0);
 
             return dateB - dateA;
         });
@@ -115,11 +114,11 @@ function displayJobs() {
                     </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción"}</p>
                     <div class="job-details">
-                        <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "Ubicación no especificada"}</p>
-                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</p>
-                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${getStandardName(job.id_categoria)}</p>
-                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: ${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""> <strong> ${Number(job.pago_cliente).toFixed(2)} €</strong></p>
+                        <span><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "Ubicación no especificada"}</span>
+                        <span><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</span>
+                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${getStandardName(job.id_categoria)}</span>
+                        <span><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</strong></span>
+                        <span><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""> <strong> ${Number(job.pago_cliente).toFixed(2)} €</strong></span>
                     </div>
                 </div>
             </article>`;
@@ -229,6 +228,17 @@ if (mobileFilterBtn && sidebar) {
         sidebar.classList.toggle('show-mobile-filters');
         mobileFilterBtn.classList.toggle('active');
         mobileFilterBtn.style.opacity = '1';
+    });
+
+    // Cerrar filtros al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('show-mobile-filters') &&
+            !sidebar.contains(e.target) &&
+            !mobileFilterBtn.contains(e.target)) {
+
+            sidebar.classList.remove('show-mobile-filters');
+            mobileFilterBtn.classList.remove('active');
+        }
     });
 }
 

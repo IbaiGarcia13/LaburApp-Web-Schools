@@ -1,10 +1,11 @@
 import { auth, db } from './firebase-config.js';
 import {
     obtenerPerfilUsuario,
-    obtenerNotificaciones,
     marcarNotificacionesComoLeidas,
     eliminarNotificacion,
-    actualizarActividadSuscripcion
+    actualizarActividadSuscripcion,
+    obtenerTareasPendientesConfirmacion,
+    registrarRespuestaConfirmacion
 } from './database.js';
 import { onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -48,8 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Actualizar nombre y email
                 const dropdownName = document.querySelector('.dropdown-name');
                 const dropdownEmail = document.querySelector('.dropdown-email');
-                if (dropdownName) dropdownName.innerText = (perfil.nombre || "Usuario").split(' ')[0];
                 if (dropdownEmail) dropdownEmail.innerText = user.email;
+
+                // --- NUEVO: Chequeo de tareas vencidas que requieren confirmación ---
+                checkExpiredTasks(user.uid);
             }
         }
     });
@@ -162,12 +165,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const sideMenuFooter = document.querySelector('.side-menu-footer');
     if (sideMenuFooter) {
         sideMenuFooter.addEventListener('click', (e) => {
-            // Buscamos el enlace dentro para saber a dónde redirigir
             const link = sideMenuFooter.querySelector('a');
             const href = link ? link.getAttribute('href') : (window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html');
             procesarCerrarSesion(href);
         });
     }
+
+    // 3. Caja completa del Dropdown Footer (especialmente para móvil donde el texto está oculto)
+    const dropdownFooter = document.querySelector('.profile-dropdown .dropdown-footer');
+    if (dropdownFooter) {
+        dropdownFooter.addEventListener('click', (e) => {
+            const link = dropdownFooter.querySelector('a');
+            if (link) {
+                procesarCerrarSesion(link.getAttribute('href'));
+            }
+        });
+    }
+
+    // 4. Botones de Logout generales en tarjetas (clase .logout-action)
+    document.querySelectorAll('.logout-action').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const link = btn.querySelector('a');
+            const href = link ? link.getAttribute('href') : (window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html');
+            procesarCerrarSesion(href);
+        });
+    });
 
     // --- LÓGICA DE NOTIFICACIONES ---
     injectNotificationsHtml();
@@ -457,7 +480,7 @@ function injectModalHtml() {
 }
 
 // Función para mostrar una alerta genérica con 1 solo botón
-window.showCustomAlert = function (title, message, btnText = "Aceptar") {
+window.showCustomAlert = function (title, message, btnText = "Aceptar", onClose = null) {
     const modal = injectModalHtml();
     document.getElementById('global-modal-title').innerText = title;
 
@@ -472,6 +495,7 @@ window.showCustomAlert = function (title, message, btnText = "Aceptar") {
 
     document.getElementById('global-modal-ok').onclick = () => {
         modal.classList.add('hidden');
+        if (typeof onClose === 'function') onClose();
     };
 };
 
@@ -563,4 +587,152 @@ function setupNotificationBadgeListener(uid) {
             badge.classList.add('hidden');
         }
     });
+}
+
+// Función específica para el cambio de contraseña con doble campo e iconos de ojo
+window.showChangePasswordModal = function (onConfirm) {
+    const modal = injectModalHtml();
+    document.getElementById('global-modal-title').innerText = "Cambiar Contraseña";
+
+    const msgEl = document.getElementById('global-modal-message');
+    msgEl.innerHTML = `
+        <div class="password-modal-container">
+            <p style="margin-bottom: 20px; text-align: left; color: var(--gray-5);">Gestiona tu seguridad con una nueva clave.</p>
+            
+            <div class="modal-input-group">
+                <label>Nueva Contraseña:</label>
+                <div class="modal-pass-wrapper">
+                    <input type="password" id="passNew" class="modal-input-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                    <button type="button" class="eye-toggle" data-target="passNew">
+                        <img src="${getIconPath('icono-ojo-si.png')}" alt="Ver">
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-input-group" style="margin-top: 20px;">
+                <label>Repetir Contraseña:</label>
+                <div class="modal-pass-wrapper">
+                    <input type="password" id="passRepeat" class="modal-input-pass" placeholder="Repite la clave" autocomplete="new-password">
+                    <button type="button" class="eye-toggle" data-target="passRepeat">
+                        <img src="${getIconPath('icono-ojo-si.png')}" alt="Ver">
+                    </button>
+                </div>
+            </div>
+            <p id="modalPassError" style="color: var(--red-2); font-size: 13px; margin-top: 10px; display: none; text-align: left;"></p>
+        </div>
+    `;
+
+    const btnContainer = document.getElementById('global-modal-buttons');
+    btnContainer.innerHTML = `
+        <button class="modal-btn cancel" id="global-modal-cancel">Cancelar</button>
+        <button class="modal-btn confirm" id="global-modal-confirm">Actualizar</button>
+    `;
+
+    modal.classList.remove('hidden');
+
+    // Toggle eye icons
+    modal.querySelectorAll('.eye-toggle').forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const img = btn.querySelector('img');
+            if (input.type === 'password') {
+                input.type = 'text';
+                img.src = getIconPath('icono-ojo-no.png');
+            } else {
+                input.type = 'password';
+                img.src = getIconPath('icono-ojo-si.png');
+            }
+        };
+    });
+
+    document.getElementById('global-modal-cancel').onclick = () => modal.classList.add('hidden');
+
+    document.getElementById('global-modal-confirm').onclick = () => {
+        const p1 = document.getElementById('passNew').value.trim();
+        const p2 = document.getElementById('passRepeat').value.trim();
+        const err = document.getElementById('modalPassError');
+
+        if (p1.length < 6) {
+            err.textContent = "La contraseña debe tener al menos 6 caracteres.";
+            err.style.display = "block";
+            return;
+        }
+        if (p1 !== p2) {
+            err.textContent = "Las contraseñas no coinciden.";
+            err.style.display = "block";
+            return;
+        }
+
+        modal.classList.add('hidden');
+        if (typeof onConfirm === 'function') onConfirm(p1);
+    };
+
+    function getIconPath(name) {
+        const isPage = window.location.pathname.includes('/pages/');
+        return isPage ? `../assets/img/icons/${name}` : `assets/img/icons/${name}`;
+    }
+};
+
+/**
+ * --- LÓGICA DE CONFIRMACIÓN DE TAREAS VENCIDAS ---
+ */
+
+async function checkExpiredTasks(uid) {
+    try {
+        const tareas = await obtenerTareasPendientesConfirmacion(uid);
+        if (tareas.length > 0) {
+            // Mostramos el modal para la primera tarea que necesite atención
+            showMandatoryCompletionModal(tareas[0]);
+        }
+    } catch (e) {
+        console.error("Error al comprobar tareas vencidas:", e);
+    }
+}
+
+function showMandatoryCompletionModal(tarea) {
+    const isPublicador = tarea.es_publicador;
+    const title = "Confirmación Obligatoria";
+    const question = isPublicador
+        ? `¿El trabajador ha completado el trabajo "${tarea.titulo}"?`
+        : `¿Has completado el trabajo "${tarea.titulo}"?`;
+
+    const modal = injectModalHtml();
+
+    // Configurar contenido
+    document.getElementById('global-modal-title').innerText = title;
+    const msgEl = document.getElementById('global-modal-message');
+    msgEl.innerText = question;
+    msgEl.style.textAlign = 'center';
+    msgEl.style.fontWeight = '600';
+
+    const btnContainer = document.getElementById('global-modal-buttons');
+    btnContainer.innerHTML = `
+        <button class="modal-btn confirm" id="modal-resp-si" style="flex: 1;">Sí</button>
+        <button class="modal-btn cancel" id="modal-resp-no" style="flex: 1;">No</button>
+        <button class="modal-btn" id="modal-resp-espera" style="flex: 1; background: var(--gray-3); color: white;">Espera</button>
+    `;
+
+    // Mostrar modal
+    modal.classList.remove('hidden');
+
+    const responder = async (respuesta) => {
+        try {
+            await registrarRespuestaConfirmacion(tarea.id, auth.currentUser.uid, respuesta);
+            modal.classList.add('hidden');
+
+            // Si hay más tareas, el siguiente recargo las mostrará.
+            if (respuesta === 'si' || respuesta === 'no') {
+                showCustomAlert("Respuesta Registrada", "Gracias por tu respuesta. Se procesará la resolución adecuada.");
+            }
+        } catch (e) {
+            console.error("Error al registrar respuesta:", e);
+            showCustomAlert("Error", "No se pudo registrar tu respuesta. Inténtalo de nuevo.");
+        }
+    };
+
+    document.getElementById('modal-resp-si').onclick = () => responder('si');
+    document.getElementById('modal-resp-no').onclick = () => responder('no');
+    document.getElementById('modal-resp-espera').onclick = () => responder('espera');
 }

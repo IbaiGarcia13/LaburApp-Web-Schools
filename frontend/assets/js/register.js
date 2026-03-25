@@ -194,13 +194,10 @@ if (formRegister) {
             });
 
             // 4.3. Éxito
-            successMsg.textContent = "¡Registro exitoso! Redirigiendo al login...";
             formRegister.reset(); // Limpiar el formulario
-
-            // Redirigir al login en 2 segundos
-            setTimeout(() => {
+            showCustomAlert("¡Registro exitoso!", "Tu cuenta ha sido creada. Pulsa aceptar para ir al login.", "Aceptar", () => {
                 window.location.href = "../index.html";
-            }, 2000);
+            });
 
         } catch (error) {
             console.error("Error al registrar:", error);

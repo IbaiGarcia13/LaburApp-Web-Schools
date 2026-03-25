@@ -1,4 +1,5 @@
-import { auth } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
+import { collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { obtenerUsuarioPorId, obtenerTodosPuntosCategorias, obtenerValoracionesRecibidas } from './database.js';
 
 // Lógica cargada al visualizar el perfil de un usuario externo
@@ -32,7 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadUserData(uid) {
         try {
             const user = await obtenerUsuarioPorId(uid);
-            const ptsCat = await obtenerTodosPuntosCategorias(uid);
+
+            // Obtenemos los puntos con sus metadatos (fechas) para desempatar
+            const q = query(collection(db, "usuarios", uid, "puntuaciones_categorias"));
+            const snapshot = await getDocs(q);
+            const ptsCat = [];
+            snapshot.forEach(docSnap => {
+                ptsCat.push({
+                    id_categoria: docSnap.id,
+                    puntos: docSnap.data().puntos || 0,
+                    fecha_creacion: docSnap.data().fecha_creacion?.toDate ? docSnap.data().fecha_creacion.toDate() : (docSnap.data().fecha_creacion || 0)
+                });
+            });
+
             const valoraciones = await obtenerValoracionesRecibidas(uid);
 
             if (user) {
@@ -67,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Stats
         const nLvl = user.nivel || 1;
         const xpActual = user.experiencia_nivel_actual || 0;
-        const maxXP = (nLvl + 1) * 100;
+        const maxXP = 100 + (nLvl - 1) * 50;
 
         document.querySelector('.lvl-val').textContent = nLvl;
         const xpBars = document.querySelectorAll('.xp-header span');
@@ -86,10 +99,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let maxPts = -1;
             let bestCatId = null;
+            let oldestDate = Infinity;
+
             ptsCat.forEach(c => {
                 if (c.puntos > maxPts) {
                     maxPts = c.puntos;
                     bestCatId = c.id_categoria;
+                    oldestDate = c.fecha_creacion;
+                } else if (c.puntos === maxPts && c.puntos > 0) {
+                    // Desempate por antigüedad
+                    if (c.fecha_creacion < oldestDate) {
+                        bestCatId = c.id_categoria;
+                        oldestDate = c.fecha_creacion;
+                    }
                 }
             });
 

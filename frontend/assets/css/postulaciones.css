@@ -325,7 +325,8 @@
     text-decoration: underline;
 }
 
-/* Botón de chat */
+/* Botón de chat: su posición absoluta se hereda de la tarjeta, 
+   pero ahora es relativo a .user-app-actions en el DOM */
 .user-chat-btn {
     position: absolute;
     right: 15px;
@@ -340,6 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10;
 }
 
 .user-chat-btn:hover {
@@ -353,19 +355,37 @@
     display: block;
 }
 
-/* Acciones rápidas para candidatos */
+/* Acciones rápidas para candidatos: 
+   Ahora contiene tanto los botones de aceptar/rechazar como el chat */
 .user-app-actions {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+    pointer-events: none;
+    /* No bloquea clics en la tarjeta */
+}
+
+.user-app-actions * {
+    pointer-events: auto;
+    /* Los botones sí reciben clics */
+}
+
+.btn-group-left {
     position: absolute;
     bottom: 17.5px;
     left: 170px;
     display: flex;
     gap: 8px;
-    z-index: 10;
     cursor: pointer;
     transition: transform 0.2s;
 }
 
-.user-app-actions:hover {
+.btn-group-left:hover {
     transform: scale(1.1);
 }
 
@@ -459,161 +479,240 @@
     }
 
     .postulaciones-layout {
-        flex-direction: column;
-        gap: 20px;
+        flex-direction: row;
+        gap: 10px;
     }
 
     .col-usuarios {
-        flex: none;
-        width: 100%;
+        flex: 1;
+        width: 50%;
+        min-width: 0;
     }
 
     .col-trabajos {
-        width: 100%;
+        flex: 1;
+        width: 50%;
+        min-width: 0;
     }
 
     .col-divider {
-        display: none;
-        /* Ocultamos el divisor en móvil */
+        display: block;
+        width: 1px;
+        background-color: var(--gray-2);
+        min-height: auto;
     }
 
     .col-header {
-        font-size: 0.9rem;
-        margin-bottom: 15px;
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
     }
 
-    /* Tarjetas de Trabajo */
     .job-card {
-        display: grid;
-        grid-template-columns: 80px minmax(0, 1fr);
-        grid-template-areas:
-            "img info"
-            "meta meta"
-            "footer footer";
-        width: auto;
-        max-width: 500px;
-        margin: 0 auto 15px auto;
-        height: auto;
-        min-height: auto;
-        padding: 15px;
-        gap: 12px;
-        align-items: flex-start;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        height: 250px !important;
+        gap: 5px !important;
+        padding: 10px !important;
         box-sizing: border-box;
         overflow: hidden;
     }
 
     .job-card-img {
-        grid-area: img;
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
+        width: 70px;
+        height: 70px;
+        border-radius: 6px;
+        margin: 0 auto;
     }
 
     .job-card-info {
-        grid-area: info;
-        display: contents;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
     }
 
     .job-card-header {
-        grid-column: 2;
-        grid-row: 1;
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 5px;
-        padding-right: 0;
+        margin-bottom: 2px;
+        width: 100%;
+        padding: 0;
     }
 
     .job-card-header h3 {
-        font-size: 1rem;
+        font-size: 0.9rem;
         margin-bottom: 0;
     }
 
     .job-card-desc {
-        grid-column: 2;
-        grid-row: 1;
-        margin-top: 50px;
-        font-size: 0.8rem;
+        display: none;
+    }
+
+    .status-badge {
+        font-size: 0.6rem;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 5px;
+        margin-right: 0px !important;
+        margin-bottom: 5px !important;
     }
 
     .job-card-meta {
-        grid-area: meta;
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        gap: 4px;
+        width: 100%;
         border-top: 1px solid var(--gray-1);
-        padding-top: 10px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5px;
+        padding-top: 8px;
+        font-size: 0.7rem;
     }
 
     .job-card-footer {
-        grid-area: footer;
-        width: 100%;
         display: flex;
-        justify-content: flex-end;
+        justify-content: center;
+        width: 100%;
+        margin-top: auto !important;
         padding-top: 5px;
     }
 
     .job-card-pago {
-        text-align: right;
-        font-size: 1rem;
+        text-align: center;
+        font-size: 0.95rem;
         font-weight: bold;
+        margin: 0;
     }
 
     /* Tarjetas de Usuario */
     .user-app-card {
-        display: grid;
-        grid-template-columns: 80px minmax(0, 1fr);
-        grid-template-areas:
-            "img info"
-            "actions actions";
-        width: auto;
-        max-width: 420px;
-        margin: 0 auto 15px auto;
-        height: auto;
-        min-height: auto;
-        padding: 15px;
-        gap: 12px;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        height: 250px !important;
+        width: 100% !important;
+        margin: 0 auto 10px auto;
+        padding: 10px 10px 0 10px !important;
+        gap: 8px !important;
         box-sizing: border-box;
-        overflow: hidden;
+        position: relative;
     }
 
     .user-app-img {
-        grid-area: img;
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
+        margin: 0 auto;
+        border-radius: 6px;
     }
 
     .user-app-info {
-        grid-area: info;
-        padding-top: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        padding: 0;
     }
 
     .user-app-name {
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-bottom: 2px;
     }
 
     .user-app-task {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+        margin-bottom: 5px;
+        margin-top: 10px;
+    }
+
+    .job-card .action-buttons {
+        position: absolute !important;
+        top: 10px !important;
+        right: 10px !important;
+        width: auto !important;
+        display: block !important;
+        z-index: 10 !important;
     }
 
     .user-app-actions {
-        grid-area: actions;
-        position: static;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        position: static !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
         border-top: 1px solid var(--gray-1);
-        padding-top: 10px;
+        padding: 8px 5px !important;
+        /* Reducido vertical */
+        margin-top: auto !important;
+        /* El truco del margin-top auto */
+        margin-bottom: 0 !important;
+        min-height: auto !important;
+        /* Quitamos altura mínima */
+        box-sizing: border-box;
+        background: var(--neutral-white);
+        /* Para que no se vea nada detrás si hay scroll */
     }
 
-    .user-app-actions div {
-        display: flex;
-        gap: 10px;
+    .btn-group-left {
+        display: flex !important;
+        gap: 8px !important;
+        align-items: center !important;
+        margin: 0 !important;
+        position: static !important;
+        transform: none !important;
+    }
+
+    .btn-accept-small,
+    .btn-reject-small,
+    .user-chat-btn,
+    .delete-btn {
+        margin: 0 !important;
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 5px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .btn-accept-small img,
+    .btn-reject-small img {
+        width: 15px !important;
+        height: 15px !important;
+    }
+
+    .delete-btn img {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .user-chat-btn img {
+        width: 18px !important;
+        height: 18px !important;
     }
 
     .user-chat-btn {
-        position: static;
+        background-color: var(--neutral-black) !important;
+        margin: 0 !important;
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+    }
+
+    .btn-accept-small {
+        background-color: var(--green-1) !important;
+    }
+
+    .btn-reject-small {
+        background-color: var(--red-2) !important;
     }
 
     .pagination {

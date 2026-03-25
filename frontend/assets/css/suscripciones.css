@@ -41,7 +41,8 @@
     justify-content: flex-start;
     transition: transform 0.3s ease;
     position: relative;
-    cursor: pointer;;
+    cursor: pointer;
+    ;
 
 }
 
@@ -174,30 +175,31 @@
 
 /* CANCELAR SUSCRIPCIÓN EN CARD */
 .cancel-placeholder {
-    margin-top: 5px;
+    margin-top: 10px;
     text-align: center;
     width: 100%;
-    margin-bottom: -20px;
 }
 
 .btn-cancel-sub {
-    background: none;
+    background: var(--red-1);
     border: none;
-    color: var(--gray-8);
+    color: var(--neutral-white);
     cursor: pointer;
-    font-weight: 500;
+    font-weight: bold;
     font-family: inherit;
-    font-size: 0.85rem;
-    padding: 5px;
+    font-size: 0.9rem;
+    padding: 8px 18px;
+    border-radius: 20px;
     transition: 0.2s;
-    margin-bottom: 0px;
     text-align: center;
+    box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
 }
 
 .btn-cancel-sub:hover {
-    color: var(--red-2);
+    color: var(--neutral-white);
+    background: var(--red-2);
     transform: scale(1.05);
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .hidden {
@@ -236,7 +238,8 @@
         max-width: 350px;
         height: auto;
         padding: 30px 20px;
-        padding-bottom: 120px;
+        padding-bottom: 30px;
+        /* Reducido ya que card-bottom será static */
     }
 
     .sub-card h3 {
@@ -249,11 +252,42 @@
     }
 
     .card-bottom {
-        bottom: 20px;
+        position: static !important;
+        margin-top: 30px !important;
     }
 
     .price-val {
         font-size: 2.5rem !important;
+    }
+
+    /* Cancelar suscripción responsive: "X" arriba a la derecha */
+    .cancel-placeholder {
+        position: absolute !important;
+        top: 15px !important;
+        right: 15px !important;
+        width: auto !important;
+        margin: 0 !important;
+        z-index: 10 !important;
+    }
+
+    .btn-cancel-sub {
+        font-size: 0 !important;
+        /* Oculta el texto */
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background-color: var(--red-1) !important;
+        background-image: url('../img/icons/icono-no-blanco.png') !important;
+        background-size: 14px 14px !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+        display: block !important;
+    }
+
+    .btn-cancel-sub::after {
+        display: none !important;
     }
 
     .ad-placeholder {

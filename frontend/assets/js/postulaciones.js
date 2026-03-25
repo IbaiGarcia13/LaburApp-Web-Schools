@@ -10,7 +10,7 @@ import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsua
 // Variables de estado
 let misPostulaciones = [];
 let postulantesParaMisTareas = [];
-const ITEMS_PER_PAGE = 5;
+let itemsPerPage = window.innerWidth <= 768 ? 3 : 5;
 let currentPage = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,6 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     setupPaginationEvents();
+
+    // Escuchar cambios de tamaño de ventana para ajustar la paginación dinámicamente
+    window.addEventListener('resize', () => {
+        const newItemsPerPage = window.innerWidth <= 768 ? 3 : 5;
+        if (newItemsPerPage !== itemsPerPage) {
+            itemsPerPage = newItemsPerPage;
+            currentPage = 1; // Reiniciar a la primera página para evitar errores de índice
+            renderTrabajos();
+        }
+    });
 });
 
 async function loadAllData(uid) {
@@ -60,9 +70,9 @@ function renderTrabajos() {
     if (!container) return;
     container.innerHTML = '';
 
-    const totalPages = Math.ceil(misPostulaciones.length / ITEMS_PER_PAGE) || 1;
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
+    const totalPages = Math.ceil(misPostulaciones.length / itemsPerPage) || 1;
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
     const items = misPostulaciones.slice(start, end);
 
     if (items.length === 0) {
@@ -93,7 +103,12 @@ function renderTrabajos() {
         const estadoText = estadoRaw.toUpperCase();
         const xp = trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10);
         const img = trabajo.foto_trabajo || "../assets/img/trabajo-defecto.png";
-        const categoriaNom = catInfo[trabajo.id_categoria] || "General";
+
+        let categoriaNom = catInfo[trabajo.id_categoria] || trabajo.id_categoria || trabajo.categoria || "General";
+        // Si es un ID de categoría, lo ponemos bonito si no estaba en el mapa (opcional, pero mejor prevenir)
+        if (categoriaNom && categoriaNom.length > 2 && !catInfo[trabajo.id_categoria]) {
+            categoriaNom = categoriaNom.charAt(0).toUpperCase() + categoriaNom.slice(1).replace('_', ' ');
+        }
 
         // Logic for red dot notification
         // We store the last seen status in localStorage to know if it has changed
@@ -130,7 +145,7 @@ function renderTrabajos() {
                 <div class="job-card-meta">
                     <span><img src="../assets/img/icons/icono-ubicacion.png" alt=""> ${trabajo.direccion || "No especificada"}</span>
                     <span><img src="../assets/img/icons/icono-relog.png" alt=""> Tiempo estimado: ${trabajo.tiempo_estimado_horas}h</span>
-                    <span><img src="../assets/img/icons/icono-categoria.png" alt=""> Categoría: ${categoriaNom}</span>
+                    <span><img src="../assets/img/icons/icono-categoria.png" alt=""> Categoría: ${categoriaNom || "General"}</span>
                     <span><img src="../assets/img/icons/icono-xp.png" alt=""> Experiencia: <strong>${xp} XP</strong></span>
                 </div>
                 <div class="job-card-footer">
@@ -179,16 +194,18 @@ async function renderUsuarios() {
                 </p>
             </div>
             <div class="user-app-actions">
-                <button class="action-btn btn-accept-small" title="Aceptar Candidato">
-                    <img src="../assets/img/icons/icono-si-blanco.png" alt="Aceptar">
-                </button>
-                <button class="action-btn btn-reject-small" title="Rechazar Candidato">
-                    <img src="../assets/img/icons/icono-no-blanco.png" alt="Rechazar">
+                <div class="btn-group-left">
+                    <button class="action-btn btn-accept-small" title="Aceptar Candidato">
+                        <img src="../assets/img/icons/icono-si-blanco.png" alt="Aceptar">
+                    </button>
+                    <button class="action-btn btn-reject-small" title="Rechazar Candidato">
+                        <img src="../assets/img/icons/icono-no-blanco.png" alt="Rechazar">
+                    </button>
+                </div>
+                <button class="user-chat-btn" title="Chatear con ${user.nombre}">
+                    <img src="../assets/img/icons/icono-chat-2.png" alt="Chat">
                 </button>
             </div>
-            <button class="user-chat-btn" title="Chatear con ${user.nombre}">
-                <img src="../assets/img/icons/icono-chat-2.png" alt="Chat">
-            </button>
         `;
         container.appendChild(card);
 
@@ -294,7 +311,7 @@ function setupPaginationEvents() {
     });
 
     document.getElementById('next-page').addEventListener('click', () => {
-        const totalPages = Math.ceil(misPostulaciones.length / ITEMS_PER_PAGE) || 1;
+        const totalPages = Math.ceil(misPostulaciones.length / itemsPerPage) || 1;
         if (currentPage < totalPages) {
             currentPage++;
             renderTrabajos();

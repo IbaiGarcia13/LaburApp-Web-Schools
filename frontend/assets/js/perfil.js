@@ -1,5 +1,6 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias } from './database.js';
+import { collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cancelarSuscripcionUsuario } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,6 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClose = document.getElementById('modal-btn cancel');
     const btnSave = document.getElementById('modal-btn confirm');
 
+    // Referencias Direct Upload Foto
+    const avatarEditBtn = document.getElementById('avatarEditBtn');
+    const inputPhotoDirect = document.getElementById('inputPhotoDirect');
+
     const catInfo = {
         'carpinteria': { nombre: 'Carpintería', color: 'cat-dot-carpinteria' },
         'construccion': { nombre: 'Construcción/Reforma', color: 'cat-dot-construccion' },
@@ -67,7 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const perfil = await obtenerPerfilUsuario(user.uid);
-                const ptsCat = await obtenerTodosPuntosCategorias(user.uid);
+                // Obtenemos los puntos con sus metadatos (fechas) para desempatar
+                const q = query(collection(db, "usuarios", user.uid, "puntuaciones_categorias"));
+                const snapshot = await getDocs(q);
+                const ptsCat = [];
+                snapshot.forEach(docSnap => {
+                    ptsCat.push({
+                        id_categoria: docSnap.id,
+                        puntos: docSnap.data().puntos || 0,
+                        fecha_creacion: docSnap.data().fecha_creacion?.toDate ? docSnap.data().fecha_creacion.toDate() : (docSnap.data().fecha_creacion || 0)
+                    });
+                });
 
                 if (perfil) {
                     // Cadenas principales
@@ -86,8 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // --- 1. LÓGICA DE NIVEL Y BARRA DE XP ---
                     const nLvl = perfil.nivel || 1;
                     const xpActual = perfil.experiencia_nivel_actual || 0;
-                    // Nueva fórmula acumulativa: Incremento = 100 + (nivel - 1) * 50 = 50 * (nivel + 1)
-                    const maxXP = 50 * (nLvl + 1);
+                    const maxXP = 100 + (nLvl - 1) * 50;
 
                     if (lvlVal) lvlVal.textContent = nLvl;
                     if (lvlBars.length >= 3) {
@@ -108,10 +122,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         let maxPts = -1;
                         let bestCat = null;
+                        let oldestDate = Infinity;
+
                         for (let c of ptsCat) {
                             if (c.puntos > maxPts) {
                                 maxPts = c.puntos;
                                 bestCat = c.id_categoria;
+                                oldestDate = c.fecha_creacion;
+                            } else if (c.puntos === maxPts && c.puntos > 0) {
+                                // Desempate por antigüedad
+                                if (c.fecha_creacion < oldestDate) {
+                                    bestCat = c.id_categoria;
+                                    oldestDate = c.fecha_creacion;
+                                }
                             }
                         }
 
@@ -149,21 +172,48 @@ document.addEventListener('DOMContentLoaded', () => {
                         const sTrabajador = perfil.id_suscripcion_trabajador || "ninguna";
                         const sCliente = perfil.id_suscripcion_cliente || "ninguna";
 
-                        let tHtml = `<strong>Suscripcion Trabajador:</strong> `;
-                        if (sTrabajador.toLowerCase() !== "ninguna") {
-                            tHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
-                        } else {
-                            tHtml += `Ninguna`;
+                        const workerSubRow = document.getElementById('workerSubRow');
+                        const clientSubRow = document.getElementById('clientSubRow');
+
+                        if (workerSubRow) {
+                            let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
+                            if (sTrabajador.toLowerCase() !== "ninguna") {
+                                workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
+                                workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
+                            } else {
+                                workerHtml += `Ninguna</p>`;
+                            }
+                            workerSubRow.innerHTML = workerHtml;
                         }
 
-                        let cHtml = `<strong>Suscripción Cliente:</strong> `;
-                        if (sCliente.toLowerCase() !== "ninguna") {
-                            cHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
-                        } else {
-                            cHtml += `Ninguna`;
+                        if (clientSubRow) {
+                            let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
+                            if (sCliente.toLowerCase() !== "ninguna") {
+                                clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
+                                clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
+                            } else {
+                                clientHtml += `Ninguna</p>`;
+                            }
+                            clientSubRow.innerHTML = clientHtml;
                         }
 
-                        subsBody.innerHTML = `<p>${tHtml}</p><p>${cHtml}</p>`;
+                        // Eventos para cancelar suscripción
+                        document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
+                            btn.onclick = async () => {
+                                const tipo = btn.dataset.tipo;
+                                const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`);
+                                if (!confirmCancel) return;
+
+                                try {
+                                    await cancelarSuscripcionUsuario(user.uid, tipo);
+                                    window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
+                                    location.reload();
+                                } catch (error) {
+                                    console.error("Error al cancelar:", error);
+                                    window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
+                                }
+                            };
+                        });
                     }
 
                     // --- 5. RENDER FOTO DE PERFIL Y CV ---
@@ -191,23 +241,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- LÓGICA DE SUBIDA DIRECTA DE FOTO DE PERFIL ---
+    if (avatarEditBtn && inputPhotoDirect) {
+        avatarEditBtn.onclick = () => inputPhotoDirect.click();
+
+        inputPhotoDirect.onchange = async (e) => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const file = e.target.files[0];
+            if (file) {
+                try {
+                    const reader = new FileReader();
+                    const base64Photo = await new Promise((resolve, reject) => {
+                        reader.onload = (ev) => resolve(ev.target.result);
+                        reader.onerror = (ev) => reject(ev);
+                        reader.readAsDataURL(file);
+                    });
+
+                    // 1. Mostrar localmente de inmediato (UX)
+                    if (displayPic) displayPic.src = base64Photo;
+
+                    // Actualizar también la foto del header y dropdown si existen
+                    const headerPic = document.querySelector('.profile-toggle');
+                    const dropdownPic = document.querySelector('.dropdown-avatar');
+                    if (headerPic) headerPic.src = base64Photo;
+                    if (dropdownPic) dropdownPic.src = base64Photo;
+
+                    // 2. Guardar en Firestore
+                    await actualizarPerfilUsuario(user.uid, { foto_perfil: base64Photo });
+
+                    showCustomAlert("¡Éxito!", "Tu foto de perfil se ha actualizado correctamente.");
+                } catch (error) {
+                    console.error("Error subiendo foto:", error);
+                    showCustomAlert("Error", "No se pudo actualizar la foto.");
+                }
+            }
+        };
+    }
+
     // --- LÓGICA DE CAMBIAR CONTRASEÑA ---
     if (btnChangePass) {
         btnChangePass.addEventListener('click', (e) => {
             e.preventDefault();
-            showCustomPrompt(
-                "Cambiar Contraseña",
-                "Introduce tu nueva contraseña:",
-                (nuevaPass) => {
-                    if (nuevaPass && nuevaPass.trim() !== "") {
-                        showCustomAlert("Éxito", "Contraseña actualizada correctamente.");
-                        if (passLabel) passLabel.textContent = "*".repeat(nuevaPass.length);
-                    }
-                },
-                "Actualizar",
-                "Cancelar",
-                "password"
-            );
+            showChangePasswordModal((nuevaPass) => {
+                showCustomAlert("¡Éxito!", "Tu contraseña ha sido actualizada correctamente en el servidor.");
+                if (passLabel) passLabel.textContent = " " + "*".repeat(nuevaPass.length);
+            });
         });
     }
 
@@ -253,7 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const newLastname = document.getElementById('inputLastname').value.trim();
             const newDescription = document.getElementById('inputDescription').value.trim();
             const newAddress = document.getElementById('inputAddress').value.trim();
-            const photoFile = document.getElementById('inputPhoto').files[0];
             const pdfFile = document.getElementById('inputPDF').files[0];
 
             try {

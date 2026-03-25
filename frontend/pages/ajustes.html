@@ -112,15 +112,20 @@
             </div>
             <div class="card-body">
                 <p><strong>Correo electrónico:</strong> <span id="displayEmail"> Cargando...</span></p>
-                <p><strong>Contraseña:</strong> <span id="passLabel"> *********</span></p>
+                <div class="password-row-flex">
+                    <p><strong>Contraseña:</strong> <span id="passLabel"> *********</span></p>
+                    <div class="change-pass-action">
+                        <a href="#" id="btnChangePass">
+                            <img src="../assets/img/icons/icono-cambiar.png" alt="Cambiar" class="icon-btn-mobile">
+                            <span>Cambiar Contraseña</span>
+                        </a>
+                    </div>
+                </div>
 
                 <div class="card-actions">
                     <div class="logout-action" id="btnLogout">
                         <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Cerrar Sesión">
                         <span>Cerrar Sesión</span>
-                    </div>
-                    <div class="change-pass-action">
-                        <a href="#" id="btnChangePass">Cambiar Contraseña</a>
                     </div>
                 </div>
             </div>
@@ -131,9 +136,13 @@
             <div class="card-header">
                 <h2 class="card-title">Suscripciones</h2>
             </div>
-            <div class="card-body">
-                <p><strong>Suscripcion Trabajador:</strong> Cargando...</p>
-                <p><strong>Suscripción Cliente:</strong> Cargando...</p>
+            <div class="card-body" id="subsContainer">
+                <div class="sub-item" id="workerSubRow">
+                    <p><strong>Suscripcion Trabajador:</strong> <span id="workerSubStatus">Cargando...</span></p>
+                </div>
+                <div class="sub-item" id="clientSubRow">
+                    <p><strong>Suscripción Cliente:</strong> <span id="clientSubStatus">Cargando...</span></p>
+                </div>
             </div>
         </section>
 
@@ -150,7 +159,11 @@
 
                 </ul>
                 <div class="right-action">
-                    <a href="#" id="btnAddPayment">Añadir Método de Pago</a>
+                    <a href="#" id="btnAddPayment">
+                        <img src="../assets/img/icons/icono-no-blanco.png" alt="Añadir"
+                            class="icon-add-payment icon-btn-mobile">
+                        <span>Añadir Método de Pago</span>
+                    </a>
                 </div>
             </div>
         </section>

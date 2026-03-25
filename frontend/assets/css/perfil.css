@@ -1,6 +1,11 @@
 /* Perfil */
 @import "paleta-colores.css";
 
+/* Perfil GLOBALS Y LAYOUT */
+.icon-btn-mobile {
+    display: none;
+}
+
 /* ==========================================================================
    ESTILOS DE VISUALIZACIÓN DE PERFIL PÚBLICO
    Define la cuadrícula de información, la barra de progreso de experiencia XP,
@@ -26,10 +31,45 @@
     align-self: flex-end;
 }
 
-.profile-pic {
+.avatar-edit-container {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 20px;
     width: 240px;
     height: 240px;
-    border-radius: 20px;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.avatar-edit-container:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.plus-icon {
+    width: 40px !important;
+    height: 40px !important;
+    transform: rotate(45deg);
+    filter: brightness(0) invert(1);
+    /* Fuerza blanco */
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     display: block;
 }
@@ -295,13 +335,64 @@
 }
 
 .card-body p {
-    margin: 15px 0;
+    margin: 0;
     font-size: 15px;
     color: var(--gray-5);
 }
 
+.card-body>p {
+    margin: 15px 0;
+}
+
 .card-body strong {
     color: var(--gray-6);
+}
+
+.sub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.sub-item:hover {
+    background: #f9f9f9;
+}
+
+.sub-item p {
+    margin: 0;
+}
+
+.btn-cancel-subscription {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    /* Red filter for white icon (icono-no-blanco.png) */
+    filter: brightness(0) saturate(100%) invert(27%) sepia(91%) saturate(2351%) hue-rotate(346deg) brightness(101%) contrast(106%);
+    transition: transform 0.2s, opacity 0.2s ease;
+    opacity: 0;
+}
+
+.sub-item:hover .btn-cancel-subscription {
+    opacity: 1;
+}
+
+.btn-cancel-subscription:hover {
+    transform: scale(1.2);
+}
+
+.password-row-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.password-row-flex p {
+    margin: 0;
 }
 
 /* Acciones de la tarjeta cuenta */
@@ -309,20 +400,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
-.logout-action {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--red-1);
-    font-weight: bold;
-    cursor: pointer;
+.change-pass-action {
+    margin: 0;
 }
 
-.logout-action img {
-    width: 20px;
+.change-pass-action .icon-btn-mobile {
+    display: none;
 }
 
 .change-pass-action a {
@@ -350,29 +436,6 @@
     transform: scale(1.1);
 }
 
-/* Tarjetas de Información */
-.info-card {
-    background-color: var(--neutral-white);
-    color: var(--gray-9);
-    border-radius: 15px;
-    padding: 25px 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.card-body p {
-    margin: 15px 0;
-    font-size: 15px;
-    color: var(--gray-5);
-}
-
-.card-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 30px;
-}
-
 .logout-action {
     display: flex;
     align-items: center;
@@ -380,6 +443,10 @@
     color: var(--red-1);
     font-weight: bold;
     cursor: pointer;
+}
+
+.logout-action img {
+    width: 20px;
 }
 
 /* Estilos del Modal (Ventana emergente) */
@@ -456,7 +523,6 @@
 /* Añade esto para que el enlace no cambie de color */
 #displayPDF {
     color: var(--neutral-black);
-    text-decoration: none;
     text-decoration: underline;
     cursor: pointer;
 }
@@ -582,10 +648,74 @@
         gap: 15px;
     }
 
+    .cat-item {
+        font-size: 0.8rem;
+    }
+
+    .card-body p {
+        font-size: 0.8rem;
+    }
+
+    .password-row-flex {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin-top: 10px;
+    }
+
+    .password-row-flex p {
+        margin: 0 !important;
+    }
+
+    #btnChangePass {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background-color: var(--gray-4) !important;
+        width: 24px !important;
+        height: 24px !important;
+        border-radius: 5px !important;
+        padding: 0 !important;
+        text-decoration: none !important;
+    }
+
+    #btnChangePass span {
+        display: none !important;
+    }
+
+    #btnChangePass .icon-btn-mobile {
+        display: block !important;
+        width: 16px !important;
+        filter: invert(1) !important;
+    }
+
     .card-actions {
         flex-direction: column;
         gap: 15px;
+        align-items: flex-start;
+        margin-top: 20px;
+    }
+
+    .logout-action {
+        display: flex;
         align-items: center;
+        gap: 10px;
+        color: var(--red-1);
+        font-weight: bold;
+        font-size: 0.7rem;
+    }
+
+    .logout-action img {
+        width: 16px;
+    }
+
+    /* Forzar visibilidad de cancelar suscripciones en perfil */
+    .btn-cancel-subscription {
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
     .modal-content {

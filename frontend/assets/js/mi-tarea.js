@@ -288,6 +288,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputDesc = document.getElementById('inputDesc');
     const inputLoc = document.getElementById('inputLoc');
 
+    // --- SUBIDA DIRECTA DE FOTO DE TAREA ---
+    const jobImageContainer = document.getElementById('jobImageContainer');
+    const inputPhotoDirect = document.getElementById('inputPhotoDirect');
+    const jobImg = document.querySelector('.job-img');
+
+    if (jobImageContainer && inputPhotoDirect) {
+        jobImageContainer.onclick = () => inputPhotoDirect.click();
+
+        inputPhotoDirect.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                // Previsualización inmediata
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const base64 = event.target.result;
+                    if (jobImg) jobImg.src = base64;
+
+                    // Guardar en Firestore
+                    await actualizarTrabajo(tareaId, { foto_trabajo: base64 });
+                    showCustomAlert("Imagen Actualizada", "La foto de la tarea se ha guardado correctamente.");
+                };
+                reader.readAsDataURL(file);
+            } catch (err) {
+                console.error("Error al subir foto:", err);
+                showCustomAlert("Error", "No se pudo actualizar la imagen.");
+            }
+        };
+    }
+
     btnEditMain.onclick = () => {
         inputTitle.value = displayTitle.textContent;
         inputDesc.value = displayDesc.textContent.trim();
@@ -297,8 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnCancelMain').onclick = () => modalMain.classList.add('hidden');
     document.getElementById('btnSaveMain').onclick = async () => {
-        const photoFile = document.getElementById('inputPhoto').files[0];
-
         try {
             const dataToUpdate = {
                 titulo: inputTitle.value,
@@ -306,27 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 direccion: inputLoc.value
             };
 
-            // Si hay una foto nueva, la convertimos a base64
-            if (photoFile) {
-                const reader = new FileReader();
-                const base64Photo = await new Promise((resolve, reject) => {
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.onerror = (e) => reject(e);
-                    reader.readAsDataURL(photoFile);
-                });
-                dataToUpdate.foto_trabajo = base64Photo;
-            }
-
             await actualizarTrabajo(tareaId, dataToUpdate);
 
             displayTitle.textContent = inputTitle.value;
             displayDesc.textContent = inputDesc.value;
             displayLoc.textContent = inputLoc.value;
-
-            if (dataToUpdate.foto_trabajo) {
-                const imgEl = document.querySelector('.job-img');
-                if (imgEl) imgEl.src = dataToUpdate.foto_trabajo;
-            }
 
             modalMain.classList.add('hidden');
             showCustomAlert("Guardado", "Cambios realizados con éxito.");
@@ -512,20 +525,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 2. Marcar como completada y transferir dinero (liberar escrow)
                 await completarTrabajo(tareaId, currentTarea.id_trabajador);
 
-                showCustomAlert("¡Tarea Finalizada!", "El pago se ha liberado al trabajador y la tarea está ahora completada.");
+                showCustomAlert("¡Tarea Finalizada!", "El pago se ha liberado al trabajador y la tarea está ahora completada.", "Aceptar", () => {
+                    location.reload();
+                });
 
                 modalValoracion.classList.add('hidden');
-                if (btnCompletar) btnCompletar.style.display = 'none';
-
-                // Actualizar badge
-                const badgeEl = document.getElementById('displayEstado');
-                if (badgeEl) {
-                    badgeEl.textContent = 'Completada';
-                    badgeEl.className = 'estado-badge completada';
-                }
-
-                // Recargar para ver cambios
-                setTimeout(() => location.reload(), 1500);
 
             } catch (e) {
                 console.error("Error al finalizar tarea:", e);

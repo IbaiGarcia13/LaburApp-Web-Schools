@@ -83,7 +83,13 @@
     <main class="main-content">
         <section class="job-header-section">
             <div class="job-image-wrapper">
-                <img src="../assets/img/trabajo-defecto.png" alt="Cortar el césped" class="job-img">
+                <div class="job-image-edit-container" id="jobImageContainer" title="Pulsa para cambiar la foto">
+                    <img src="../assets/img/trabajo-defecto.png" alt="Cortar el césped" class="job-img">
+                    <div class="avatar-overlay">
+                        <img src="../assets/img/icons/icono-no-blanco.png" alt="+" class="plus-icon">
+                    </div>
+                </div>
+                <input type="file" id="inputPhotoDirect" accept="image/*" style="display: none;">
             </div>
 
             <div class="job-info-main">
@@ -195,10 +201,6 @@
                 <input type="text" id="inputLoc">
             </div>
 
-            <div class="input-group">
-                <label>Foto de la tarea:</label>
-                <input type="file" id="inputPhoto" accept="image/*">
-            </div>
 
             <div class="modal-buttons">
                 <button id="btnCancelMain" class="modal-btn cancel">Cancelar</button>
@@ -215,7 +217,8 @@
             <div class="input-group">
                 <label>Pago (€):</label>
                 <input type="number" step="0.01" id="inputPay">
-                <small style="color: var(--gray-5); font-size: 0.75rem;">La experiencia se calculará como Pago x 10</small>
+                <small style="color: var(--gray-5); font-size: 0.75rem;">La experiencia se calculará como Pago x
+                    10</small>
             </div>
 
             <div class="modal-buttons">

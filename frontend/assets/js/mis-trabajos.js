@@ -42,6 +42,17 @@ document.addEventListener("DOMContentLoaded", () => {
             mobileFilterBtn.classList.toggle('active');
             mobileFilterBtn.style.opacity = '1';
         });
+
+        // Cerrar filtros al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('show-mobile-filters') &&
+                !sidebar.contains(e.target) &&
+                !mobileFilterBtn.contains(e.target)) {
+
+                sidebar.classList.remove('show-mobile-filters');
+                mobileFilterBtn.classList.remove('active');
+            }
+        });
     }
 
     auth.onAuthStateChanged(async (user) => {
@@ -59,8 +70,8 @@ async function loadMyAcceptedJobs(uid) {
     try {
         const rawJobs = await obtenerTrabajosAceptadosPorMi(uid);
         allJobs = rawJobs.sort((a, b) => {
-            const dateA = a.fecha_aceptacion?.toDate ? a.fecha_aceptacion.toDate() : (a.fecha_aceptacion || a.fecha_publicacion?.toDate?.() || a.fecha_publicacion || 0);
-            const dateB = b.fecha_aceptacion?.toDate ? b.fecha_aceptacion.toDate() : (b.fecha_aceptacion || b.fecha_publicacion?.toDate?.() || b.fecha_publicacion || 0);
+            const dateA = a.fecha_actividad?.toDate ? a.fecha_actividad.toDate() : (a.fecha_actividad || a.fecha_aceptacion?.toDate?.() || a.fecha_aceptacion || a.fecha_publicacion?.toDate?.() || a.fecha_publicacion || 0);
+            const dateB = b.fecha_actividad?.toDate ? b.fecha_actividad.toDate() : (b.fecha_actividad || b.fecha_aceptacion?.toDate?.() || b.fecha_aceptacion || b.fecha_publicacion?.toDate?.() || b.fecha_publicacion || 0);
             return dateB - dateA;
         });
         applyClientFilters();
@@ -137,11 +148,11 @@ function displayJobs() {
                     </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción."}</p>
                     <div class="job-details">
-                        <p><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "No especificada"}</p>
-                        <p><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</p>
-                        <p><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</p>
-                        <p><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></p>
-                        <p><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(pago).toFixed(2)} €</strong></p>
+                        <span><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "No especificada"}</span>
+                        <span><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</span>
+                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</span>
+                        <span><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></span>
+                        <span><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(pago).toFixed(2)} €</strong></span>
                     </div>
                 </div>
             </article>`;

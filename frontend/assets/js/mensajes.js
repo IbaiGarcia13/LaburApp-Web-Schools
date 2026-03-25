@@ -105,6 +105,17 @@ document.addEventListener("DOMContentLoaded", () => {
             mobileFilterBtn.classList.toggle('active');
             mobileFilterBtn.style.opacity = '1';
         });
+
+        // Cerrar filtros al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('show-mobile-filters') &&
+                !sidebar.contains(e.target) &&
+                !mobileFilterBtn.contains(e.target)) {
+
+                sidebar.classList.remove('show-mobile-filters');
+                mobileFilterBtn.classList.remove('active');
+            }
+        });
     }
 
     let unreadListener = null;

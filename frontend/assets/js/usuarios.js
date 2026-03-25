@@ -31,6 +31,18 @@ if (mobileFilterBtn && sidebar) {
         // El botón ahora es siempre opaco
         mobileFilterBtn.style.opacity = '1';
     });
+
+    // Cerrar filtros al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('show-mobile-filters') &&
+            !sidebar.contains(e.target) &&
+            !mobileFilterBtn.contains(e.target)) {
+
+            sidebar.classList.remove('show-mobile-filters');
+            mobileFilterBtn.classList.remove('active');
+            // Restablecer opacidad si fuera necesario, o dejar
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -53,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loc: u.direccion_principal || "No especificada",
                 lvl: u.nivel || 1,
                 val: u.valoracion_media !== undefined ? u.valoracion_media : 2.5,
-                esp: (u.especialidad || "General").toLowerCase().trim()
+                esp: u.especialidad_principal || u.id_categoria_trabajador || u.especialidad || "Ninguna"
             }));
 
             // Filtrar para no mostrarse a sí mismo
@@ -101,7 +113,8 @@ function getStandardName(catId) {
         'otros': 'Otros',
         'general': 'General'
     };
-    return names[catId] || catId || 'General';
+    const res = names[catId.toLowerCase()] || catId;
+    return res.charAt(0).toUpperCase() + res.slice(1);
 }
 
 // Función principal para pintar las tarjetas de usuarios en la interfaz

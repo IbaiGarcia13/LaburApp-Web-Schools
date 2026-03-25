@@ -30,8 +30,9 @@ let chatMode = 'direct';
 if (idTrabajo) {
     chatMode = 'job';
 } else if (!userIdDirect) {
-    showCustomAlert("Error", "No se ha especificado un destinatario para el chat.");
-    setTimeout(() => window.location.href = 'mensajes.html', 2000);
+    showCustomAlert("Error", "No se ha especificado un destinatario para el chat.", "Ir a Mensajes", () => {
+        window.location.href = 'mensajes.html';
+    });
 }
 
 // 2. Cargar Info
@@ -48,6 +49,31 @@ async function loadChatMeta() {
                     if (trabajo) {
                         const url = (user.uid === trabajo.id_publicador) ? `mi-tarea.html?id=${idTrabajo}` : `trabajo.html?id=${idTrabajo}`;
                         jobTitle.innerHTML = `Trabajo: <a href="${url}" class="job-link">${trabajo.titulo}</a>`;
+
+                        // Mobile dropdown logic
+                        const jobContextMobile = document.getElementById('jobContextMobile');
+                        const jobMobileLink = document.getElementById('jobMobileLink');
+                        const btnJobMobile = document.getElementById('btnJobMobile');
+                        const jobMobileDropdown = document.getElementById('jobMobileDropdown');
+
+                        if (jobContextMobile && jobMobileLink && btnJobMobile && jobMobileDropdown) {
+                            jobContextMobile.classList.remove('hidden');
+                            jobMobileLink.href = url;
+                            jobMobileLink.textContent = trabajo.titulo || 'Ir al trabajo';
+
+                            btnJobMobile.onclick = (e) => {
+                                e.stopPropagation();
+                                jobMobileDropdown.classList.toggle('hidden');
+                            };
+
+                            // Close dropdown when clicking outside
+                            document.addEventListener('click', (e) => {
+                                if (!jobContextMobile.contains(e.target)) {
+                                    jobMobileDropdown.classList.add('hidden');
+                                }
+                            });
+                        }
+
                         // If otherId wasn't in URL, we find it from the job
                         if (!otherId) {
                             otherId = (user.uid === trabajo.id_publicador) ? trabajo.id_trabajador : trabajo.id_publicador;
@@ -55,6 +81,8 @@ async function loadChatMeta() {
                     }
                 } else {
                     jobTitle.style.display = 'none';
+                    const jobContextMobile = document.getElementById('jobContextMobile');
+                    if (jobContextMobile) jobContextMobile.style.display = 'none';
                 }
 
                 if (otherId) {

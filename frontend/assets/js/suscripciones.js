@@ -17,11 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancel = document.getElementById('btnCancelSub');
     const btnConfirm = document.getElementById('btnConfirmPurchase');
 
-    const modalTitle = document.getElementById('modalSubTitle');
 
-    // Elementos nueva sección activa (ahora placeholders en las cards)
-    const cancelCurrante = document.getElementById('cancel-currante');
-    const cancelJefe = document.getElementById('cancel-jefe');
 
     let selectedSub = null; // { type, id, price, name }
     let userProfile = null;
@@ -29,63 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             userProfile = await obtenerPerfilUsuario(user.uid);
-            checkActiveSubscription();
-        } else {
-            if (cancelCurrante) cancelCurrante.classList.add('hidden');
-            if (cancelJefe) cancelJefe.classList.add('hidden');
         }
     });
 
-    function checkActiveSubscription() {
-        if (!userProfile) return;
 
-        const subTrabajador = userProfile.id_suscripcion_trabajador;
-        const subCliente = userProfile.id_suscripcion_cliente;
-
-        // Mostrar u ocultar según lo que tenga
-        if (subTrabajador && cancelCurrante) {
-            cancelCurrante.classList.remove('hidden');
-            setupCancelButton(cancelCurrante.querySelector('button'), 'trabajador');
-        } else if (cancelCurrante) {
-            cancelCurrante.classList.add('hidden');
-        }
-
-        if (subCliente && cancelJefe) {
-            cancelJefe.classList.remove('hidden');
-            setupCancelButton(cancelJefe.querySelector('button'), 'cliente');
-        } else if (cancelJefe) {
-            cancelJefe.classList.add('hidden');
-        }
-    }
-
-    // --- CONFIGURAR BOTÓN DE CANCELAR ---
-    function setupCancelButton(btn, tipo) {
-        if (!btn) return;
-        btn.onclick = async (e) => {
-            e.stopPropagation(); // Evitar abrir el modal de compra de nuevo
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`);
-            if (!confirmCancel) return;
-
-            try {
-                btn.disabled = true;
-                btn.textContent = "Cancelando...";
-
-                await cancelarSuscripcionUsuario(user.uid, tipo);
-
-                window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
-                location.reload();
-
-            } catch (error) {
-                console.error("Error al cancelar:", error);
-                window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
-                btn.disabled = false;
-                btn.textContent = "Cancelar suscripción";
-            }
-        };
-    }
 
     // --- CARGAR MÉTODOS DE PAGO AL ABRIR EL MODAL ---
     async function cargarMetodosPago(uid) {

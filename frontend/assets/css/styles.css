@@ -382,6 +382,50 @@ footer {
     font-size: 1rem;
 }
 
+/* Password Modal Specifics */
+.modal-input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.modal-input-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--gray-6);
+    margin-bottom: 5px;
+}
+
+.modal-pass-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.modal-input-pass {
+    width: 100%;
+    padding: 10px 45px 10px 10px;
+    border: 1px solid var(--gray-3);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--neutral-white);
+}
+
+.eye-toggle {
+    position: absolute;
+    right: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.eye-toggle img {
+    width: 20px;
+    height: 20px;
+}
+
 .modal-buttons {
     display: flex;
     gap: 15px;
@@ -427,6 +471,15 @@ footer {
 
 .modal-btn.cancel:hover {
     background: var(--gray-3);
+}
+
+.logout-action {
+    cursor: pointer !important;
+}
+
+.logout-action img,
+.logout-action span {
+    pointer-events: none;
 }
 
 .hidden {
@@ -752,42 +805,91 @@ footer {
     }
 
     /* --- GLOBAL PROFILE DROPDOWN RESPONSIVE --- */
+    /* Transformado en una barra horizontal debajo del header */
     .profile-dropdown {
-        top: 75px;
-        right: 54px;
-        width: 150px;
-        background: var(--neutral-white);
-        border-radius: 15px;
-        padding: 15px;
+        position: fixed !important;
+        top: 60px !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        background: var(--neutral-white) !important;
+        border-radius: 0 !important;
+        padding: 10px 20px !important;
         display: none;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        color: var(--neutral-black);
-        z-index: 2000;
+        /* Se activa con .show */
+        grid-template-areas: "avatar name logout"
+            "avatar email logout" !important;
+        grid-template-columns: auto 1fr auto !important;
+        align-items: center !important;
+        gap: 0px 15px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+        z-index: 2000 !important;
+        border-bottom: 1px solid var(--gray-1) !important;
     }
 
-    .profile-dropdown img {
-        width: 50px !important;
-        height: 50px !important;
+    .profile-dropdown.show {
+        display: grid !important;
+    }
+
+    .profile-dropdown::before {
+        display: none !important;
+        /* Quita la flechita */
+    }
+
+    .profile-dropdown a:first-child {
+        grid-area: avatar !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .dropdown-avatar {
+        width: 45px !important;
+        height: 45px !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
     }
 
     .profile-dropdown .dropdown-name {
-        font-size: 0.8rem !important;
+        grid-area: name !important;
+        font-size: 1rem !important;
+        font-weight: bold !important;
+        margin: 0 !important;
+        text-align: left !important;
+        align-self: end !important;
+        line-height: 1.2 !important;
     }
 
     .profile-dropdown .dropdown-email {
-        font-size: 0.5rem !important;
-        margin-bottom: 10px;
+        grid-area: email !important;
+        font-size: 0.75rem !important;
+        color: var(--gray-6) !important;
+        margin: 0 !important;
+        text-align: left !important;
+        align-self: start !important;
+        line-height: 1.2 !important;
+    }
+
+    .profile-dropdown .dropdown-footer {
+        grid-area: logout !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        padding: 0 !important;
+        background: none !important;
+        border: none !important;
+        margin: 0 !important;
     }
 
     .profile-dropdown .dropdown-footer a {
-        font-size: 0.7rem !important;
+        display: none !important;
+        /* Oculta el texto "Cerrar Sesión" */
     }
 
     .profile-dropdown .dropdown-footer img {
-        width: 14px !important;
-        height: 14px !important;
+        width: 26px !important;
+        height: 26px !important;
+        margin: 0 !important;
+        cursor: pointer !important;
     }
 
     /* --- GLOBAL BOTTOM NAVIGATION RESPONSIVE --- */
@@ -888,6 +990,10 @@ footer {
     }
 
     .notif-empty {
+        font-size: 0.8rem !important;
+    }
+
+    .loading-text {
         font-size: 0.8rem !important;
     }
 }

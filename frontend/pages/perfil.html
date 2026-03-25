@@ -87,7 +87,14 @@
         <!-- BLOQUE 1: Información personal, foto y estadísticas numéricas -->
         <section class="profile-section">
             <div class="avatar-wrapper">
-                <img src="../assets/img/avatar-defecto.png" alt="Foto de Perfil" class="profile-pic" id="displayPic">
+                <div class="avatar-edit-container" id="avatarEditBtn">
+                    <img src="../assets/img/avatar-defecto.png" alt="Foto de Perfil" class="profile-pic"
+                        id="displayPic">
+                    <div class="avatar-overlay">
+                        <img src="../assets/img/icons/icono-no-blanco.png" alt="Cambiar" class="plus-icon">
+                    </div>
+                </div>
+                <input type="file" id="inputPhotoDirect" accept="image/*" style="display: none;">
             </div>
 
             <div class="profile-info">
@@ -156,26 +163,34 @@
             <h2 class="card-title">Cuenta</h2>
             <div class="card-body">
                 <p><strong>Correo electrónico:</strong> Cargando...</p>
-                <p><strong>Contraseña:</strong> <span id="passLabel"> *******</span></p>
+                <div class="password-row-flex">
+                    <p><strong>Contraseña:</strong> <span id="passLabel"> *******</span></p>
+                    <div class="change-pass-action">
+                        <a href="#" id="btnChangePass">
+                            <img src="../assets/img/icons/icono-cambiar.png" alt="Cambiar" class="icon-btn-mobile">
+                            <span>Cambiar Contraseña</span>
+                        </a>
+                    </div>
+                </div>
 
                 <div class="card-actions">
                     <div class="logout-action">
                         <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Cerrar Sesión">
                         <a href="../index.html" style="color: inherit; text-decoration: none;">Cerrar Sesión</a>
                     </div>
-                    <div class="change-pass-action">
-                        <a href="#" id="btnChangePass">Cambiar Contraseña</a>
-                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- BLOQUE 4: Tier de suscripciones activas -->
         <section class="info-card">
             <h2 class="card-title">Suscripciones</h2>
-            <div class="card-body">
-                <p><strong>Suscripcion Trabajador:</strong> Cargando...</p>
-                <p><strong>Suscripción Cliente:</strong> Cargando...</p>
+            <div class="card-body" id="subsContainer">
+                <div class="sub-item" id="workerSubRow">
+                    <p><strong>Suscripcion Trabajador:</strong> <span id="workerSubStatus">Cargando...</span></p>
+                </div>
+                <div class="sub-item" id="clientSubRow">
+                    <p><strong>Suscripción Cliente:</strong> <span id="clientSubStatus">Cargando...</span></p>
+                </div>
             </div>
         </section>
 
@@ -193,10 +208,7 @@
         <div class="modal-content">
             <h3>Editar Perfil</h3>
 
-            <div class="input-group">
-                <label>Foto de Perfil (Opcional):</label>
-                <input type="file" id="inputPhoto" accept="image/*">
-            </div>
+
 
             <div class="input-group">
                 <label>Nombre:</label>
