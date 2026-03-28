@@ -1,13 +1,16 @@
 import { auth, db } from './firebase-config.js';
 import {
     obtenerPerfilUsuario,
+    obtenerNotificaciones,
     marcarNotificacionesComoLeidas,
     eliminarNotificacion,
     actualizarActividadSuscripcion,
     obtenerTareasPendientesConfirmacion,
-    registrarRespuestaConfirmacion
+    registrarRespuestaConfirmacion,
+    verificarSuscripcionesRecurrentes
 } from './database.js';
 import { onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initCookieConsent } from './cookies.js';
 
 // Evento global que inicializa el menú lateral y las acciones comunes en la barra superior al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,6 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Actualizar siempre la actividad para refrescar prioridad o quitarla si ya no es suscriptor
                 actualizarActividadSuscripcion(user.uid).catch(e => {
                     console.error("Error actualizando actividad suscripción:", e);
+                });
+
+                // Verificar y procesar renovaciones automáticas de suscripciones
+                verificarSuscripcionesRecurrentes(user.uid).catch(e => {
+                    console.error("Error verificando suscripciones recurrentes:", e);
                 });
 
                 const avatarUrl = perfil.foto_perfil || (window.location.pathname.includes('/pages/') ? '../assets/img/avatar-defecto.png' : 'frontend/assets/img/avatar-defecto.png');
@@ -197,60 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNotificationsLogic();
 
     // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
-    setupCookieConsent();
+    initCookieConsent();
 
 });
 
-function setupCookieConsent() {
-    if (localStorage.getItem('cookieConsent') === 'accepted') return;
-
-    const banner = document.createElement('div');
-    banner.id = 'cookieBanner';
-    banner.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        right: 20px;
-        background: #ffffff;
-        color: #333;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        border: 1px solid #eee;
-        max-width: 500px;
-        margin: 0 auto;
-    `;
-
-    banner.innerHTML = `
-        <div style="font-weight: 600; font-size: 1.1rem; color: #2c3e50;">🍪 Usamos cookies</div>
-        <p style="margin: 0; font-size: 0.9rem; line-height: 1.4; color: #666;">
-            Utilizamos cookies propias y de terceros (como Google AdSense) para mejorar tu experiencia y mostrarte publicidad personalizada. 
-            Al hacer clic en "Aceptar", consientes su uso. Puedes leer más en nuestra 
-            <a href="${window.location.pathname.includes('/pages/') ? 'politica-privacidad.html' : 'pages/politica-privacidad.html'}" style="color: #3498db; text-decoration: none;">Política de Privacidad</a>.
-        </p>
-        <div style="display: flex; gap: 10px; justify-content: flex-end;">
-            <button id="declineCookies" style="background: transparent; border: 1px solid #ccc; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">Solo necesarias</button>
-            <button id="acceptCookies" style="background: #2c3e50; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Aceptar todo</button>
-        </div>
-    `;
-
-    document.body.appendChild(banner);
-
-    document.getElementById('acceptCookies').onclick = () => {
-        localStorage.setItem('cookieConsent', 'accepted');
-        banner.style.display = 'none';
-        // Aquí se podrían cargar scripts de tracking si los hubiera
-    };
-
-    document.getElementById('declineCookies').onclick = () => {
-        localStorage.setItem('cookieConsent', 'declined');
-        banner.style.display = 'none';
-    };
-}
 
 function setupNotificationsLogic() {
     const sideMenu = document.getElementById('sideMenu');

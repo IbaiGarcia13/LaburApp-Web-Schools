@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cards = document.querySelectorAll('.sub-card:not(.card-none)');
     const modal = document.getElementById('subscriptionModal');
+    const modalSubTitle = document.getElementById('modalSubTitle');
     const selectPayment = document.getElementById('selectSavedPayment');
     const noPaymentWarning = document.getElementById('noPaymentWarning');
     const btnCancel = document.getElementById('btnCancelSub');
@@ -87,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: card.querySelector('h3').textContent
             };
 
-            modalTitle.textContent = `Adquirir Suscripción ${selectedSub.name}`;
+            if (modalSubTitle) {
+                modalSubTitle.textContent = `Adquirir Suscripción ${selectedSub.name}`;
+            }
             cargarMetodosPago(user.uid);
             modal.classList.remove('hidden');
         });

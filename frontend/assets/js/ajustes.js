@@ -67,8 +67,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (workerSubRow) {
                             let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
                             if (sTrabajador.toLowerCase() !== "ninguna") {
+                                const fechaV = perfil.fecha_vencimiento_trabajador?.toDate ? perfil.fecha_vencimiento_trabajador.toDate().toLocaleDateString() : null;
+                                const renovacion = perfil.renovacion_automatica_trabajador !== false; // true por defecto
+
                                 workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
-                                workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
+                                if (fechaV) {
+                                    workerHtml += `<br><small style="color: var(--gray-5); margin-left: 30px;">Vence: ${fechaV} (${renovacion ? 'Renovación automática' : 'No renovable'})</small>`;
+                                }
+                                workerHtml += `</p>`;
+                                if (renovacion) {
+                                    workerHtml += `<img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Renovación">`;
+                                }
                             } else {
                                 workerHtml += `Ninguna</p>`;
                             }
@@ -78,8 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (clientSubRow) {
                             let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
                             if (sCliente.toLowerCase() !== "ninguna") {
+                                const fechaV = perfil.fecha_vencimiento_cliente?.toDate ? perfil.fecha_vencimiento_cliente.toDate().toLocaleDateString() : null;
+                                const renovacion = perfil.renovacion_automatica_cliente !== false; // true por defecto
+
                                 clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
-                                clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
+                                if (fechaV) {
+                                    clientHtml += `<br><small style="color: var(--gray-5); margin-left: 30px;">Vence: ${fechaV} (${renovacion ? 'Renovación automática' : 'No renovable'})</small>`;
+                                }
+                                clientHtml += `</p>`;
+                                if (renovacion) {
+                                    clientHtml += `<img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Renovación">`;
+                                }
                             } else {
                                 clientHtml += `Ninguna</p>`;
                             }
@@ -90,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
                             btn.onclick = async () => {
                                 const tipo = btn.dataset.tipo;
-                                const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`);
+                                const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar la renovación automática de tu suscripción de ${tipo}? Mantendrás los beneficios hasta que finalice el periodo actual.`);
                                 if (!confirmCancel) return;
 
                                 try {

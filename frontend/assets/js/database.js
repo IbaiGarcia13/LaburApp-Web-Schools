@@ -55,10 +55,18 @@ export async function actualizarPerfilUsuario(uid, datosNuevos) {
  */
 export async function actualizarSuscripcionUsuario(uid, tipo, idSuscripcion) {
     const docRef = doc(db, "usuarios", uid);
-    const campo = tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
+    const campoId = tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
+    const campoVencimiento = tipo === 'trabajador' ? 'fecha_vencimiento_trabajador' : 'fecha_vencimiento_cliente';
+    const campoRenovacion = tipo === 'trabajador' ? 'renovacion_automatica_trabajador' : 'renovacion_automatica_cliente';
+
+    const hoy = new Date();
+    const proximoMes = new Date();
+    proximoMes.setMonth(hoy.getMonth() + 1);
 
     const updateData = {};
-    updateData[campo] = idSuscripcion;
+    updateData[campoId] = idSuscripcion;
+    updateData[campoVencimiento] = proximoMes;
+    updateData[campoRenovacion] = true;
 
     await updateDoc(docRef, updateData);
 
@@ -66,7 +74,7 @@ export async function actualizarSuscripcionUsuario(uid, tipo, idSuscripcion) {
     await actualizarActividadSuscripcion(uid).catch(console.error);
 
     // Notificar al usuario
-    await crearNotificacion(uid, "Nueva suscripción adquirida", `Tu suscripción de ${tipo} ahora es "${idSuscripcion}".`, "suscripcion");
+    await crearNotificacion(uid, "Nueva suscripción adquirida", `Tu suscripción de ${tipo} ahora es "${idSuscripcion}". Tu próximo cobro será el ${proximoMes.toLocaleDateString()}.`, "suscripcion");
 
     return true;
 }
@@ -76,18 +84,22 @@ export async function actualizarSuscripcionUsuario(uid, tipo, idSuscripcion) {
  */
 export async function cancelarSuscripcionUsuario(uid, tipo) {
     const docRef = doc(db, "usuarios", uid);
-    const campo = tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
+    const campoRenovacion = tipo === 'trabajador' ? 'renovacion_automatica_trabajador' : 'renovacion_automatica_cliente';
+    const campoVencimiento = tipo === 'trabajador' ? 'fecha_vencimiento_trabajador' : 'fecha_vencimiento_cliente';
+
+    const userSnap = await getDoc(docRef);
+    if (!userSnap.exists()) return false;
+    const data = userSnap.data();
+    const fechaVencimiento = data[campoVencimiento]?.toDate ? data[campoVencimiento].toDate() : null;
 
     const updateData = {};
-    updateData[campo] = ""; // O "ninguna" si prefieres, pero el código parece esperar IDs
+    updateData[campoRenovacion] = false;
 
     await updateDoc(docRef, updateData);
 
-    // Actualizar actividad inmediatamente para quitar prioridad en las listas
-    await actualizarActividadSuscripcion(uid).catch(console.error);
-
     // Notificar
-    await crearNotificacion(uid, "Suscripción Cancelada", `Has cancelado tu suscripción de ${tipo}.`, "rechazado");
+    const fechaStr = fechaVencimiento ? fechaVencimiento.toLocaleDateString() : 'el fin del periodo pagado';
+    await crearNotificacion(uid, "Renovación Cancelada", `Has cancelado la renovación automática de tu suscripción de ${tipo}. Seguirás disfrutando de los beneficios hasta el ${fechaStr}.`, "info");
 
     return true;
 }
@@ -1302,7 +1314,8 @@ export async function gestionarBorradoTarea(idTrabajo, rol) {
         else {
             updateData.borrado_por_trabajador = true;
             updateData.estado = "Cancelada";
-            if (pagoYaReembolsado) updateData.pago_retenido = false;
+            // Si el trabajador abandona, nos aseguramos de que el pago no quede retenido
+            updateData.pago_retenido = false;
         }
 
         await updateDoc(trabajoRef, updateData);
@@ -1486,12 +1499,20 @@ export async function ejecutarResolucionTarea(idTarea) {
     if (!fechaLim) return;
     const diasTranscurridos = (ahora - fechaLim) / (1000 * 60 * 60 * 24);
 
-    // A) COINCIDENCIA (Sí/Sí o No/No)
+    // A) COINCIDENCIA (Sí/Sí o No/No) o TRABAJADOR DICE QUE NO (Abandono/No completado)
+    if (resW === 'no') {
+        // Si el trabajador admite que no lo hizo, reembolso automático (independiente de lo que diga el jefe)
+        await reembolsarTrabajo(idTarea);
+        await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+        return;
+    }
+
     if (resP === 'si' && resW === 'si') {
         await completarTrabajo(idTarea, tarea.id_trabajador);
         await updateDoc(trabajoRef, { resolucion_finalizada: true });
         return;
     }
+
     if (resP === 'no' && resW === 'no') {
         await reembolsarTrabajo(idTarea);
         await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
@@ -1555,5 +1576,69 @@ export async function reembolsarTrabajo(idTarea) {
             `Se te han devuelto ${monto.toFixed(2)}€ a tu saldo por la tarea "${tarea.titulo}".`,
             "pago"
         );
+    }
+}
+
+/**
+ * Verifica y procesa los cobros automáticos de las suscripciones vencidas.
+ * Se debe llamar al iniciar la aplicación tras obtener el perfil.
+ */
+export async function verificarSuscripcionesRecurrentes(uid) {
+    const docRef = doc(db, "usuarios", uid);
+    const userSnap = await getDoc(docRef);
+    if (!userSnap.exists()) return;
+
+    const data = userSnap.data();
+    const hoy = new Date();
+    const updates = {};
+    let huboCambios = false;
+
+    const roles = [
+        { tipo: 'trabajador', id: data.id_suscripcion_trabajador, vencimiento: data.fecha_vencimiento_trabajador, renovacion: data.renovacion_automatica_trabajador, precio: 2 },
+        { tipo: 'cliente', id: data.id_suscripcion_cliente, vencimiento: data.fecha_vencimiento_cliente, renovacion: data.renovacion_automatica_cliente, precio: 1 }
+    ];
+
+    for (const role of roles) {
+        if (!role.id || role.id === "" || role.id === "ninguna") continue;
+
+        const fechaVencimiento = role.vencimiento?.toDate ? role.vencimiento.toDate() : (role.vencimiento ? new Date(role.vencimiento) : null);
+        if (!fechaVencimiento) continue;
+
+        if (hoy >= fechaVencimiento) {
+            if (role.renovacion === true) {
+                // Renovación Automática: Cobrar y extender
+                const nuevaFechaVencimiento = new Date(fechaVencimiento);
+                nuevaFechaVencimiento.setMonth(nuevaFechaVencimiento.getMonth() + 1);
+
+                // Si por algún motivo hoy sigue siendo después de la nueva fecha (ej: meses sin loguear), ajustar
+                while (hoy >= nuevaFechaVencimiento) {
+                    nuevaFechaVencimiento.setMonth(nuevaFechaVencimiento.getMonth() + 1);
+                }
+
+                const campoVencimiento = role.tipo === 'trabajador' ? 'fecha_vencimiento_trabajador' : 'fecha_vencimiento_cliente';
+                updates[campoVencimiento] = nuevaFechaVencimiento;
+                huboCambios = true;
+
+                // Registrar Pago en Historial
+                const nombreSub = role.id.charAt(0).toUpperCase() + role.id.slice(1);
+                await registrarPagoHistorial(uid, "Renovación Automática", -role.precio, `Renovación mensual suscripción ${nombreSub}`);
+                await crearNotificacion(uid, "Suscripción Renovada", `Tu suscripción de ${role.tipo} se ha renovado automáticamente hasta el ${nuevaFechaVencimiento.toLocaleDateString()}.`, "suscripcion");
+            } else {
+                // Fin de suscripción (no renovable)
+                const campoId = role.tipo === 'trabajador' ? 'id_suscripcion_trabajador' : 'id_suscripcion_cliente';
+                const campoVencimiento = role.tipo === 'trabajador' ? 'fecha_vencimiento_trabajador' : 'fecha_vencimiento_cliente';
+                updates[campoId] = "";
+                updates[campoVencimiento] = null;
+                huboCambios = true;
+
+                await crearNotificacion(uid, "Suscripción Finalizada", `El periodo de tu suscripción de ${role.tipo} ha finalizado.`, "info");
+                // Quitar actividad/prioridad
+                await actualizarActividadSuscripcion(uid).catch(console.error);
+            }
+        }
+    }
+
+    if (huboCambios) {
+        await updateDoc(docRef, updates);
     }
 }

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Cookies - LaburApp</title>
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/politica-cookies.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4927720250134961"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="cookies-container">
+        <a href="javascript:history.back()" class="back-link">&larr; Volver</a>
+        <h1>Política de Cookies</h1>
+        <p>LaburApp utiliza cookies propias y de terceros para mejorar la experiencia de navegación del usuario y
+            realizar análisis estadísticos.</p>
+
+        <h2>1. ¿Qué son las cookies?</h2>
+        <p>Una cookie es un pequeño archivo que se almacena en el ordenador, tablet o smartphone del usuario con el fin
+            de almacenar datos y recuperarlos para futuras visitas.</p>
+
+        <h2>2. Tipos de Cookies que utilizamos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Finalidad</th>
+                    <th>Duración</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>session_id</td>
+                    <td>Propia / Técnica</td>
+                    <td>Identificar la sesión del usuario</td>
+                    <td>Sesión</td>
+                </tr>
+                <tr>
+                    <td>_ga, _gid</td>
+                    <td>Terceros (Google)</td>
+                    <td>Análisis estadístico de visitas</td>
+                    <td>2 años / 24h</td>
+                </tr>
+                <tr>
+                    <td>cookie_consent</td>
+                    <td>Propia / Técnica</td>
+                    <td>Recordar tu elección sobre cookies</td>
+                    <td>1 año</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Gestión de Cookies</h2>
+        <p>Puedes configurar o rechazar el uso de cookies en cualquier momento a través de nuestro panel de
+            configuración:</p>
+        <button id="open-cookie-settings" class="btn-config">Configurar Cookies</button>
+
+        <h2>4. Cómo desactivar las cookies en los navegadores</h2>
+        <p>También puedes permitir, bloquear o eliminar las cookies instaladas en tu equipo mediante la configuración de
+            las opciones del navegador que utilices:</p>
+        <ul>
+            <li><strong>Chrome:</strong> Configuración -> Mostrar opciones avanzadas -> Privacidad -> Configuración de
+                contenido.</li>
+            <li><strong>Firefox:</strong> Herramientas -> Opciones -> Privacidad -> Historial -> Configuración
+                Personalizada.</li>
+            <li><strong>Opera:</strong> Configuración -> Avanzado -> Privacidad y seguridad -> Configuración del sitio
+                -> Cookies y datos del sitio.</li>
+            <li><strong>Safari:</strong> Preferencias -> Seguridad.</li>
+            <li><strong>Edge:</strong> Configuración -> Configuración avanzada -> Privacidad y servicios.</li>
+        </ul>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 LaburApp - Todos los derechos reservados. |
+            <a href="aviso-legal.html">Aviso Legal</a> |
+            <a href="politica-privacidad.html">Privacidad</a> |
+            <a href="politica-cookies.html">Cookies</a> |
+            <a href="terminos-condiciones.html">Términos</a>
+        </p>
+    </footer>
+
+    <script type="module" src="../assets/js/general.js"></script>
+    <script>
+        document.getElementById('open-cookie-settings')?.addEventListener('click', () => {
+            // Este evento será capturado por el script global de cookies
+            window.dispatchEvent(new CustomEvent('openCookieBanner'));
+        });
+    </script>
+</body>
+
+</html>

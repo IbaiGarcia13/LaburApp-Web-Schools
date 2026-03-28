@@ -195,7 +195,7 @@ if (formRegister) {
 
             // 4.3. Éxito
             formRegister.reset(); // Limpiar el formulario
-            showCustomAlert("¡Registro exitoso!", "Tu cuenta ha sido creada. Pulsa aceptar para ir al login.", "Aceptar", () => {
+            window.showCustomAlert("¡Registro exitoso!", "Tu cuenta ha sido creada. Pulsa aceptar para ir al login.", "Aceptar", () => {
                 window.location.href = "../index.html";
             });
 

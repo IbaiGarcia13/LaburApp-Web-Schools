@@ -4,6 +4,7 @@
    y ventanas modales globales de LaburApp.
    ========================================================================== */
 @import "paleta-colores.css";
+@import "cookies.css";
 
 /* --- RESET GENERAL DE ELEMENTOS --- */
 * {

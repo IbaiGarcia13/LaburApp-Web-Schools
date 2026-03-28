@@ -199,35 +199,50 @@ function setupEventListeners() {
 
 window.confirmarAbandonar = function (id) {
     const job = allJobs.find(j => j.id === id);
-    const isCompletada = job && (job.estado || "").toLowerCase() === "completada";
+    if (!job) return;
 
-    const modalTitle = isCompletada ? "Eliminar del Historial" : "Abandonar Trabajo";
-    const modalDesc = isCompletada
-        ? "¿Quieres eliminar este trabajo de tu lista? Solo desaparecerá para ti, el registro se mantiene para el publicador."
-        : "¿Quieres dejar de ser el trabajador de esta oferta?";
+    const isCompletada = (job.estado || "").toLowerCase() === "completada";
 
-    showCustomConfirm(
-        modalTitle,
-        modalDesc,
-        async () => {
-            try {
-                const { permanent } = await gestionarBorradoTarea(id, 'trabajador');
+    // Calcular si estamos dentro de la fecha límite
+    const ahora = new Date();
+    const fechaLim = job.fecha_limite?.toDate ? job.fecha_limite.toDate() : (job.fecha_limite ? new Date(job.fecha_limite) : null);
+    const dentroDePlazo = !fechaLim || fechaLim > ahora;
 
-                if (permanent) {
-                    allJobs = allJobs.filter(j => j.id !== id);
-                } else {
-                    const jobIndex = allJobs.findIndex(j => j.id === id);
-                    if (jobIndex !== -1) {
-                        allJobs[jobIndex].borrado_por_trabajador = true;
-                    }
+    const realizarAbandono = async () => {
+        try {
+            const { permanent } = await gestionarBorradoTarea(id, 'trabajador');
+
+            if (permanent) {
+                allJobs = allJobs.filter(j => j.id !== id);
+            } else {
+                const jobIndex = allJobs.findIndex(j => j.id === id);
+                if (jobIndex !== -1) {
+                    allJobs[jobIndex].borrado_por_trabajador = true;
                 }
-
-                applyClientFilters();
-            } catch (e) {
-                console.error(e);
             }
-        },
-        "Si",
-        "No"
-    );
+
+            applyClientFilters();
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    // Si el usuario abandona dentro del plazo, no se pregunta nada (reembolso automático)
+    if (!isCompletada && dentroDePlazo) {
+        realizarAbandono();
+    } else {
+        // Para tareas completadas (borrar historial) u otras, mantenemos el modal por seguridad
+        const modalTitle = isCompletada ? "Eliminar del Historial" : "Abandonar Trabajo";
+        const modalDesc = isCompletada
+            ? "¿Quieres eliminar este trabajo de tu lista? Solo desaparecerá para ti, el registro se mantiene para el publicador."
+            : "¿Quieres dejar de ser el trabajador de esta oferta?";
+
+        showCustomConfirm(
+            modalTitle,
+            modalDesc,
+            realizarAbandono,
+            "Si",
+            "No"
+        );
+    }
 };

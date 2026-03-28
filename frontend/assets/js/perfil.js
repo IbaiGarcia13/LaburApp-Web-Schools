@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // --- 3. RENDIMIENTO DE TABLA DE CATEGORIAS ---
                     if (catGrid) {
+                        ptsCat.sort((a, b) => b.puntos - a.puntos);
                         catGrid.innerHTML = "";
                         let hasCats = false;
                         for (let c of ptsCat) {
@@ -344,18 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     direccion_principal: newAddress
                 };
 
-                // Actualizar foto localmente y preparar para DB
-                if (photoFile) {
-                    const reader = new FileReader();
-                    const base64Photo = await new Promise((resolve, reject) => {
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.onerror = (e) => reject(e);
-                        reader.readAsDataURL(photoFile);
-                    });
-                    updateData.foto_perfil = base64Photo;
-                    displayPic.src = base64Photo;
-                }
-
                 // Actualizar CV PDF
                 if (pdfFile) {
                     const reader = new FileReader();
@@ -381,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Refrescar Visual Texto
                 displayName.textContent = updateData.nombre_completo;
                 displayDescription.textContent = newDescription || "¡Hola! Soy nuevo en LaburApp. Todavía no he escrito mi biografía.";
-                displayAddress.textContent = newAddress || "Ubicación no especificada";
+                displayAddress.textContent = newAddress || "Ubicación no establecida";
 
                 showCustomAlert("Éxito", "Perfil guardado correctamente en la Base de Datos.");
                 modal.style.display = "none";

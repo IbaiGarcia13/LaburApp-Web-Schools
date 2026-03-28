@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Categorías
         const grid = document.querySelector('.cat-grid');
         if (grid) {
+            ptsCat.sort((a, b) => b.puntos - a.puntos);
             grid.innerHTML = "";
             ptsCat.forEach(c => {
                 if (c.puntos > 0) {

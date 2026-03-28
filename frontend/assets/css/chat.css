@@ -436,6 +436,10 @@ body {
     height: 40px;
 }
 
+.icon-job-mobile {
+    display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
 
@@ -514,6 +518,7 @@ body {
         filter: invert(0.5);
         margin-top: -8px;
         margin-right: -5px;
+        display: inline !important;
     }
 
     .job-mobile-dropdown {
@@ -547,6 +552,7 @@ body {
         text-decoration: underline !important;
         font-weight: 500;
         display: block;
+        text-align: left !important;
     }
 
     /* Reducir cuadros de mensajes estilo WhatsApp */

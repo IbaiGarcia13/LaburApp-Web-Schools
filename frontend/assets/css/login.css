@@ -254,6 +254,66 @@ footer {
     font-size: 14px;
 }
 
+#about_laburapp {
+    background-color: var(--neutral-white);
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    text-align: center;
+    width: calc(100% - 60px);
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+#about_laburapp h2 {
+    color: var(--neutral-black);
+    margin-bottom: 20px;
+}
+
+#about_laburapp p {
+    color: var(--gray-7);
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.about-features {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.feature-item {
+    flex: 1;
+    min-width: 200px;
+    padding: 20px;
+    background: var(--neutral-white);
+    border: 1px solid var(--gray-2);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.feature-item h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--neutral-black);
+}
+
+.feature-item p {
+    font-size: 0.85rem;
+    color: var(--gray-6);
+    margin-bottom: 0;
+}
+
 /* RESPONSIVE - MÓVILES */
 
 @media (max-width: 768px) {
@@ -326,5 +386,16 @@ footer {
         font-size: 0.6rem;
         color: var(--gray-6);
         line-height: 1.5;
+    }
+
+    #about_laburapp {
+        width: calc(100% - 40px);
+        padding: 25px 20px;
+        margin: 20px auto;
+    }
+
+    .about-features {
+        flex-direction: column;
+        gap: 15px;
     }
 }
