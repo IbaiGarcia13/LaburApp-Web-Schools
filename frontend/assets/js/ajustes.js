@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
                             if (sTrabajador.toLowerCase() !== "ninguna") {
                                 const fechaV = perfil.fecha_vencimiento_trabajador?.toDate ? perfil.fecha_vencimiento_trabajador.toDate().toLocaleDateString() : null;
-                                const renovacion = perfil.renovacion_automatica_trabajador !== false; // true por defecto
+                                const renovacion = perfil.renovacion_automatica_trabajador !== false;
 
                                 workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
                                 if (fechaV) {
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
                             if (sCliente.toLowerCase() !== "ninguna") {
                                 const fechaV = perfil.fecha_vencimiento_cliente?.toDate ? perfil.fecha_vencimiento_cliente.toDate().toLocaleDateString() : null;
-                                const renovacion = perfil.renovacion_automatica_cliente !== false; // true por defecto
+                                const renovacion = perfil.renovacion_automatica_cliente !== false;
 
                                 clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
                                 if (fechaV) {
@@ -106,35 +106,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Eventos para cancelar suscripción
                         document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
-                            btn.onclick = async () => {
+                            btn.onclick = () => {
                                 const tipo = btn.dataset.tipo;
-                                const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar la renovación automática de tu suscripción de ${tipo}? Mantendrás los beneficios hasta que finalice el periodo actual.`);
-                                if (!confirmCancel) return;
-
-                                try {
-                                    await cancelarSuscripcionUsuario(user.uid, tipo);
-                                    window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
-                                    location.reload();
-                                } catch (error) {
-                                    console.error("Error al cancelar:", error);
-                                    window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
-                                }
+                                window.showCustomConfirm(
+                                    "Cancelar Renovación",
+                                    `¿Estás seguro de que deseas cancelar la renovación automática de tu suscripción de ${tipo}? Mantendrás los beneficios hasta que finalice el periodo actual.`,
+                                    async () => {
+                                        try {
+                                            await cancelarSuscripcionUsuario(user.uid, tipo);
+                                            window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
+                                            location.reload();
+                                        } catch (error) {
+                                            console.error("Error al cancelar:", error);
+                                            window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
+                                        }
+                                    },
+                                    "Confirmar",
+                                    "Volver",
+                                    "delete"
+                                );
                             };
                         });
+                    } // fin if (subsBody)
+
+                    // --- 2. RENDER MÉTODOS DE PAGO ---
+                    if (paymentsList) {
+                        await renderizarMetodosPago(user.uid);
                     }
-                }
 
-                // --- 2. RENDER MÉTODOS DE PAGO ---
-                if (paymentsList) {
-                    await renderizarMetodosPago(user.uid);
-                }
+                    // --- 3. RENDER HISTORIAL DE PAGOS ---
+                    if (historyContainer) {
+                        const historial = await obtenerHistorialPagos(user.uid);
+                        renderHistorialPagos(historial, false);
+                    }
 
-                // --- 3. RENDER HISTORIAL DE PAGOS ---
-                if (historyContainer) {
-                    const historial = await obtenerHistorialPagos(user.uid);
-                    renderHistorialPagos(historial, false);
-                }
-
+                } // fin if (perfil)
             } catch (error) {
                 console.error("Error obteniendo perfil/pagos en Ajustes:", error);
             }

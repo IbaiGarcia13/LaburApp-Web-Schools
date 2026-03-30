@@ -200,19 +200,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Eventos para cancelar suscripción
                         document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
-                            btn.onclick = async () => {
+                            btn.onclick = () => {
                                 const tipo = btn.dataset.tipo;
-                                const confirmCancel = confirm(`¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`);
-                                if (!confirmCancel) return;
-
-                                try {
-                                    await cancelarSuscripcionUsuario(user.uid, tipo);
-                                    window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
-                                    location.reload();
-                                } catch (error) {
-                                    console.error("Error al cancelar:", error);
-                                    window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
-                                }
+                                window.showCustomConfirm(
+                                    "Cancelar Suscripción",
+                                    `¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`,
+                                    async () => {
+                                        try {
+                                            await cancelarSuscripcionUsuario(user.uid, tipo);
+                                            window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
+                                            location.reload();
+                                        } catch (error) {
+                                            console.error("Error al cancelar:", error);
+                                            window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
+                                        }
+                                    },
+                                    "Confirmar",
+                                    "Volver",
+                                    "delete"
+                                );
                             };
                         });
                     }

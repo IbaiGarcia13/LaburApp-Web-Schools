@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayPay.textContent = newValue.toFixed(2);
                 displayExp.textContent = xp;
                 modalPay.classList.add('hidden');
-                showCustomAlert("Guardado", "Presupuesto actualizado.");
+                showCustomAlert("Guardado", "Pago actualizado.");
             } catch (e) {
                 console.error(e);
             }

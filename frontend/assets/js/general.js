@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             setupNotificationBadgeListener(user.uid);
 
+            // Inyectar notificaciones solo para usuarios autenticados
+            injectNotificationsHtml();
+            setupNotificationsLogic();
+
             // Comprobar si han pasado más de 7 días (si se usó "Recordarme")
             const loginTimestamp = localStorage.getItem("loginTimestamp");
             if (loginTimestamp) {
@@ -199,10 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
             procesarCerrarSesion(href);
         });
     });
-
-    // --- LÓGICA DE NOTIFICACIONES ---
-    injectNotificationsHtml();
-    setupNotificationsLogic();
 
     // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
     initCookieConsent();
