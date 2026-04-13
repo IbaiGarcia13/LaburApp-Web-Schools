@@ -1,5 +1,27 @@
 User-agent: *
+Disallow: /pages/ajustes.html
+Disallow: /pages/chat.html
+Disallow: /pages/mensajes.html
+Disallow: /pages/mapa.html
+Disallow: /pages/suscripciones.html
+Disallow: /pages/mi-tarea.html
+Disallow: /pages/mi-trabajo.html
+Disallow: /pages/perfil.html
+Disallow: /pages/mis-tareas.html
+Disallow: /pages/mis-trabajos.html
+Disallow: /pages/postulaciones.html
 Allow: /
 
 User-agent: Mediapartners-Google
+Disallow: /pages/ajustes.html
+Disallow: /pages/chat.html
+Disallow: /pages/mensajes.html
+Disallow: /pages/mapa.html
+Disallow: /pages/suscripciones.html
+Disallow: /pages/mi-tarea.html
+Disallow: /pages/mi-trabajo.html
+Disallow: /pages/perfil.html
+Disallow: /pages/mis-tareas.html
+Disallow: /pages/mis-trabajos.html
+Disallow: /pages/postulaciones.html
 Allow: /
