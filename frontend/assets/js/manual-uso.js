@@ -53,11 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Scroll to target (uses scroll-margin-top from CSS)
                 // Sub-menu links center the target, main menu headers scroll to start
-                const isSubMenuLink = this.closest('.submenu');
+
+                // Por defecto centramos arriba ('start'), a menos que tenga la clase 'scroll-center'
+                const shouldCenter = this.classList.contains('scroll-center') || this.parentElement.classList.contains('scroll-center');
 
                 targetElement.scrollIntoView({
                     behavior: 'smooth',
-                    block: isSubMenuLink ? 'center' : 'start'
+                    block: shouldCenter ? 'center' : 'start'
                 });
 
                 // Highlight Effect

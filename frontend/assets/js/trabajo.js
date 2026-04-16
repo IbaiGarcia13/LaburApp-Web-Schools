@@ -29,10 +29,22 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function checkUserRelation(trabajo) {
         auth.onAuthStateChanged(async (user) => {
-            if (!user) return;
-
             const btnPostular = document.getElementById("btn-postular");
             const btnChat = document.getElementById("btn-chat");
+
+            if (!user) {
+                if (btnPostular) {
+                    btnPostular.style.display = 'block';
+                    btnPostular.onclick = () => window.verificarSesion(null, "postularte a este trabajo");
+                }
+                if (btnChat) {
+                    btnChat.onclick = (e) => {
+                        e.preventDefault();
+                        window.verificarSesion(null, "chatear con el publicador");
+                    };
+                }
+                return;
+            }
 
             // Si soy el dueño, no puedo postularme
             if (user.uid === trabajo.id_publicador) {
@@ -95,15 +107,20 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+    // El listener del btnChat se maneja ahora dentro de checkUserRelation para invitados también
+
     // 3. Lógica del botón de chat
     const btnChat = document.getElementById("btn-chat");
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
             e.preventDefault();
-            if (currentTrabajo && currentTrabajo.id_publicador) {
-                // Redirigir directamente al chat con el publicador
-                window.location.href = `chat.html?id=${trabajoId}&userId=${currentTrabajo.id_publicador}`;
-            }
+            // Si el usuario está logueado, checkUserRelation reescribirá este onclick o ya lo habrá hecho
+            // Pero como fallback o para invitados:
+            window.verificarSesion(() => {
+                if (currentTrabajo && currentTrabajo.id_publicador) {
+                    window.location.href = `chat.html?id=${trabajoId}&userId=${currentTrabajo.id_publicador}`;
+                }
+            }, "chatear con el publicador");
         });
     }
 });

@@ -181,6 +181,14 @@ if (btnUpdate) {
             // Si solo cambiaron precios o tiempos, filtramos sobre lo que ya tenemos
             applyClientFilters();
         }
+
+        // Cerrar filtros si estamos en móvil
+        const sidebar = document.getElementById('sidebar');
+        const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+        if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
+            sidebar.classList.remove('show-mobile-filters');
+            if (mobileFilterBtn) mobileFilterBtn.classList.remove('active');
+        }
     };
 }
 

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Referencias UI Cuenta
     const passLabel = document.getElementById('passLabel');
     const btnChangePass = document.getElementById('btnChangePass');
+    const btnDeleteAccount = document.getElementById('btnDeleteAccount');
 
     // --- MODAL DE EDICIÓN DE DATOS PERSONALES ---
     const editModal = document.getElementById('editSettingsModal');
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayTelefono = document.getElementById('displayTelefono');
 
     // Contenedores para Suscripciones, Pagos e Historial
-    const settingsCards = document.querySelectorAll('.settings-card');
+    const settingsCards = document.querySelectorAll('.settings-card, .info-card');
     let subsBody = null;
     let paymentsList = null;
     let historyContainer = null;
@@ -37,9 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los datos reales desde Firestore
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const perfil = await obtenerPerfilUsuario(user.uid);
+        if (!user) {
+            sessionStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = '../index.html';
+            return;
+        }
+
+        try {
+            const perfil = await obtenerPerfilUsuario(user.uid);
                 if (perfil) {
                     if (displayNombre) displayNombre.textContent = perfil.nombre || "";
                     if (displayApellidos) displayApellidos.textContent = perfil.apellidos || "";
@@ -68,16 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
                             if (sTrabajador.toLowerCase() !== "ninguna") {
                                 const fechaV = perfil.fecha_vencimiento_trabajador?.toDate ? perfil.fecha_vencimiento_trabajador.toDate().toLocaleDateString() : null;
-                                const renovacion = perfil.renovacion_automatica_trabajador !== false;
-
                                 workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
                                 if (fechaV) {
-                                    workerHtml += `<br><small style="color: var(--gray-5); margin-left: 30px;">Vence: ${fechaV} (${renovacion ? 'Renovación automática' : 'No renovable'})</small>`;
+                                    workerHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
                                 }
-                                workerHtml += `</p>`;
-                                if (renovacion) {
-                                    workerHtml += `<img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Renovación">`;
-                                }
+                                workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
                             } else {
                                 workerHtml += `Ninguna</p>`;
                             }
@@ -88,16 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
                             if (sCliente.toLowerCase() !== "ninguna") {
                                 const fechaV = perfil.fecha_vencimiento_cliente?.toDate ? perfil.fecha_vencimiento_cliente.toDate().toLocaleDateString() : null;
-                                const renovacion = perfil.renovacion_automatica_cliente !== false;
-
                                 clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
                                 if (fechaV) {
-                                    clientHtml += `<br><small style="color: var(--gray-5); margin-left: 30px;">Vence: ${fechaV} (${renovacion ? 'Renovación automática' : 'No renovable'})</small>`;
+                                    clientHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
                                 }
-                                clientHtml += `</p>`;
-                                if (renovacion) {
-                                    clientHtml += `<img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Renovación">`;
-                                }
+                                clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
                             } else {
                                 clientHtml += `Ninguna</p>`;
                             }
@@ -109,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             btn.onclick = () => {
                                 const tipo = btn.dataset.tipo;
                                 window.showCustomConfirm(
-                                    "Cancelar Renovación",
-                                    `¿Estás seguro de que deseas cancelar la renovación automática de tu suscripción de ${tipo}? Mantendrás los beneficios hasta que finalice el periodo actual.`,
+                                    "Cancelar Suscripción",
+                                    `¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`,
                                     async () => {
                                         try {
                                             await cancelarSuscripcionUsuario(user.uid, tipo);
@@ -144,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Error obteniendo perfil/pagos en Ajustes:", error);
             }
-        }
     });
 
     // --- LÓGICA DE CERRAR SESIÓN (Manejada globalmente por general.js clase .logout-action) ---

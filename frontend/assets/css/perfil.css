@@ -302,13 +302,6 @@
     background-color: var(--cat-13);
 }
 
-/* Espacio Anuncio */
-.ad-placeholder {
-    height: 120px;
-    width: 100%;
-    margin-top: 20px;
-}
-
 /* Botón Editar superior */
 .edit-container {
     text-align: right;
@@ -363,6 +356,13 @@
 
 .sub-item p {
     margin: 0;
+}
+
+.sub-renewal-date {
+    font-style: italic;
+    color: var(--gray-3);
+    margin-left: 10px;
+    font-size: 0.85rem;
 }
 
 .btn-cancel-subscription {
@@ -722,5 +722,12 @@
         padding: 20px;
         width: 95%;
         margin: 5% auto;
+    }
+
+    .sub-renewal-date {
+        display: block;
+        margin-left: 0;
+        margin-top: 4px;
+        font-size: 0.75rem;
     }
 }

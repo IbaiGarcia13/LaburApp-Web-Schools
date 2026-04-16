@@ -7,16 +7,79 @@ import {
     actualizarActividadSuscripcion,
     obtenerTareasPendientesConfirmacion,
     registrarRespuestaConfirmacion,
-    verificarSuscripcionesRecurrentes
+    verificarSuscripcionesRecurrentes,
+    ejecutarResolucionTarea
 } from './database.js';
-import { onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onSnapshot, collection, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initCookieConsent } from './cookies.js';
+
+// --- UTILIDAD GLOBAL: VERIFICAR SESIÓN ---
+// Esta función comprueba si el usuario está logueado. Si no, muestra el modal de bloqueo.
+window.verificarSesion = function (callback, mensajeAux = "realizar esta acción") {
+    const user = auth.currentUser;
+    if (user) {
+        if (typeof callback === 'function') callback();
+        return true;
+    } else {
+        const isPage = window.location.pathname.includes('/pages/');
+        const loginUrl = isPage ? 'login.html' : 'pages/login.html';
+
+        showCustomConfirm(
+            "Acceso Restringido",
+            `Para ${mensajeAux} necesitas una cuenta en LaburApp. ¿Quieres iniciar sesión ahora?`,
+            () => {
+                // Guardamos la URL actual para intentar volver después del login si fuera posible (opcional)
+                sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = loginUrl;
+            },
+            "Iniciar Sesión",
+            "Cancelar",
+            "confirm",
+            true
+        );
+        return false;
+    }
+};
 
 // Evento global que inicializa el menú lateral y las acciones comunes en la barra superior al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+    // Forzar scroll arriba si venimos de una página legal (detectado por bandera en sessionStorage)
+    if (sessionStorage.getItem('forceScrollTop') === 'true') {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        
+        // Timeout para asegurar que el scroll se mantiene arriba tras la carga completa
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+            sessionStorage.removeItem('forceScrollTop');
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'auto';
+            }
+        }, 100);
+    }
+
     // -- LÓGICA DE USUARIO EN CABECERA --
     auth.onAuthStateChanged(async (user) => {
+        const isPage = window.location.pathname.includes('/pages/');
+        const assetsBase = isPage ? '../assets/img/' : 'assets/img/';
+        const guestAvatar = assetsBase + 'avatar-defecto.png';
+        const loginUrl = isPage ? 'login.html' : 'pages/login.html';
+
         if (user) {
+            // Mostrar avatar y ocultar botón de login de invitado
+            const headerAvatar = document.getElementById('profileBtn');
+            if (headerAvatar) headerAvatar.style.display = 'block';
+            const guestLoginBtn = document.getElementById('guestLoginBtn');
+            if (guestLoginBtn) guestLoginBtn.style.display = 'none';
+
+            // Mostrar pie de menús
+            const sideFooter = document.querySelector('.side-menu-footer');
+            if (sideFooter) sideFooter.style.display = 'flex';
+            const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
+            if (dropFooter) dropFooter.style.display = 'flex';
+
             setupNotificationBadgeListener(user.uid);
 
             // Inyectar notificaciones solo para usuarios autenticados
@@ -31,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Sesión expirada (7 días). Cerrando sesión...");
                     localStorage.removeItem("loginTimestamp");
                     auth.signOut().then(() => {
-                        window.location.href = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
+                        console.log("Sesión expirada (7 días).");
                     });
                     return;
                 }
@@ -39,21 +102,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const perfil = await obtenerPerfilUsuario(user.uid);
             if (perfil) {
-                // Actualizar actividad si tiene suscripción activa (Prioridad en listas)
-                // Actualizar siempre la actividad para refrescar prioridad o quitarla si ya no es suscriptor
                 actualizarActividadSuscripcion(user.uid).catch(e => {
                     console.error("Error actualizando actividad suscripción:", e);
                 });
 
-                // Verificar y procesar renovaciones automáticas de suscripciones
                 verificarSuscripcionesRecurrentes(user.uid).catch(e => {
                     console.error("Error verificando suscripciones recurrentes:", e);
                 });
 
-                const avatarUrl = perfil.foto_perfil || (window.location.pathname.includes('/pages/') ? '../assets/img/avatar-defecto.png' : 'frontend/assets/img/avatar-defecto.png');
+                const avatarUrl = perfil.foto_perfil || guestAvatar;
 
                 // Actualizar avatars en la cabecera
-                const headerAvatar = document.getElementById('profileBtn');
                 const dropdownAvatar = document.querySelector('.dropdown-avatar');
                 if (headerAvatar) headerAvatar.src = avatarUrl;
                 if (dropdownAvatar) dropdownAvatar.src = avatarUrl;
@@ -61,10 +120,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Actualizar nombre y email
                 const dropdownName = document.querySelector('.dropdown-name');
                 const dropdownEmail = document.querySelector('.dropdown-email');
+                if (dropdownName) dropdownName.innerText = perfil.nombre || user.displayName || "Usuario";
                 if (dropdownEmail) dropdownEmail.innerText = user.email;
 
-                // --- NUEVO: Chequeo de tareas vencidas que requieren confirmación ---
-                checkExpiredTasks(user.uid);
+                // Cambiar link de pie de dropdown si estaba en "Iniciar Sesion" (por si acaso)
+                const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
+                if (dropFooter) {
+                    const dropLink = dropFooter.querySelector('a');
+                    if (dropLink) {
+                        dropLink.innerText = "Cerrar Sesión";
+                        dropLink.href = loginUrl;
+                    }
+                }
+
+                // --- Chequeo de tareas vencidas que requieren confirmación ---
+                setTimeout(() => checkExpiredTasks(user.uid), 0);
+            }
+        } else {
+            // USUARIO INVITADO (GUEST)
+            console.log("Navegando como invitado.");
+            
+            // 1. Ocultar avatar y mostrar botón de login
+            const headerAvatar = document.getElementById('profileBtn');
+            if (headerAvatar) headerAvatar.style.display = 'none';
+
+            let guestLoginBtn = document.getElementById('guestLoginBtn');
+            if (!guestLoginBtn) {
+                guestLoginBtn = document.createElement('button');
+                guestLoginBtn.id = 'guestLoginBtn';
+                guestLoginBtn.className = 'login-btn-header';
+                guestLoginBtn.innerText = 'Iniciar Sesión';
+                guestLoginBtn.onclick = () => window.location.href = loginUrl;
+                
+                const headerIcons = document.querySelector('.header-icons');
+                if (headerIcons) {
+                    // Insertar antes del botón de hamburguesa (menuBtn)
+                    const menuBtn = document.getElementById('menuBtn');
+                    headerIcons.insertBefore(guestLoginBtn, menuBtn);
+                }
+            } else {
+                guestLoginBtn.style.display = 'block';
+            }
+
+            // 2. Textos en dropdown (por si acaso se llegara a abrir, aunque ahora no es accesible fácilmente)
+            const dropdownName = document.querySelector('.dropdown-name');
+            const dropdownEmail = document.querySelector('.dropdown-email');
+            if (dropdownName) dropdownName.innerText = "Invitado";
+            if (dropdownEmail) dropdownEmail.innerText = "Inicia sesión para más funciones";
+
+            // 3. Ocultar pie de menús (Cerrar Sesión) para invitados
+            const sideFooter = document.querySelector('.side-menu-footer');
+            if (sideFooter) sideFooter.style.display = 'none';
+            const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
+            if (dropFooter) dropFooter.style.display = 'none';
+
+            // 4. Adaptar Side Menu (Proteger items restringidos)
+            const restrictedItems = [
+                'Perfil', 'Mis Tareas', 'Mis Trabajos', 'Postulaciones', 'Mensajes', 'Ajustes'
+            ];
+            
+            const menuLinks = document.querySelectorAll('.side-menu ul li a');
+            menuLinks.forEach(link => {
+                if (restrictedItems.some(item => link.textContent.includes(item))) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.verificarSesion(null, "entrar a esta sección");
+                    });
+                }
+            });
+
+            // 5. Interceptar link al perfil en el dropdown
+            const dropdownProfileLink = document.querySelector('.profile-dropdown a[href*="perfil.html"]');
+            if (dropdownProfileLink) {
+                dropdownProfileLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.verificarSesion(null, "ver tu perfil");
+                });
             }
         }
     });
@@ -142,17 +273,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA GLOBAL DE CERRAR SESIÓN ---
-    function procesarCerrarSesion(href) {
+    function procesarCerrarSesion() {
         showCustomConfirm(
             "Cerrar Sesión",
             "¿Estás seguro de que quieres cerrar sesión?",
             () => {
                 localStorage.removeItem("loginTimestamp");
                 auth.signOut().then(() => {
-                    window.location.href = href;
+                    // No redirigimos. onAuthStateChanged se encargará de adaptar la UI
+                    // o redirigir si la página es restringida (mediante los guards locales).
+                    console.log("Sesión cerrada con éxito.");
                 }).catch((error) => {
                     console.error("Error al cerrar sesión:", error);
-                    window.location.href = href;
                 });
             },
             "Cerrar Sesión",
@@ -163,12 +295,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 1. Enlaces individuales (en el dropdown del perfil, etc.)
-    const logoutLinks = document.querySelectorAll('a[href="../index.html"], a[href="index.html"]');
+    const logoutLinks = document.querySelectorAll('a[href="login.html"], a[href="pages/login.html"]');
     logoutLinks.forEach(link => {
         if (link.textContent.toLowerCase().includes('cerrar sesi') || link.parentElement.innerHTML.includes('icono-cerrar-sesion')) {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                procesarCerrarSesion(link.getAttribute('href'));
+                procesarCerrarSesion();
             });
         }
     });
@@ -177,9 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sideMenuFooter = document.querySelector('.side-menu-footer');
     if (sideMenuFooter) {
         sideMenuFooter.addEventListener('click', (e) => {
-            const link = sideMenuFooter.querySelector('a');
-            const href = link ? link.getAttribute('href') : (window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html');
-            procesarCerrarSesion(href);
+            procesarCerrarSesion();
         });
     }
 
@@ -187,10 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownFooter = document.querySelector('.profile-dropdown .dropdown-footer');
     if (dropdownFooter) {
         dropdownFooter.addEventListener('click', (e) => {
-            const link = dropdownFooter.querySelector('a');
-            if (link) {
-                procesarCerrarSesion(link.getAttribute('href'));
-            }
+            procesarCerrarSesion();
         });
     }
 
@@ -198,9 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.logout-action').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            const link = btn.querySelector('a');
-            const href = link ? link.getAttribute('href') : (window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html');
-            procesarCerrarSesion(href);
+            procesarCerrarSesion();
         });
     });
 
@@ -640,9 +765,18 @@ window.showChangePasswordModal = function (onConfirm) {
 async function checkExpiredTasks(uid) {
     try {
         const tareas = await obtenerTareasPendientesConfirmacion(uid);
-        if (tareas.length > 0) {
-            // Mostramos el modal para la primera tarea que necesite atención
-            showMandatoryCompletionModal(tareas[0]);
+        
+        // --- LIMPIEZA SILENCIOSA ---
+        // Para cada tarea vencida, intentamos una resolución automática (ej: si pasaron 7 días)
+        // Esto permite que el sistema cumpla con el manual incluso si el usuario ignora el modal.
+        for (const tarea of tareas) {
+            await ejecutarResolucionTarea(tarea.id);
+        }
+
+        // Volvemos a obtener las tareas que aún requieren confirmación manual
+        const tareasPendientes = await obtenerTareasPendientesConfirmacion(uid);
+        if (tareasPendientes.length > 0) {
+            showMandatoryCompletionModal(tareasPendientes[0]);
         }
     } catch (e) {
         console.error("Error al comprobar tareas vencidas:", e);

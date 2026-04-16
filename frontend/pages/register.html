@@ -16,8 +16,12 @@
 
 <body>
     <header class="header-login">
-        <img class="icon" src="../assets/img/logo/LaburApp2-sin-fondo.png" alt="LaburApp Icono">
-        <img class="logo-text" src="../assets/img/logo/LaburApp3-sin-fondo.png" alt="Texto LABURAPP">
+        <a href="../index.html">
+            <img class="icon" src="../assets/img/logo/LaburApp2-sin-fondo.png" alt="LaburApp Icono">
+        </a>
+        <a href="../index.html">
+            <img class="logo-text" src="../assets/img/logo/LaburApp3-sin-fondo.png" alt="Texto LABURAPP">
+        </a>
     </header>
     <main>
         <section id="login">
@@ -61,6 +65,15 @@
                     <label for="dni">DNI:</label>
                     <input type="text" id="dni" name="dni" maxlength="9"><br><br>
 
+                    <div class="terms-container">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">
+                            He leído y acepto los <a href="terminos-condiciones.html">Términos y condiciones</a>, 
+                            la <a href="politica-privacidad.html">Política de privacidad</a> 
+                            y el <a href="aviso-legal.html">Aviso legal</a> de LaburApp.
+                        </label>
+                    </div>
+
                     <div style="display: flex; gap: 10px;">
                         <button type="button" id="btnAtras">Atrás</button>
                         <button type="submit" id="btnRegistrarse">Registrarse</button>
@@ -70,7 +83,7 @@
                 <p id="registerError" class="error"></p>
                 <p id="registerSuccess" style="color: var(--green-1); font-weight: bold;"></p>
             </form><br><br>
-            <p style="margin-top: -40px;">¿Ya tienes una cuenta? <a href="../index.html">Inicia sesión aquí</a></p>
+            <p style="margin-top: -40px;">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a></p>
         </section>
 
         <section id="download_app">
@@ -96,14 +109,41 @@
 
 </body>
 <footer>
-    <p>&copy; 2026 LaburApp - Todos los derechos reservados. |
-        <a href="aviso-legal.html">Aviso Legal</a> |
-        <a href="politica-privacidad.html">Privacidad</a> |
-        <a href="politica-cookies.html">Cookies</a> |
-        <a href="terminos-condiciones.html">Términos</a> |
-        <a href="seguridad.html">Seguridad</a> |
-        <a href="contacto.html">Contacto</a>
-    </p>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Soporte</h4>
+            <ul>
+                <li><a href="contacto.html">Contacto</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="terminos-condiciones.html">Términos y condiciones</a></li>
+                <li><a href="politica-privacidad.html">Política de privacidad</a></li>
+                <li><a href="politica-cookies.html">Política de cookies</a></li>
+                <li><a href="aviso-legal.html">Aviso legal</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Plataforma</h4>
+            <ul>
+                <li><a href="manual-uso.html">Manual de uso</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Redes Sociales</h4>
+            <ul>
+                <li><a href="#" class="disabled-link">YouTube</a></li>
+                <li><a href="#" class="disabled-link">Instagram</a></li>
+                <li><a href="#" class="disabled-link">TikTok</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>
+    </div>
 </footer>
 
 </html>
+

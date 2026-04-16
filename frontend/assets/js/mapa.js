@@ -334,9 +334,14 @@ document.getElementById("close-view-btn").addEventListener("click", () => docume
 const btnAdd = document.getElementById("create-marker-btn");
 if (btnAdd) {
     btnAdd.addEventListener("click", async () => {
+        if (creatingMode || tempMarker) {
+            showCustomAlert("Atención", "Ya tienes un marcador pendiente de colocar o configurar en el mapa.");
+            return;
+        }
+
         const user = auth.currentUser;
         if (!user) {
-            showCustomAlert("Acceso Restringido", "Debes iniciar sesión para publicar un trabajo.");
+            window.verificarSesion(null, "publicar un trabajo");
             return;
         }
 
@@ -421,4 +426,14 @@ document.getElementById("filter-range").addEventListener("input", function () {
     updateVisibleMarkers();
 });
 
-document.getElementById("apply-filters-btn").addEventListener("click", aplicarFiltros);
+document.getElementById("apply-filters-btn").addEventListener("click", () => {
+    aplicarFiltros();
+
+    // Cerrar filtros si estamos en móvil
+    const filterPanel = document.getElementById('filter-panel');
+    const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+    if (filterPanel && filterPanel.classList.contains('show-mobile-filters')) {
+        filterPanel.classList.remove('show-mobile-filters');
+        if (mobileFilterBtn) mobileFilterBtn.classList.remove('active');
+    }
+});

@@ -56,9 +56,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            await loadMyPostedTasks(user.uid);
+        if (!user) {
+            sessionStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = '../index.html';
+            return;
         }
+        await loadMyPostedTasks(user.uid);
     });
     setupEventListeners();
 });
@@ -180,6 +183,14 @@ function setupEventListeners() {
         currentFilters.pMin = parseFloat(document.getElementById('pay-min').value) || 2;
         currentFilters.pMax = parseFloat(document.getElementById('pay-max').value) || 1000;
         applyClientFilters();
+
+        // Cerrar filtros si estamos en móvil
+        const sidebar = document.getElementById('sidebar');
+        const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+        if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
+            sidebar.classList.remove('show-mobile-filters');
+            if (mobileFilterBtn) mobileFilterBtn.classList.remove('active');
+        }
     };
 
     document.getElementById('next-page').onclick = () => {

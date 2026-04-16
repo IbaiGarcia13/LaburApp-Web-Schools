@@ -1,4 +1,4 @@
-﻿import { db, auth } from './firebase-config.js';
+import { db, auth } from './firebase-config.js';
 import {
     collection,
     addDoc,
@@ -20,7 +20,7 @@ import {
     onAuthStateChanged,
     deleteUser
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 /**
  * ==========================================
@@ -1334,19 +1334,82 @@ export async function eliminarCuentaUsuario() {
     if (!user) throw new Error("No hay usuario autenticado.");
 
     const uid = user.uid;
+    const storage = getStorage();
 
     try {
-        // 1. Borrar documento del usuario
-        const docRef = doc(db, "usuarios", uid);
-        await deleteDoc(docRef);
+        // 0. Obtener datos actuales para el archivo
+        const userRef = doc(db, "usuarios", uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            // 0.1 Archivar identidad
+            await addDoc(collection(db, "usuarios_eliminados"), {
+                uid: uid,
+                nombre: data.nombre || "",
+                apellidos: data.apellidos || "",
+                dni: data.dni || "",
+                fecha_eliminacion: serverTimestamp()
+            });
+        }
 
-        // 2. Borrar de Firebase Auth
+        // 1. Limpieza de Subcolecciones de usuarios/{uid}
+        const subcollections = ["notificaciones", "conversaciones", "metodos_pago", "historial_pagos", "valoraciones_recibidas", "puntuaciones_categorias"];
+        for (const sub of subcollections) {
+            const q = query(collection(db, "usuarios", uid, sub));
+            const snap = await getDocs(q);
+            const batchDeletes = [];
+            snap.forEach(docSnap => {
+                batchDeletes.push(deleteDoc(docSnap.ref));
+            });
+            await Promise.all(batchDeletes);
+        }
+
+        // 2. Limpieza de Trabajos e Interacciones
+        // 2.1 Trabajos publicados por el usuario
+        const qJobs = query(collection(db, "trabajos"), where("id_publicador", "==", uid));
+        const jobsSnap = await getDocs(qJobs);
+        for (const jobDoc of jobsSnap.docs) {
+            const jobData = jobDoc.data();
+            if (jobData.estado === "Pendiente") {
+                // Borrado físico si no hay nadie aceptado
+                await deleteDoc(jobDoc.ref);
+            } else {
+                // Cancelación si hay actividad
+                await updateDoc(jobDoc.ref, { 
+                    estado: "Cancelada", 
+                    borrado_por_publicador: true,
+                    nota_sistema: "Cuenta de publicador eliminada."
+                });
+            }
+        }
+
+        // 2.2 Postulaciones del usuario en otros trabajos
+        // Nota: Iteramos trabajos pendientes para buscar sus postulaciones (basado en estructura actual)
+        const qAllJobs = query(collection(db, "trabajos"), where("estado", "==", "Pendiente"));
+        const allJobsSnap = await getDocs(qAllJobs);
+        for (const jobDoc of allJobsSnap.docs) {
+            const postRef = doc(db, "trabajos", jobDoc.id, "postulaciones", uid);
+            const postSnap = await getDoc(postRef);
+            if (postSnap.exists()) {
+                await deleteDoc(postRef);
+            }
+        }
+
+        // 3. Limpieza de Storage (Foto de Perfil)
+        const profilePicRef = ref(storage, `avatars/${uid}/profile.jpg`);
+        await deleteObject(profilePicRef).catch(e => console.log("No había foto de perfil en storage para borrar o error ignorado."));
+
+        // 4. Borrar documento principal del usuario
+        await deleteDoc(userRef);
+
+        // 5. Borrar de Firebase Auth
         await deleteUser(user);
 
         return true;
     } catch (error) {
-        console.error("Error al eliminar cuenta:", error);
-        throw error; // Lanzamos para que ajustes.js lo maneje
+        console.error("Error al eliminar cuenta integral:", error);
+        throw error;
     }
 }
 
@@ -1483,6 +1546,9 @@ export async function registrarRespuestaConfirmacion(idTarea, uid, respuesta) {
 /**
  * Lógica central de resolución: decide si se paga, se reembolsa o se entra en disputa.
  */
+/**
+ * Lógica central de resolución: decide si se paga, se reembolsa o se entra en disputa.
+ */
 export async function ejecutarResolucionTarea(idTarea) {
     const trabajoRef = doc(db, "trabajos", idTarea);
     const snap = await getDoc(trabajoRef);
@@ -1499,57 +1565,87 @@ export async function ejecutarResolucionTarea(idTarea) {
     if (!fechaLim) return;
     const diasTranscurridos = (ahora - fechaLim) / (1000 * 60 * 60 * 24);
 
-    // A) COINCIDENCIA (Sí/Sí o No/No) o TRABAJADOR DICE QUE NO (Abandono/No completado)
+    // 1. ACUERDO O ACCIÓN INMEDIATA
+    // 1.1 Si el trabajador admite que no lo hizo (abandono) -> Reembolso
     if (resW === 'no') {
-        // Si el trabajador admite que no lo hizo, reembolso automático (independiente de lo que diga el jefe)
         await reembolsarTrabajo(idTarea);
         await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+        await eliminarTareaResolucion(idTarea);
         return;
     }
 
+    // 1.2 Coincidencia Sí/Sí -> Pago
     if (resP === 'si' && resW === 'si') {
         await completarTrabajo(idTarea, tarea.id_trabajador);
         await updateDoc(trabajoRef, { resolucion_finalizada: true });
+        await eliminarTareaResolucion(idTarea);
         return;
     }
 
+    // 1.3 Coincidencia No/No -> Reembolso
     if (resP === 'no' && resW === 'no') {
         await reembolsarTrabajo(idTarea);
         await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+        await eliminarTareaResolucion(idTarea);
         return;
     }
 
-    // B) CONTRADICCIÓN INMEDIATA (Investigación)
+    // 1.4 CONTRADICCIÓN (Sí vs No) -> Investigación (No se borra)
     if ((resP === 'si' && resW === 'no') || (resP === 'no' && resW === 'si')) {
         await updateDoc(trabajoRef, { estado: 'En disputa', resolucion_finalizada: true });
         const msg = `Hay discrepancias en la confirmación de "${tarea.titulo}". Se ha abierto una investigación manual.`;
         await crearNotificacion(tarea.id_publicador, "Investigación Abierta", msg, "info");
         await crearNotificacion(tarea.id_trabajador, "Investigación Abierta", msg, "info");
+        // NOTA: Aquí no llamamos a gestionarBorradoTarea para que el admin pueda verla
         return;
     }
 
-    // C) EXPIRACIÓN (7 días)
+    // 2. EXPIRACIÓN (7 días)
     if (diasTranscurridos >= 7) {
         // Alguien respondió y el otro no (dar razón al que habló)
         if ((resP === 'si' || resP === 'no') && (resW === 'pendiente' || resW === 'espera')) {
-            await reembolsarTrabajo(idTarea); // Publisher gana -> Reembolso
-            await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
-        }
-        else if ((resW === 'si' || resW === 'no') && (resP === 'pendiente' || resP === 'espera')) {
-            if (resW === 'si') {
-                await completarTrabajo(idTarea, tarea.id_trabajador); // Worker gana -> Pago
-            } else {
-                await reembolsarTrabajo(idTarea); // Worker dice que NO -> Reembolso
-            }
-            await updateDoc(trabajoRef, { resolucion_finalizada: true });
-        }
-        else {
-            // Nadie respondió o ambos pulsaron espera -> Reembolso y borrar
+            // El publicador respondió -> Reembolso
             await reembolsarTrabajo(idTarea);
             await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
-            // Intentar borrado permanente (gestionarBorradoTarea ya tiene lógica de >7 días)
-            await gestionarBorradoTarea(idTarea, 'publicador').catch(console.error);
+            await eliminarTareaResolucion(idTarea);
         }
+        else if ((resW === 'si') && (resP === 'pendiente' || resP === 'espera')) {
+            // El trabajador respondió Sí -> Pago
+            await completarTrabajo(idTarea, tarea.id_trabajador);
+            await updateDoc(trabajoRef, { resolucion_finalizada: true });
+            await eliminarTareaResolucion(idTarea);
+        }
+        else {
+            // Nadie respondió o ambos pulsaron espera -> Reembolso por defecto y borrado
+            await reembolsarTrabajo(idTarea);
+            await updateDoc(trabajoRef, { resolucion_finalizada: true, estado: 'Cancelada' });
+            await eliminarTareaResolucion(idTarea);
+        }
+    }
+}
+
+/**
+ * Elimina físicamente el documento de la tarea de Firestore.
+ * Solo si la resolución ha terminado y no está en disputa.
+ */
+export async function eliminarTareaResolucion(idTarea) {
+    try {
+        const docRef = doc(db, "trabajos", idTarea);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) return;
+        const data = snap.data();
+
+        if (data.estado === "En disputa") {
+            console.log("Abortando borrado: Tarea en disputa.");
+            return;
+        }
+
+        if (data.resolucion_finalizada) {
+            await deleteDoc(docRef);
+            console.log(`Tarea ${idTarea} eliminada físicamente.`);
+        }
+    } catch (e) {
+        console.error("Error al borrar tarea:", e);
     }
 }
 

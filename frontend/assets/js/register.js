@@ -14,6 +14,7 @@ const nombreInput = document.getElementById("nombre");
 const apellidosInput = document.getElementById("apellidos");
 const fechaNacInput = document.getElementById("fechaNac");
 const dniInput = document.getElementById("dni");
+const termsCheckbox = document.getElementById("terms");
 
 // Buttons & Error
 const btnSiguiente = document.getElementById("btnSiguiente");
@@ -131,6 +132,19 @@ if (formRegister) {
 
         if (!isDniValid(dni)) {
             errorMsg.textContent = "El formato del DNI no es válido (ej: 12345678A).";
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
+            return;
+        }
+
+        if (!termsCheckbox || !termsCheckbox.checked) {
+            errorMsg.textContent = "Debes aceptar los términos y condiciones, la política de privacidad y el aviso legal para continuar.";
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
             return;
         }
 

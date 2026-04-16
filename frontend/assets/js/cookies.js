@@ -22,10 +22,12 @@ export function initCookieConsent() {
 function injectBanner(policyUrl) {
     if (document.getElementById('cookie-banner')) return;
 
+    const iconPath = isPage ? '../assets/img/icons/icono-cookie.png' : 'assets/img/icons/icono-cookie.png';
+
     const banner = document.createElement('div');
     banner.id = 'cookie-banner';
     banner.innerHTML = `
-        <h3>🍪 Configuración de Cookies</h3>
+        <h3><img src="${iconPath}" style="width: 25px; vertical-align: middle; margin-right: 8px;"> Configuración de Cookies</h3>
         <p>Utilizamos cookies para personalizar contenido, anuncios y analizar nuestro tráfico. 
            Puedes aceptar todas o configurar tus preferencias. Más info en nuestra 
            <a href="${policyUrl}">Política de Cookies</a>.</p>

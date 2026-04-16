@@ -507,7 +507,7 @@ body {
     }
 
     .job-context-mobile {
-        display: block !important;
+        display: block;
     }
 
     .icon-job-mobile {
@@ -518,7 +518,7 @@ body {
         filter: invert(0.5);
         margin-top: -8px;
         margin-right: -5px;
-        display: inline !important;
+        display: inline;
     }
 
     .job-mobile-dropdown {

@@ -11,6 +11,68 @@
 </head>
 
 <body>
+    <!-- HEADER MOVILES -->
+    <header class="show-only-mobile">
+        <div class="logo">
+            <a href="../index.html">
+                <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
+            </a>
+            <a href="../index.html">
+                <img src="../assets/img/logo/LaburApp3.png" alt="Texto LABURAPP" class="logo-text">
+            </a>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li><a href="usuarios.html">Usuarios</a></li>
+                    <li><a href="trabajos.html">Trabajos</a></li>
+                    <li><a href="mapa.html">Mapa</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="perfil.html">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
+                    </a>
+                    <p class="dropdown-name">Cargando...</p>
+                    <p class="dropdown-email">Cargando...</p>
+                    <div class="dropdown-footer">
+                        <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
+                        <a href="login.html">Cerrar Sesión</a>
+                    </div>
+                </div>
+
+                <div class="hamburger" id="menuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="side-menu show-only-mobile" id="sideMenu">
+        <ul>
+            <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
+            <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
+            <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
+            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
+            </li>
+            <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
+            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
+            </li>
+            <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a>
+            </li>
+            <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
+        </ul>
+        <div class="side-menu-footer">
+            <img src="../assets/img/icons/icono-cerrar-sesion.png"> <a href="login.html">Cerrar Sesión</a>
+        </div>
+    </nav>
+
     <button id="toggleIndex" class="mobile-index-btn">Índice</button>
 
     <div class="manual-layout">
@@ -70,7 +132,7 @@
                         <li><a href="#mis-trabajos-estados">Estados</a></li>
                         <li><a href="#mis-trabajos-cancelada">Cancelar/Eliminar</a></li>
                         <li><a href="#mi-trabajo">Acciones mi trabajo</a></li>
-                        <li><a href="#mi-trabajo-valoraciones">Valoraciones</a></li>
+                        <li class="scroll-center"><a href="#mi-trabajo-valoraciones">Valoraciones</a></li>
                     </ul>
                 </li>
 
@@ -87,8 +149,8 @@
                 <li class="has-submenu">
                     <a href="#suscripciones" class="menu-header">Suscripciones <span class="arrow"></span></a>
                     <ul class="submenu">
-                        <li><a href="#suscripciones-trabajador">Trabajador</a></li>
-                        <li><a href="#suscripciones-cliente">Cliente</a></li>
+                        <li class="scroll-center"><a href="#suscripciones-trabajador">Trabajador</a></li>
+                        <li class="scroll-center"><a href="#suscripciones-cliente">Cliente</a></li>
                     </ul>
                 </li>
                 
@@ -104,36 +166,50 @@
 
                 <li><a href="#pagos" class="menu-header">Pagos</a></li>
 
-                <li><a href="#soporte" class="menu-header">Centro de Ayuda y Soporte</a></li>
+                <li class="scroll-center"><a href="#soporte" class="menu-header">Centro de Ayuda y Soporte</a></li>
                 
-                <li><a href="#seguridad" class="menu-header">Seguridad y Sanciones</a></li>
+                <li class="scroll-center"><a href="#seguridad" class="menu-header">Seguridad y Sanciones</a></li>
 
                 <li><a href="#sanciones" class="menu-header">Sanciones</a></li>
             </ul>
         </nav>
 
         <div class="legal-container">
-            <a href="javascript:history.back()" class="back-link">&larr; Volver</a>
+            <div class="legal-header">
+            <a href="login.html" onclick="sessionStorage.setItem('forceScrollTop', 'true');" class="btn-back">
+                <img src="../assets/img/icons/icono-flecha.png" alt="Volver">
+            </a>
             <h1>Manual de Uso</h1>
-            <p style="padding: 0px 40px;">Bienvenido al manual de uso de LaburApp. Aquí encontrarás toda la información necesaria para navegar y utilizar nuestra plataforma de forma eficiente y segura.</p>
+        </div>
+            <p class="manual-resumen">Bienvenido al manual de uso de LaburApp. Aquí encontrarás toda la información necesaria para navegar y utilizar nuestra plataforma de forma eficiente y segura.</p>
 
             <div class="manual-section" id="registro">
                 <h2>REGISTRO</h2>
-                <p>Crear tu cuenta es muy sencillo:</p>
-                <ul>
-                    <p><strong>1. Cuenta:</strong> Introduce tu correo electrónico y la contraseña que quieres usar.</p>
-                    <p><strong>2. Datos personales:</strong> Introduce la información básica solicitada para configurar tu acceso.</p>
-                    <p><strong>3. ¡Listo!:</strong> Una vez verificado, ya podrás empezar a navegar por la plataforma.</p>
-                </ul>
+                <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <p>Crear tu cuenta es muy sencillo:</p>
+                        <ul>
+                            <p><strong>1. Cuenta:</strong> Introduce tu correo electrónico y la contraseña que quieres usar.</p>
+                            <p><strong>2. Datos personales:</strong> Introduce la información básica solicitada para configurar tu acceso.</p>
+                            <p><strong>3. ¡Listo!:</strong> Una vez verificado, ya podrás empezar a navegar por la plataforma.</p>
+                        </ul>
+                    </div>
+                    <img src="../assets/img/manual/registro-1.png" alt="Proceso de registro" style="max-width: 300px; width: 100%;">
+                </div>
             </div>
 
             <div class="manual-section" id="inicio-sesion">
                 <h2>INICIO DE SESIÓN</h2>
-                <p>Podrás iniciar sesión desde cualquier dispositivo, solo necesitas tu correo electrónico y tu contraseña. Además, podrás realizar varias acciones:</p>
-                <ul>
-                    <li><strong>Persistencia:</strong> Si marcas la casilla de “Recordarme” podrás hacer que se recuerde tu cuenta en el sistema durante un periodo de tiempo y no tengas que iniciar sesión cada vez que entres.</li>
-                    <li><strong>Recuperar contraseña:</strong> Si no te acuerdas de tu contraseña, podrás acceder al apartado de “¿Has olvidado tu contraseña?” y recibirás un correo electrónico para restablecer tu contraseña (revisa la carpeta de Spam de tu correo electrónico por si acaso).</li>
-                </ul>
+                <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <p>Podrás iniciar sesión desde cualquier dispositivo, solo necesitas tu correo electrónico y tu contraseña. Además, podrás realizar varias acciones:</p>
+                        <ul>
+                            <li><strong>Persistencia:</strong> Si marcas la casilla de “Recordarme” podrás hacer que se recuerde tu cuenta en el sistema durante un periodo de tiempo y no tengas que iniciar sesión cada vez que entres.</li>
+                            <li><strong>Recuperar contraseña:</strong> Si no te acuerdas de tu contraseña, podrás acceder al apartado de “¿Has olvidado tu contraseña?” y recibirás un correo electrónico para restablecer tu contraseña (revisa la carpeta de Spam de tu correo electrónico por si acaso).</li>
+                        </ul>
+                    </div>
+                    <img src="../assets/img/manual/inicio-sesion-1.png" alt="Inicio de sesión" style="max-width: 300px; width: 100%;">
+                </div>
             </div>
 
             <div class="manual-section" id="perfil">
@@ -152,6 +228,7 @@
                             </ul>
                         </li>
                     </ul>
+                    <img src="../assets/img/manual/perfil-1.png" alt="Perfil de usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">      
                     <p>Podrás editar tu información pulsando en el botón de editar perfil que se muestra en pantalla.</p>
                     <p>En el perfil, también podrás encontrar diferentes apartados útiles:</p>
                     <ul>
@@ -165,11 +242,24 @@
                                 <p><strong>- Dinero Conseguido:</strong> El dinero total que has conseguido haciendo trabajos.</p>
                             </ul>
                         </li>
+                    </ul>
+                    <img src="../assets/img/manual/perfil-2.png" alt="Perfil de usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                    <ul>
                         <li><strong>Categorías:</strong> Las categorías de las cuales tienes puntos por hacer trabajos con esa categoría, además de los puntos de cada una.</li>
+                    </ul>
+                    <img src="../assets/img/manual/perfil-3.png" alt="Perfil de usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                    <ul>
                         <li id="perfil-cuenta"><strong>Cuenta:</strong> El correo y la contraseña de tu cuenta, con posibilidad de cambiar la contraseña o cerrar sesión pulsando los botones que se muestran en pantalla.</li>
+                    </ul>
+                    <img src="../assets/img/manual/perfil-4.png" alt="Perfil de usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                    <ul>
                         <li><strong>Suscripciones:</strong> Las suscripciones que tienes activas, además, aquí podrás cancelarlas cuando quieras pulsando en el icono que se muestra en pantalla.</li>
+                    </ul>
+                    <img src="../assets/img/manual/perfil-5.png" alt="Perfil de usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                    <ul>
                         <li><strong>"Usuario":</strong> En este apartado podrás ver tu perfil desde la perspectiva de otro usuario (como ven los demás tu perfil). Aquí podrás ver tus valoraciones.</li>
                     </ul>
+                    <img src="../assets/img/manual/perfil-6.png" alt="Perfil de usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                 </div>
             </div>
 
@@ -186,11 +276,13 @@
                         <li><strong>Valoración Media:</strong> La media de todas las valoraciones que el usuario ha recibido.</li>
                         <li><strong>Especialidad:</strong> La categoría con la que el usuario tiene más puntos.</li>
                     </ul>
+                    <img src="../assets/img/manual/usuarios-1.png" alt="Usuarios" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                 </div>
 
                 <div class="manual-section" id="usuario" style="padding-top: 80px;">
                     <h2>USUARIO</h2>
                     <p>Aquí podrás ver el perfil del usuario al completo, incluso las valoraciones de este. Además podrás mandarle mensajes desde el icono del chat que hay en pantalla.</p>
+                    <img src="../assets/img/manual/usuario-1.png" alt="Usuario" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                 </div>
             </div>
 
@@ -208,12 +300,14 @@
                         <li><strong>Pago:</strong> El dinero que el cliente ofrece por su trabajo.</li>
                         <li id="trabajos-xp"><strong>Experiencia:</strong> La experiencia se recibe al completar un trabajo. Consiste en lo siguiente: Pago x 10 (luego se le suma o resta dependiendo de la valoración que recibas).</li>
                     </ul>
+                    <img src="../assets/img/manual/trabajos-1.png" alt="Trabajos" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                     <p><strong>Nota:</strong> Para poder realizar un trabajo, antes debes añadir un método de pago a tu cuenta. Podrás hacerlo desde Ajustes.</p>
                 </div>
 
                 <div class="manual-section" id="trabajo" style="padding-top: 80px;">
                     <h2>TRABAJO</h2>
                     <p>Aquí podrás ver la información del trabajo al completo. Podrás postularte a este trabajo para intentar realizarlo, importante: no podrás postular a ningún trabajo si no has añadido un método de pago a tu cuenta. Además podrás mandarle mensajes al publicador desde el icono del chat que hay en pantalla. Por último, podrás ver donde se ubica el trabajo en el mapa.</p>
+                    <img src="../assets/img/manual/trabajo-1.png" alt="Trabajo" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                 </div>
             </div>
 
@@ -222,8 +316,13 @@
                 <p>El mapa es una herramienta que tiene dos funciones dependiendo de si eres trabajador o cliente:</p>
                 <ul>
                     <li><strong>Trabajador:</strong> Aquí podrás encontrar trabajos directamente en el mapa y filtrar dependiendo de lo que busques. Al pulsar en el marcador del mapa, podremos ver breve información sobre ese trabajo, podemos ver más información sobre el trabajo pulsando los botones que aparecen en pantalla.</li>
+                </ul>
+                <img src="../assets/img/manual/mapa-1.png" alt="Mapa" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li><strong>Cliente:</strong> Aquí podrás ver tus tareas y toda su información, este pasará directamente a Trabajos al crearse. Para poder crear una tarea, antes debes añadir un método de pago a tu cuenta. Podrás hacerlo desde Ajustes.</li>
                 </ul>
+                <img src="../assets/img/manual/mapa-2.png" alt="Mapa" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+
 
                 <p>El mapa tiene tiene varios componentes importantes:</p>
                 <ul>
@@ -231,6 +330,10 @@
                         <li><strong>Marcadores:</strong> Círculos en el mapa que contienen trabajos, estos sirven para diferentes cosas dependiendo de si eres trabajador o cliente:</li>
                         <ul>
                             <p><strong>- Trabajador:</strong> Al pulsar en el marcador del mapa, podremos ver breve información sobre ese trabajo, podemos ver más información sobre el trabajo pulsando los botones que aparecen en pantalla.</p>
+                        </ul>
+                        <img src="../assets/img/manual/mapa-3.png" alt="Mapa" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <img src="../assets/img/manual/mapa-4.png" alt="Mapa" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <p><strong>- Cliente:</strong> Creas un marcador y personalizas el marcador, esto creará tu tarea, que será un trabajo para los demás. Importante: No podrás crear ningún marcador si no has añadido un método de pago a tu cuenta.</p>
                         </ul>
                     </div>
@@ -250,6 +353,7 @@
                         </ul>
                     </div>
                 </ul>
+                <img src="../assets/img/manual/mapa-5.png" alt="Mapa" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
 
                 <ul>
                     <div id="mapa-categorias">
@@ -265,11 +369,24 @@
                     <div id="mis-tareas-estados">
                         <ul>
                             <li><strong>Pendiente:</strong> No has aceptado a ningún postulante.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-tareas-1.png" alt="Mis Tareas" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li><strong>Aceptada:</strong> Has aceptado a un postulante, pero este no ha empezado a trabajar.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-tareas-2.png" alt="Mis Tareas" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li><strong>En curso:</strong> El trabajador ha comenzado a trabajar. Cuando el usuario termine, te mandará una foto de “prueba” de que el trabajo se ha realizado. Ahí podrás marcar la tarea como completada. Podrás marcar la tarea como completada (irreversible) sin la foto de prueba, pero si el trabajo no se ha realizado correctamente no podrás reclamar.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-tareas-3.png" alt="Mis Tareas" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li><strong>Completada:</strong> Has marcado la tarea como completada porque has considerado que el trabajo se ha completado correctamente. Esta acción es irreversible.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-tareas-4.png" alt="Mis Tareas" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li id="mis-tareas-cancelada"><strong>Cancelada:</strong> El trabajo ha sido cancelado o abandonado por alguna de las partes. El trabajador podrá abandonar el trabajo desde “Mis Trabajos”, en este caso, se te reembolsará el dinero automáticamente. Por otro lado, si tú cancelas la tarea, en este caso, si la tarea no estaba “En curso” (el trabajador no había empezado) se te reembolsará el dinero. En caso de que el estado estuviera “En curso” (el trabajador había empezado la tarea), el dinero seguirá retenido por LaburApp por seguridad del trabajador, y se llevará a cabo una investigación de la situación (motivo de la cancelación), consultándote tanto a tí, como al trabajador. Dependiendo del resultado de la investigación, se le pagará al trabajador o se te reembolsará el dinero.</li>
                         </ul>
+                        <img src="../assets/img/manual/mis-tareas-5.png" alt="Mis Tareas" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                         <p>Podrás cancelar la tarea pulsando el botón que se ve en pantalla. Una vez cancelada la tarea, podrás eliminarla con el botón que se ve en pantalla. Esto no eliminará la tarea definitivamente, simplemente tú no la verás más (el trabajador la verá como "Cancelada").</p>
                         <p>Una vez que pase la fecha límite de la tarea, se te preguntará a tí y al trabajador si la tarea se ha completado. 7 días tras la fecha límite, la tarea se eliminará (si no hay respuesta de ninguno de los dos) y se te reembolsará el dinero y se marcará la tarea como cancelada. Si hay respuesta de tu parte y no del trabajador, se te dará la razón. Si hay respuesta de parte del trabajador y no de tu parte, se le dará la razón al trabajador. Si las respuestas no coinciden, se realizará una investigación. Si las respuestas coinciden, se llevará a cabo el proceso adecuado (pago o reembolso). Si la tarea está completada, márcala como “Completada” para pagar al usuario y saltarte este aburrido proceso.</p>
                         <p id="mis-tareas-informe"><strong>Informar:</strong> Si quieres informar sobre cualquier cosa sobre el usuario y/o el trabajo, podrás denunciar al usuario desde el chat. También podrás hablar con Asistencia al cliente o contactar con nosotros vía email desde la página de contacto.</p>
@@ -289,9 +406,15 @@
                             <p>- Chatear con los postulantes.</p>
                             <p>- Ver perfiles de los postulantes.</p>
                         </ul>
-                    </li>
+                    </li> 
+                </ul>
+                <img src="../assets/img/manual/mi-tarea-1.png" alt="Mi Tarea" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li><strong>Trabajador:</strong> Podrás seguir viendo el perfil del trabajador una vez aceptes su postulación, o incluso chatear con él.</li>
                     <li><strong>Completar:</strong> Podrás marcar la tarea como completada mientras la tarea está “En curso”, esto dará la tarea como finalizada y pagará automáticamente al trabajador (esta acción es irreversible).</li>
+                </ul>
+                <img src="../assets/img/manual/mi-tarea-2.png" alt="Mi Tarea" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li id="mi-tarea-valorar"><strong>Valorar:</strong> Una vez completada la tarea, tendrás que valorar al usuario del 1 al 5 dependiendo de tu opinión. Además podrás dejar un comentario (opcional). Es obligatorio valorar al usuario para poder marcar la tarea como “Completada”. Dependiendo de la puntuación que le des, obtendrá XP extra o no:
                         <ul>
                             <p></p>
@@ -303,6 +426,7 @@
                         </ul>
                     </li>
                 </ul>
+                <img src="../assets/img/manual/mi-tarea-3.png" alt="Mi Tarea" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
             </div>
 
             <div class="manual-section" id="mis-trabajos">
@@ -312,10 +436,20 @@
                     <div id="mis-trabajos-estados">
                         <ul>
                             <li><strong>Aceptada:</strong> Postulación aceptada, pero sin comenzar.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-trabajos-1.png" alt="Mis Trabajos" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li><strong>En curso:</strong> Has comenzado a trabajar. Cuando termines, tendrás que mandar una foto de “prueba” de que el trabajo lo has realizado. No es obligatorio mandar la foto de “prueba” pero es muy recomendable por tu seguridad.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-trabajos-2.png" alt="Mis Trabajos" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li><strong>Completada:</strong> El cliente ha marcado la tarea como completada porque ha considerado que el trabajo se ha completado correctamente. Tras esto te llegará tanto el pago como una valoración sobre tu trabajo.</li>
+                        </ul>
+                        <img src="../assets/img/manual/mis-trabajos-3.png" alt="Mis Trabajos" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                        <ul>
                             <li id="mis-trabajos-cancelada"><strong>Cancelada:</strong> El trabajo ha sido cancelado o abandonado por alguna de las partes. Podrás abandonar el trabajo desde aquí, en este caso, se le reembolsará el dinero automáticamente al cliente. Por otro lado, si el cliente cancela el trabajo, en este caso, si el trabajo no estaba “En curso” (no habías empezado a trabajar) se le reembolsará el dinero al cliente. En caso de que el estado estuviera “En curso” (habías empezado a trabajar), el dinero seguirá retenido por LaburApp por tu seguridad, y se llevará a cabo una investigación de la situación (motivo de la cancelación), consultandote tanto a tí, como al cliente. Dependiendo del resultado de la investigación, se te pagará o se le reembolsará el dinero al cliente.</li>
                         </ul>
+                        <img src="../assets/img/manual/mis-trabajos-4.png" alt="Mis Trabajos" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
                         <p>El trabajo ha sido cancelado o abandonado por alguna de las partes. Podrás abandonar el trabajo desde aquí, en este caso, se le reembolsará el dinero automáticamente al cliente. Por otro lado, si el cliente cancela el trabajo, en este caso, si el trabajo no estaba “En curso” (no habías empezado a trabajar) se le reembolsará el dinero al cliente. En caso de que el estado estuviera “En curso” (habías empezado a trabajar), el dinero seguirá retenido por LaburApp por tu seguridad, y se llevará a cabo una investigación de la situación (motivo de la cancelación), consultandote tanto a tí, como al cliente. Dependiendo del resultado de la investigación, se te pagará o se le reembolsará el dinero al cliente.</p>
                         <p>El trabajo se marcará como “Cancelada” una vez que pase la fecha límite, y se te preguntará a tí y al cliente si la tarea se ha completado. 7 días tras la fecha límite, la tarea se eliminará (si no hay respuesta de ninguno de los dos) y se le reembolsará el dinero al cliente marcará la tarea como cancelada.. Si hay respuesta de tu parte y no del cliente, se te dará la razón. Si hay respuesta de parte del cliente y no de tu parte, se le dará la razón al cliente. Si las respuestas no coinciden, se realizará una investigación. Si las respuestas coinciden, se llevará a cabo el proceso adecuado (pago o reembolso).</p>
                         <p id="mis-trabajos-informe"><strong>Informar:</strong> Si quieres informar sobre cualquier cosa sobre el usuario y/o el trabajo, podrás denunciar al usuario desde el chat. También podrás hablar con Asistencia al cliente o contactar con nosotros vía email desde la página de contacto.</p>
@@ -329,8 +463,15 @@
                 <ul>
                     <li><strong>Chatear:</strong> Podrás hablar con el cliente de la tarea sobre el trabajo o cualquier cosa, pulsando el icono que se muestra en pantalla.</li>
                     <li><strong>Empezar:</strong> Podrás empezar a trabajar mientras el trabajo está “Aceptada”, esto dará la tarea como empezada y tendrás vía libre para trabajar.</li>
+                </ul> 
+                <img src="../assets/img/manual/mi-trabajo-1.png" alt="Mi Trabajo" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li><strong>Finalizar:</strong> Podrás mandar la foto de "prueba" cuando hayas terminado.</li>
-                    <li id="mi-trabajo-valoraciones"><strong>Valoraciones:</strong> Una vez completada la tarea, tendrás que valorar al usuario del 1 al 5 dependiendo de tu opinión. Además podrás dejar un comentario (opcional). Es obligatorio valorar al usuario para poder marcar la tarea como “Completada”. Dependiendo de la puntuación que le des, obtendrá XP extra o no:
+                </ul> 
+                <img src="../assets/img/manual/mi-trabajo-2.png" alt="Mi Trabajo" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <img src="../assets/img/manual/mi-trabajo-3.png" alt="Mi Trabajo" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
+                    <li id="mi-trabajo-valoraciones"><strong>Valoraciones:</strong> Una vez completada la tarea, obtendrás una valoración del cliente del 1 al 5 dependiendo de su opinión. Dependiendo de la puntuación que te den, obtendrás XP extra o no:
                         <ul>
                             <p></p>
                             <p><strong>- 5 estrellas:</strong> +20% de XP extra.</p>
@@ -348,8 +489,12 @@
                 <p>Aquí podrás ver tanto los trabajos a los que has postulado, como los usuarios que postulan a tus tareas.</p>
                 <ul>
                     <li id="postulaciones-trabajos"><strong>Trabajos:</strong> Podrás entrar al trabajo si pulsas en él. Además, podrás cancelar la postulación con el botón que se muestra en pantalla.</li>
+                </ul> 
+                <img src="../assets/img/manual/postulaciones-1.png" alt="Postulaciones" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li id="postulaciones-usuarios"><strong>Usuarios:</strong> Podrás aceptar o rechazar a los usuarios que postulan a tus trabajos, incluso podrás chatear con ellos, con los botones que se muestran en pantalla. Además, si pulsas en este usuario, podrás ver el perfil de este. Por último, si pulsas el nombre de la tarea a la que ha postulado, podrás verla.</li>
                 </ul>
+                <img src="../assets/img/manual/postulaciones-2.png" alt="Postulaciones" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
             </div>
 
             <div class="manual-section" id="mensajes">
@@ -359,6 +504,7 @@
                     <li><strong>Chat directo:</strong> Comunicación directa con un usuario.</li>
                     <li><strong>Chat de trabajo:</strong> Es un chat con un usuario, pero para hablar sobre un trabajo/tarea.</li>
                 </ul>
+                <img src="../assets/img/manual/mensajes-1.png" alt="Mensajes" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
             </div>
 
             <div class="manual-section" id="mensajes-chat">
@@ -367,9 +513,13 @@
                 <ul>
                     <li id="mensajes-chat-denunciar"><strong>Denunciar:</strong> Podrás denunciar al usuarios pulsando el botón que se muestra en pantalla y escribir el motivo de denuncia.
                     </li>
+                </ul>
+                <img src="../assets/img/manual/chat-1.png" alt="Chat" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li><strong>Mensajes:</strong> Podréis enviaros mensajes mutuamente, tanto texto como imágenes. Sale la fecha exacta del envío del mensaje y se indica si el otro usuario ha leído tu mensaje o no.
                     </li>
                 </ul>
+                <img src="../assets/img/manual/chat-2.png" alt="Chat" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
             </div>
 
             <div class="manual-section" id="suscripciones">
@@ -412,6 +562,8 @@
             <div class="manual-section" id="notificaciones">
                 <h2>NOTIFICACIONES</h2>
                 <p>Aquí podrás ver todas las notificaciones que tienes, si tienes nuevas notificaciones te aparecerán con un círculo rojo y el número de notificaciones sin leer. Podrás acceder a las notificaciones pulsando en ellas y te redirigirá a la página necesaria.</p>
+                <img src="../assets/img/manual/notificaciones-1.png" alt="Notificaciones" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <img src="../assets/img/manual/notificaciones-2.png" alt="Notificaciones" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
             </div>
 
             <div class="manual-section" id="ajustes">
@@ -419,11 +571,24 @@
                 <p>Aquí podrás ver todos los datos importantes sobre tu cuenta.</p>
                 <ul>
                     <li><strong>Datos personales:</strong> Información personal, podrás editarla pulsando el icono que se muestra en pantalla.</li>
+                </ul>
+                <img src="../assets/img/manual/ajustes-1.png" alt="Ajustes" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li><strong>Cuenta:</strong> El correo y la contraseña de tu cuenta, con posibilidad de cambiar la contraseña o cerrar sesión pulsando los botones que se muestran en pantalla</li>
+                </ul>
+                <img src="../assets/img/manual/ajustes-2.png" alt="Ajustes" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li><strong>Suscripciones:</strong> Las suscripciones que tienes activas, además, aquí podrás cancelarlas cuando quieras pulsando en el icono que se muestra en pantalla.</li>
+                </ul>
+                <img src="../assets/img/manual/ajustes-3.png" alt="Ajustes" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li id="ajustes-metodos-pago"><strong>Métodos de pago:</strong> Aquí podrás añadir o eliminar métodos de pago para realizar o recibir pagos. Como mínimo tienes que tener un método de pago para subir o realizar trabajos, el primer o único método de pago que tengas, se marcará como favorito. Podrás añadir tanto una tarjeta bancaria, como una plataforma de pago.</li>
+                </ul>
+                <img src="../assets/img/manual/ajustes-4.png" alt="Ajustes" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
+                <ul>
                     <li id="ajustes-historial-transacciones"><strong>Historial de transacciones:</strong> Aquí podrás ver los pagos que has realizado o recibido. Tienes el monto del pago, la fecha de emisión, y el motivo de la transacción.</li>
                 </ul>
+                <img src="../assets/img/manual/ajustes-5.png" alt="Ajustes" style="width: 100%; height: auto; margin-top: 15px; margin-bottom: 30px; display: block;">         
             </div>
 
             <div class="manual-section" id="pagos">
@@ -465,11 +630,61 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 LaburApp - Todos los derechos reservados.</p>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Soporte</h4>
+                <ul>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="terminos-condiciones.html">Términos y condiciones</a></li>
+                    <li><a href="politica-privacidad.html">Política de privacidad</a></li>
+                    <li><a href="politica-cookies.html">Política de cookies</a></li>
+                    <li><a href="aviso-legal.html">Aviso legal</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Plataforma</h4>
+                <ul>
+                    <li><a href="manual-uso.html">Manual de uso</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Redes Sociales</h4>
+                <ul>
+                    <li><a href="#" class="disabled-link">YouTube</a></li>
+                    <li><a href="#" class="disabled-link">Instagram</a></li>
+                    <li><a href="#" class="disabled-link">TikTok</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>
+        </div>
     </footer>
+
+    <!-- MENU INFERIOR MOVILES -->
+    <nav class="mobile-bottom-nav show-only-mobile" style="display: none;">
+        <a href="usuarios.html" class="nav-item">
+            <img src="../assets/img/icons/icono-perfil.png" alt="Usuarios">
+            <span>Usuarios</span>
+        </a>
+        <a href="trabajos.html" class="nav-item">
+            <img src="../assets/img/icons/icono-trabajos.png" alt="Trabajos">
+            <span>Trabajos</span>
+        </a>
+        <a href="mapa.html" class="nav-item">
+            <img src="../assets/img/icons/icono-ubicacion.png" alt="Mapa">
+            <span>Mapa</span>
+        </a>
+    </nav>
 
     <script type="module" src="../assets/js/general.js"></script>
     <script type="module" src="../assets/js/manual-uso.js"></script>
 </body>
 
 </html>
+

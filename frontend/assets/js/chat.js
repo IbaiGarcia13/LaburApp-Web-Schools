@@ -82,7 +82,7 @@ async function loadChatMeta() {
                 } else {
                     jobTitle.style.display = 'none';
                     const jobContextMobile = document.getElementById('jobContextMobile');
-                    if (jobContextMobile) jobContextMobile.style.display = 'none';
+                    if (jobContextMobile) jobContextMobile.classList.add('hidden');
                 }
 
                 if (otherId) {
@@ -123,6 +123,9 @@ async function loadChatMeta() {
 
                 // --- A: ESCUCHAR MENSAJES (Se inicia al saber el usuario) ---
                 startMessageListener(user.uid, otherId);
+            } else {
+                sessionStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = '../index.html';
             }
         });
     } catch (e) {

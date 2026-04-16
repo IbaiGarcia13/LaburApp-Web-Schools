@@ -182,6 +182,14 @@ document.getElementById('update-btn').onclick = () => {
 
     currentPage = 1;
     displayUsers();
+
+    // Cerrar filtros si estamos en móvil
+    const sidebar = document.getElementById('sidebar');
+    const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+    if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
+        sidebar.classList.remove('show-mobile-filters');
+        if (mobileFilterBtn) mobileFilterBtn.classList.remove('active');
+    }
 };
 
 // Evento para cambiar de página hacia adelante en el listado

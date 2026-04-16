@@ -23,10 +23,10 @@
 
     <header>
         <div class="logo">
-            <a href="principal.html">
+            <a href="../index.html">
                 <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
             </a>
-            <a href="principal.html">
+            <a href="../index.html">
                 <img src="../assets/img/logo/LaburApp3.png" alt="Texto LABURAPP" class="logo-text">
             </a>
         </div>
@@ -50,7 +50,7 @@
                     <p class="dropdown-email">Cargando...</p>
                     <div class="dropdown-footer">
                         <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
-                        <a href="../index.html">Cerrar Sesión</a>
+                        <a href="login.html">Cerrar Sesión</a>
                     </div>
                 </div>
 
@@ -78,9 +78,14 @@
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
-            <img src="../assets/img/icons/icono-cerrar-sesion.png"> <a href="../index.html">Cerrar Sesión</a>
+            <img src="../assets/img/icons/icono-cerrar-sesion.png"> <a href="login.html">Cerrar Sesión</a>
         </div>
     </nav>
+
+    <a href="javascript:void(0)" onclick="sessionStorage.setItem('forceScrollTop', 'true'); history.back();"
+        class="btn-back-global">
+        <img src="../assets/img/icons/icono-flecha.png" alt="Volver">
+    </a>
 
     <main class="main-content">
         <section class="job-header-section">
@@ -167,14 +172,41 @@
     <script type="module" src="../assets/js/trabajo.js"></script>
 </body>
 <footer>
-    <p>&copy; 2026 LaburApp - Todos los derechos reservados. |
-        <a href="aviso-legal.html">Aviso Legal</a> |
-        <a href="politica-privacidad.html">Privacidad</a> |
-        <a href="politica-cookies.html">Cookies</a> |
-        <a href="terminos-condiciones.html">Términos</a> |
-        <a href="seguridad.html">Seguridad</a> |
-        <a href="contacto.html">Contacto</a>
-    </p>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Soporte</h4>
+            <ul>
+                <li><a href="contacto.html">Contacto</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="terminos-condiciones.html">Términos y condiciones</a></li>
+                <li><a href="politica-privacidad.html">Política de privacidad</a></li>
+                <li><a href="politica-cookies.html">Política de cookies</a></li>
+                <li><a href="aviso-legal.html">Aviso legal</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Plataforma</h4>
+            <ul>
+                <li><a href="manual-uso.html">Manual de uso</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Redes Sociales</h4>
+            <ul>
+                <li><a href="#" class="disabled-link">YouTube</a></li>
+                <li><a href="#" class="disabled-link">Instagram</a></li>
+                <li><a href="#" class="disabled-link">TikTok</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>
+    </div>
 </footer>
 
 </html>
+

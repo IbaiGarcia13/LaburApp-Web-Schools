@@ -275,6 +275,14 @@ function setupFilterEvents() {
     document.getElementById('update-btn').addEventListener('click', () => {
         currentPage = 1;
         applyFilters();
+
+        // Cerrar filtros si estamos en móvil
+        const sidebar = document.getElementById('sidebar');
+        const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+        if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
+            sidebar.classList.remove('show-mobile-filters');
+            if (mobileFilterBtn) mobileFilterBtn.classList.remove('active');
+        }
     });
 
     // Allow pressing Enter in the form to trigger the filter

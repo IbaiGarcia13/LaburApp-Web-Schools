@@ -1,5 +1,6 @@
-import { auth, db } from './firebase-config.js';
+import { auth, db, storage } from './firebase-config.js';
 import { collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cancelarSuscripcionUsuario } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -63,13 +64,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los datos desde Firebase al abrir la app o iniciar sesión
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                // Actualizar correo real en la tarjeta 'Cuenta'
-                if (cuentaBody) {
-                    const emailP = cuentaBody.querySelector('p');
-                    if (emailP) emailP.innerHTML = `<strong>Correo electrónico:</strong> ${user.email}`;
-                }
+        if (!user) {
+            // Guardamos la URL actual por si acaso
+            sessionStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = '../index.html';
+            return;
+        }
+
+        try {
+            // Actualizar correo real en la tarjeta 'Cuenta'
+            if (cuentaBody) {
+                const emailP = cuentaBody.querySelector('p');
+                if (emailP) emailP.innerHTML = `<strong>Correo electrónico:</strong> ${user.email}`;
+            }
 
                 const perfil = await obtenerPerfilUsuario(user.uid);
                 // Obtenemos los puntos con sus metadatos (fechas) para desempatar
@@ -179,7 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (workerSubRow) {
                             let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
                             if (sTrabajador.toLowerCase() !== "ninguna") {
+                                const fechaV = perfil.fecha_vencimiento_trabajador?.toDate ? perfil.fecha_vencimiento_trabajador.toDate().toLocaleDateString() : null;
                                 workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
+                                if (fechaV) {
+                                    workerHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
+                                }
                                 workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
                             } else {
                                 workerHtml += `Ninguna</p>`;
@@ -190,7 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (clientSubRow) {
                             let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
                             if (sCliente.toLowerCase() !== "ninguna") {
+                                const fechaV = perfil.fecha_vencimiento_cliente?.toDate ? perfil.fecha_vencimiento_cliente.toDate().toLocaleDateString() : null;
                                 clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
+                                if (fechaV) {
+                                    clientHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
+                                }
                                 clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
                             } else {
                                 clientHtml += `Ninguna</p>`;
@@ -245,39 +260,38 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Error cargando perfil:", error);
             }
-        }
     });
 
     // --- LÓGICA DE SUBIDA DIRECTA DE FOTO DE PERFIL ---
     if (avatarEditBtn && inputPhotoDirect) {
         avatarEditBtn.onclick = () => inputPhotoDirect.click();
-
+    
         inputPhotoDirect.onchange = async (e) => {
             const user = auth.currentUser;
             if (!user) return;
-
+    
             const file = e.target.files[0];
             if (file) {
                 try {
-                    const reader = new FileReader();
-                    const base64Photo = await new Promise((resolve, reject) => {
-                        reader.onload = (ev) => resolve(ev.target.result);
-                        reader.onerror = (ev) => reject(ev);
-                        reader.readAsDataURL(file);
-                    });
-
-                    // 1. Mostrar localmente de inmediato (UX)
-                    if (displayPic) displayPic.src = base64Photo;
-
-                    // Actualizar también la foto del header y dropdown si existen
+                    // 1. Mostrar localmente de inmediato (UX / Preview)
+                    const previewUrl = URL.createObjectURL(file);
+                    if (displayPic) displayPic.src = previewUrl;
+    
+                    // Actualizar también la foto del header y dropdown si existen (Preview)
                     const headerPic = document.querySelector('.profile-toggle');
                     const dropdownPic = document.querySelector('.dropdown-avatar');
-                    if (headerPic) headerPic.src = base64Photo;
-                    if (dropdownPic) dropdownPic.src = base64Photo;
-
-                    // 2. Guardar en Firestore
-                    await actualizarPerfilUsuario(user.uid, { foto_perfil: base64Photo });
-
+                    if (headerPic) headerPic.src = previewUrl;
+                    if (dropdownPic) dropdownPic.src = previewUrl;
+    
+                    // 2. Subir a Firebase Storage
+                    // Usamos una ruta única para el avatar del usuario
+                    const photoRef = ref(storage, `avatars/${user.uid}/profile.jpg`);
+                    await uploadBytes(photoRef, file, { contentType: file.type });
+                    const downloadUrl = await getDownloadURL(photoRef);
+    
+                    // 3. Guardar la URL en Firestore (Mucho más eficiente que Base64)
+                    await actualizarPerfilUsuario(user.uid, { foto_perfil: downloadUrl });
+    
                     showCustomAlert("¡Éxito!", "Tu foto de perfil se ha actualizado correctamente.");
                 } catch (error) {
                     console.error("Error subiendo foto:", error);
@@ -351,19 +365,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     direccion_principal: newAddress
                 };
 
-                // Actualizar CV PDF
+                // Actualizar CV PDF (subir a Firebase Storage, no guardar base64 en Firestore)
                 if (pdfFile) {
-                    const reader = new FileReader();
-                    const base64PDF = await new Promise((resolve, reject) => {
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.onerror = (e) => reject(e);
-                        reader.readAsDataURL(pdfFile);
-                    });
-                    updateData.curriculum_url = base64PDF;
+                    const pdfRef = ref(storage, `curricula/${user.uid}/cv.pdf`);
+                    await uploadBytes(pdfRef, pdfFile, { contentType: 'application/pdf' });
+                    const pdfUrl = await getDownloadURL(pdfRef);
+                    updateData.curriculum_url = pdfUrl;
 
                     const displayPDF = document.getElementById('displayPDF');
                     if (displayPDF) {
-                        displayPDF.href = base64PDF;
+                        displayPDF.href = pdfUrl;
                         displayPDF.style.display = "inline";
                         const pdfRow = displayPDF.closest('.link-row');
                         if (pdfRow) pdfRow.style.display = "flex";

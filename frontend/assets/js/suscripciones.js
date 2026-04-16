@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('click', () => {
             const user = auth.currentUser;
             if (!user) {
-                window.showCustomAlert("Acceso Restringido", "Debes iniciar sesión para adquirir una suscripción.");
+                window.verificarSesion(null, "adquirir una suscripción");
                 return;
             }
 

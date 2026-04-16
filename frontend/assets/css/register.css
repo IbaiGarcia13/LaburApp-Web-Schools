@@ -289,6 +289,42 @@ button:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* TÉRMINOS Y CONDICIONES */
+.terms-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.terms-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.terms-container label {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 1.4;
+    user-select: none;
+}
+
+.terms-container label a {
+    color: var(--gray-11);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: underline;
+}
+
+.terms-container label a:hover {
+    color: var(--neutral-black);
+}
+
 #login p {
     margin-top: 15px;
 }

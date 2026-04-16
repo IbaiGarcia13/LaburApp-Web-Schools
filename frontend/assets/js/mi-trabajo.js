@@ -14,16 +14,24 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     let currentTrabajo = null;
     // 2. Cargar datos del trabajo desde Firestore
-    try {
-        currentTrabajo = await obtenerTrabajoPorId(trabajoId);
-        if (currentTrabajo) {
-            renderTrabajo(currentTrabajo);
-        } else {
-            console.error("Trabajo no encontrado");
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            sessionStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = '../index.html';
+            return;
         }
-    } catch (e) {
-        console.error("Error cargando detalle del trabajo:", e);
-    }
+
+        try {
+            currentTrabajo = await obtenerTrabajoPorId(trabajoId);
+            if (currentTrabajo) {
+                renderTrabajo(currentTrabajo);
+            } else {
+                console.error("Trabajo no encontrado");
+            }
+        } catch (e) {
+            console.error("Error cargando detalle del trabajo:", e);
+        }
+    });
 
     // 3. Lógica del botón de chat
     const btnChat = document.getElementById("btn-chat");

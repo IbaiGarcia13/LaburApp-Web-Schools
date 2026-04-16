@@ -156,7 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        valoraciones.forEach(val => {
+        const LIMIT = 5;
+        const visibles = valoraciones.slice(0, LIMIT);
+        const ocultas = valoraciones.slice(LIMIT);
+
+        function crearCard(val) {
             const div = document.createElement('div');
             div.className = 'review-card';
 
@@ -165,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const puntos = val.puntuacion || 0;
             const comentario = val.comentario || "<i style='color:#999'>Sin comentario.</i>";
 
-            // Generar estrellas visuales
             let estrellasHTML = "";
             for (let i = 1; i <= 5; i++) {
                 if (i <= puntos) {
@@ -201,16 +204,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>${comentario}</p>
                 </div>
             `;
-            list.appendChild(div);
-        });
+            return div;
+        }
+
+        visibles.forEach(val => list.appendChild(crearCard(val)));
+
+        if (ocultas.length > 0) {
+            const btnVerMas = document.createElement('button');
+            btnVerMas.id = 'btnVerMasValoraciones';
+            btnVerMas.className = 'btn-ver-mas-valoraciones';
+            btnVerMas.textContent = `Ver más valoraciones (${ocultas.length} restantes)`;
+            btnVerMas.addEventListener('click', () => {
+                ocultas.forEach(val => list.appendChild(crearCard(val)));
+                btnVerMas.remove();
+            });
+            list.after(btnVerMas);
+        }
     }
+
 
     const btnChat = document.getElementById('btn-chat');
     if (btnChat) {
         btnChat.addEventListener('click', (e) => {
             e.preventDefault();
-            // Eliminamos la confirmación molesta y redirigimos directamente al chat
-            window.location.href = `chat.html?userId=${userId}`;
+            window.verificarSesion(() => {
+                window.location.href = `chat.html?userId=${userId}`;
+            }, "iniciar un chat con este usuario");
         });
     }
 });
