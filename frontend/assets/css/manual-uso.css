@@ -1,6 +1,6 @@
 @import "paleta-colores.css";
 
-/* Layout General */
+
 .manual-layout {
     display: flex;
     gap: 30px;
@@ -10,7 +10,7 @@
     align-items: flex-start;
 }
 
-/* Sidebar Estilos */
+
 .manual-sidebar {
     width: 280px;
     position: sticky;
@@ -43,7 +43,7 @@
     margin-top: 10px;
 }
 
-/* Menu Hierárquico */
+
 .main-menu {
     list-style: none;
     padding: 10px 0 25px 0;
@@ -73,7 +73,7 @@
     border-left-color: var(--primary);
 }
 
-/* Submenu */
+
 .submenu {
     list-style: none;
     padding: 0;
@@ -86,7 +86,7 @@
 
 .has-submenu.active .submenu {
     max-height: 500px;
-    /* Suficiente para los items */
+    
 }
 
 .submenu li a {
@@ -102,7 +102,7 @@
     color: var(--primary);
 }
 
-/* Flecha Indicadora */
+
 .arrow {
     width: 8px;
     height: 8px;
@@ -116,7 +116,7 @@
     transform: rotate(45deg);
 }
 
-/* Resto de estilos del sidebar para links simples */
+
 .main-menu>li>a:not(.menu-header) {
     display: block;
     padding: 12px 25px;
@@ -134,7 +134,7 @@
     border-left-color: var(--primary);
 }
 
-/* Content Container Overrides */
+
 .legal-container {
     flex: 1;
     max-width: 950px;
@@ -147,7 +147,7 @@
     color: var(--gray-9);
 }
 
-/* Scroll Adjustment for IDs (Containers) */
+
 .manual-section {
     transition: background-color 0.4s ease;
     border-radius: 12px;
@@ -180,12 +180,12 @@
 
 
 
-/* Mobile Toggle Button */
+
 .mobile-index-btn {
     display: none;
 }
 
-/* Header y Botón Volver */
+/* --- HEADER Y BOTÓN VOLVER --- */
 .legal-header {
     display: flex;
     align-items: center;
@@ -240,14 +240,14 @@ h2 {
 h3 {
     color: var(--neutral-black);
     margin-top: 35px;
-    /* Mantener espacio razonable */
+    
     margin-bottom: 15px;
     font-size: 1.2rem;
     font-weight: 700;
     transition: background-color 0.3s;
 }
 
-/* Highlight Target Animation - Now for full containers */
+
 .highlight-target {
     animation: highlightFade 2.5s ease-out forwards;
     z-index: 10;
@@ -288,7 +288,7 @@ strong {
 
 
 
-/* Imágenes Manual */
+
 .img-manual {
     display: block;
     margin: 30px auto;
@@ -309,7 +309,7 @@ strong {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsividad */
+
 @media (max-width: 1100px) {
     .manual-sidebar {
         width: 240px;
@@ -396,7 +396,7 @@ strong {
         font-size: 0.85rem;
     }
 
-    /* Ajuste de scroll para que los anclajes no queden debajo del header fijo */
+    /* --- AJUSTE DE SCROLL PARA QUE LOS ANCLAJES NO QUEDEN DEBAJO DEL HEADER FIJO --- */
     [id] {
         scroll-margin-top: 70px;
     }

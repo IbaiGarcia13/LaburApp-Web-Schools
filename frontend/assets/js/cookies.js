@@ -1,19 +1,14 @@
-/**
- * Sistema de Gestión de Cookies para LaburApp
- * Maneja el banner de consentimiento y la configuración granular.
- */
+
 
 export function initCookieConsent() {
     const consent = localStorage.getItem('cookie_consent');
     const isPage = window.location.pathname.includes('/pages/');
     const policyUrl = isPage ? 'politica-cookies.html' : 'pages/politica-cookies.html';
 
-    // Inyectar HTML del banner si no hay consentimiento sacado
     if (!consent) {
         injectBanner(policyUrl);
     }
 
-    // Escuchar eventos para abrir configuración desde la página de política
     window.addEventListener('openCookieBanner', () => {
         showConfigModal();
     });
@@ -99,7 +94,6 @@ function showConfigModal() {
         if (banner) banner.style.display = 'none';
     };
 
-    // Cerrar al hacer clic fuera
     modal.onclick = (e) => {
         if (e.target === modal) modal.style.display = 'none';
     };
@@ -107,12 +101,11 @@ function showConfigModal() {
 
 function saveConsent(preferences) {
     localStorage.setItem('cookie_consent', JSON.stringify(preferences));
-    // Aquí se podrían activar/desactivar los scripts dinámicamente
+   
     console.log('Consentimiento guardado:', preferences);
 
-    // Si no se acepta marketing, podríamos informar a AdSense si fuera necesario
     if (!preferences.marketing) {
-        // Lógica para npa (non-personalized ads) de Google
+       // --- LÓGICA PARA NPA (NON-PERSONALIZED ADS) DE GOOGLE ---
         (window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
     }
 }

@@ -6,7 +6,6 @@ const formRegister = document.getElementById("formRegister");
 const fase1 = document.getElementById("fase1");
 const fase2 = document.getElementById("fase2");
 
-// Fields
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const passwordRptInput = document.getElementById("passwordRpt");
@@ -16,7 +15,6 @@ const fechaNacInput = document.getElementById("fechaNac");
 const dniInput = document.getElementById("dni");
 const termsCheckbox = document.getElementById("terms");
 
-// Buttons & Error
 const btnSiguiente = document.getElementById("btnSiguiente");
 const btnAtras = document.getElementById("btnAtras");
 const togglePassword = document.getElementById("togglePassword");
@@ -24,7 +22,6 @@ const togglePasswordRpt = document.getElementById("togglePasswordRpt");
 const errorMsg = document.getElementById("registerError");
 const successMsg = document.getElementById("registerSuccess");
 
-// 1. Mostrar/Ocultar contraseñas
 function toggleVisibility(inputId, buttonId) {
     const input = document.getElementById(inputId);
     const button = document.getElementById(buttonId);
@@ -46,30 +43,25 @@ if (togglePasswordRpt) {
     togglePasswordRpt.addEventListener("click", () => toggleVisibility("passwordRpt", "togglePasswordRpt"));
 }
 
-// 2. Navegación entre fases
 if (btnSiguiente) {
     btnSiguiente.addEventListener("click", () => {
-        errorMsg.textContent = ""; // Limpiar errores
+        errorMsg.textContent = "";
 
-        // Basic check for required Phase 1 fields
         if (!emailInput.value || !passwordInput.value || !passwordRptInput.value) {
             errorMsg.textContent = "Rellena todos los campos de la fase 1.";
             return;
         }
 
-        // Check if passwords match
         if (passwordInput.value !== passwordRptInput.value) {
             errorMsg.textContent = "Las contraseñas no coinciden.";
             return;
         }
 
-        // Password length check (Firebase requires at least 6)
         if (passwordInput.value.length < 6) {
             errorMsg.textContent = "La contraseña debe tener al menos 6 caracteres.";
             return;
         }
 
-        // Proceed to Phase 2
         fase1.classList.add("hidden");
         fase2.classList.remove("hidden");
     });
@@ -83,13 +75,11 @@ if (btnAtras) {
     });
 }
 
-// 3. Validación de DNI (básica)
 function isDniValid(dni) {
     const dniRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
     return dniRegex.test(dni);
 }
 
-// 4. Enviar formulario a Firebase
 if (formRegister) {
     formRegister.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -110,7 +100,6 @@ if (formRegister) {
         const dNac = fechaNacInput ? fechaNacInput.value.trim() : "";
         const dni = dniInput.value.trim().toUpperCase();
 
-        // Validaciones de la fase 2
         if (!nombre || !apellidos || !dni || !dNac) {
             errorMsg.textContent = "Todos los campos de datos personales (incluyendo Fecha Nac.) son obligatorios.";
             if (btnReg) {
@@ -148,7 +137,7 @@ if (formRegister) {
             return;
         }
 
-        // --- VALIDACIÓN DE EDAD (Mínimo 16 años) ---
+       // --- VALIDACIÓN DE EDAD (MÍNIMO 16 AÑOS) ---
         const birthDate = new Date(dNac);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -167,7 +156,6 @@ if (formRegister) {
             return;
         }
 
-        // Format date to DD-MM-YYYY if it comes from date input as YYYY-MM-DD
         let formattedDate = dNac;
         if (dNac.includes("-") && dNac.split("-")[0].length === 4) {
             const parts = dNac.split("-");
@@ -183,32 +171,28 @@ if (formRegister) {
                 return;
             }
 
-            // 4.1. Crear usuario en Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 4.2. Guardar datos extra en Firestore (colección 'usuarios')
-            // Usamos setDoc con el ID del usuario de Auth para enlazar los perfiles fácilmente
             await setDoc(doc(db, "usuarios", user.uid), {
                 nombre: nombre,
                 nombre_completo: nombre + " " + apellidos,
                 apellidos: apellidos,
                 dni: dni,
                 email: email,
-                fecha_nacimiento: formattedDate,  // Fecha de nacimiento introducida por el usuario
-                fecha_ingreso: serverTimestamp(),  // Fecha real de registro en la plataforma
+                fecha_nacimiento: formattedDate, 
+                fecha_ingreso: serverTimestamp(), 
                 nivel: 1,
                 experiencia_total: 0,
                 experiencia_nivel_actual: 0,
                 valoracion_media: 2.5,
-                num_valoraciones: 1, // La valoración inicial de 2.5 cuenta como la primera
+                num_valoraciones: 1,
                 dinero_ganado_total: 0,
                 id_suscripcion_trabajador: "ninguna",
                 id_suscripcion_cliente: "ninguna"
             });
 
-            // 4.3. Éxito
-            formRegister.reset(); // Limpiar el formulario
+            formRegister.reset();
             window.showCustomAlert("¡Registro exitoso!", "Tu cuenta ha sido creada. Pulsa aceptar para ir al login.", "Aceptar", () => {
                 window.location.href = "../index.html";
             });

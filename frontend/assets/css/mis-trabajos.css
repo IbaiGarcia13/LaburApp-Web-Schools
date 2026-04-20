@@ -1,10 +1,6 @@
 @import "paleta-colores.css";
 
-/* ==========================================================================
-   ESTILOS DE LISTA DE MIS TRABAJOS (TABLÓN PERSONAL)
-   Establece el diseño en tarjetas horizontales para los trabajos disponibles,
-   además de su interacción por hover y los filtros laterales.
-   ========================================================================== */
+
 #container {
     display: flex;
     max-width: 1300px;
@@ -39,7 +35,7 @@
     margin-top: -10px;
 }
 
-/* --- TARJETAS DE TRABAJO (Imágenes 200px) --- */
+/* --- TARJETAS DE TRABAJO (IMÁGENES 200PX) --- */
 .job-card {
     background: var(--neutral-white);
     border-radius: 15px;
@@ -88,7 +84,7 @@
     padding-right: 60px;
 }
 
-/* Badge de estado (Igual que en postulaciones.css) */
+
 .status-badge {
     font-size: 0.8rem;
     font-weight: bold;
@@ -97,7 +93,7 @@
     border-radius: 5px;
 }
 
-/* Colores de estado (Sólo texto, sin backgrounds para coincidir con postulaciones) */
+
 .status-pendiente {
     color: var(--neutral-white);
     background-color: var(--orange-1);
@@ -264,7 +260,7 @@
     font-size: 0.9rem;
 }
 
-/* Alineación Desde/Hasta (Flebox uniforme) */
+
 .input-row {
     display: flex;
     gap: 15px;
@@ -471,7 +467,7 @@
         display: grid;
         grid-template-columns: 120px minmax(0, 1fr);
         grid-template-rows: auto 1fr auto;
-        /* 1: header, 2: desc, 3: details */
+        /* --- 1: HEADER, 2: DESC, 3: DETAILS --- */
         height: auto;
         min-height: auto;
         padding: 12px;
@@ -515,7 +511,7 @@
         font-size: 0.9rem !important;
         margin: 0 !important;
         padding-right: 70px !important;
-        /* Espacio para los botones de acción */
+        
         white-space: normal !important;
         line-height: 1.2 !important;
         display: -webkit-box !important;

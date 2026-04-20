@@ -10,7 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Registro</title>
-    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="shortcut icon" href="../assets/img/icons/icono-app.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
     <link rel="stylesheet" href="../assets/css/register.css">
 </head>
 
@@ -27,43 +28,43 @@
         <section id="login">
             <h2>Registrarse</h2>
             <form id="formRegister">
-                <!-- Fase 1: Credenciales -->
+                
                 <div id="fase1">
                     <label for="email">Correo electrónico:</label>
-                    <input type="email" id="email" name="email" required><br><br>
+                    <input type="email" id="email" name="email" required>
 
                     <label for="password">Contraseña:</label>
-                    <div style="display: flex; align-items: center; gap: 5px;">
+                    <div class="password-toggle-group">
                         <input type="password" id="password" name="password" required>
                         <button type="button" id="togglePassword">
                             <img src="../assets/img/icons/icono-ojo-si.png" alt="Mostrar" id="imgToggle">
                         </button>
-                    </div><br>
+                    </div>
 
                     <label for="passwordRpt">Repite la contraseña:</label>
-                    <div style="display: flex; align-items: center; gap: 5px;">
+                    <div class="password-toggle-group">
                         <input type="password" id="passwordRpt" name="passwordRpt" required>
                         <button type="button" id="togglePasswordRpt">
                             <img src="../assets/img/icons/icono-ojo-si.png" alt="Mostrar" id="imgToggleRpt">
                         </button>
-                    </div><br><br>
+                    </div>
 
                     <button type="button" id="btnSiguiente">Siguiente</button>
                 </div>
 
-                <!-- Fase 2: Datos Personales (Oculto inicialmente) -->
+                
                 <div id="fase2" class="hidden">
                     <label for="nombre">Nombre:</label>
-                    <input type="text" id="nombre" name="nombre" maxlength="30"><br><br>
+                    <input type="text" id="nombre" name="nombre" maxlength="30">
 
                     <label for="apellidos">Apellidos:</label>
-                    <input type="text" id="apellidos" name="apellidos" maxlength="70"><br><br>
+                    <input type="text" id="apellidos" name="apellidos" maxlength="70">
 
                     <label for="fechaNac">Fecha de Nacimiento:</label>
-                    <input type="date" id="fechaNac" name="fechaNac" required><br><br>
+                    <input type="date" id="fechaNac" name="fechaNac" required>
 
                     <label for="dni">DNI:</label>
-                    <input type="text" id="dni" name="dni" maxlength="9"><br><br>
+                    <input type="text" id="dni" name="dni" maxlength="9">
 
                     <div class="terms-container">
                         <input type="checkbox" id="terms" name="terms" required>
@@ -88,7 +89,10 @@
 
         <section id="download_app">
             <div class="download-text">
-                <img src="../assets/img/app-descargar.png" alt="app descargar" class="ordenador">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="../assets/img/app-movil-descargar.png">
+                    <img src="../assets/img/app-pc-descargar.png" alt="app descargar" class="ordenador">
+                </picture>
                 <div>
                     <h2>¡DESCARGA LABURAPP!</h2>
                     <p>Descárgate nuestra app de LaburApp para Android o IOs gratis y empieza a disfrutar de la
@@ -96,7 +100,7 @@
                 </div>
             </div>
             <div class="download-button">
-                <button type="button" id="descargar" onclick="window.location.href='app.html'">
+                <button type="button" id="descargar" onclick="window.instalarPWA()">
                     DESCARGAR APP
                     <img src="../assets/img/icons/icono-descargar.png" alt="descargar icon">
                 </button>
@@ -139,6 +143,11 @@
                 <li><a href="#" class="disabled-link">TikTok</a></li>
             </ul>
         </div>
+    </div>
+    <div class="footer-logo-container">
+        <a href="../index.html">
+            <img src="../assets/img/logo/LaburApp4-sin-fondo.png" alt="LaburApp Logo" class="footer-logo">
+        </a>
     </div>
     <div class="footer-bottom">
         <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>

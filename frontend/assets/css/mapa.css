@@ -40,13 +40,9 @@
     margin-top: -10px;
 }
 
-/* MAPA */
-/* ==========================================================================
-   ESTILOS DEL MAPA INTERACTIVO (Leaflet)
-   Controla el alto, disposición lateral de columnas, el z-index de los controles 
-   y el formulario flotante para añadir / visualizar pines de trabajo.
-   ========================================================================== */
-/* Div donde Leaflet renderiza el mapa interactivo */
+/* --- MAPA --- */
+
+
 #map {
     height: 450px;
     border-radius: 20px;
@@ -55,7 +51,7 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* CAJA OSCURA (FILTROS) */
+/* --- CAJA OSCURA (FILTROS) --- */
 .filter-box {
     background-color: var(--neutral-black);
     color: var(--neutral-white);
@@ -161,7 +157,7 @@
     text-align: center;
 }
 
-/* FORMULARIO Y VISTA INCRUSTADO (IZQUIERDA) */
+/* --- FORMULARIO Y VISTA INCRUSTADO (IZQUIERDA) --- */
 #marker-form-box,
 #marker-view-box {
     background: var(--neutral-white);
@@ -190,7 +186,7 @@
     font-weight: bold;
 }
 
-/* FORMULARIO */
+/* --- FORMULARIO --- */
 #marker-form-box input,
 #marker-form-box select {
     width: 100%;
@@ -216,7 +212,7 @@
 }
 
 
-/* Fix para solapamiento de Zoom sobre el Header */
+/* --- FIX PARA SOLAPAMIENTO DE ZOOM SOBRE EL HEADER --- */
 .leaflet-top,
 .leaflet-bottom {
     z-index: 400 !important;

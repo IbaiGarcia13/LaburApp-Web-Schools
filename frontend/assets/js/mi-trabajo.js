@@ -3,7 +3,7 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
 import { obtenerTrabajoPorId, actualizarTrabajo, enviarMensajeTrabajo, crearNotificacion } from './database.js';
 
 document.addEventListener("DOMContentLoaded", async function () {
-    // 1. Obtener el ID del trabajo desde la URL
+   
     const urlParams = new URLSearchParams(window.location.search);
     const trabajoId = urlParams.get('id');
 
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     let currentTrabajo = null;
-    // 2. Cargar datos del trabajo desde Firestore
+   
     auth.onAuthStateChanged(async (user) => {
         if (!user) {
             sessionStorage.setItem('redirectAfterLogin', window.location.href);
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    // 3. Lógica del botón de chat
+   // --- 3. LÓGICA DEL BOTÓN DE CHAT ---
     const btnChat = document.getElementById("btn-chat");
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-    // 4. Lógica del botón de Empezar
+   // --- 4. LÓGICA DEL BOTÓN DE EMPEZAR ---
     const btnEmpezar = document.getElementById("btn-empezar");
     if (btnEmpezar) {
         btnEmpezar.addEventListener("click", async function () {
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-    // 5. Lógica de Finalizar con Cámara
+   // --- 5. LÓGICA DE FINALIZAR CON CÁMARA ---
     const btnFinalizar = document.getElementById("btn-finalizar");
     const modalCamera = document.getElementById('modalCamera');
     const cameraStream = document.getElementById('cameraStream');
@@ -123,29 +123,24 @@ document.addEventListener("DOMContentLoaded", async function () {
                 btnCapture.disabled = true;
                 btnCapture.innerText = "📦 Procesando...";
 
-                // 1. Capturar fotograma en canvas
                 cameraCanvas.width = cameraStream.videoWidth;
                 cameraCanvas.height = cameraStream.videoHeight;
                 cameraCanvas.getContext('2d').drawImage(cameraStream, 0, 0);
                 stopCamera();
 
-                // 2. Convertir a Blob
                 const blob = await new Promise(resolve => cameraCanvas.toBlob(resolve, 'image/jpeg', 0.85));
                 if (!blob) throw new Error("No se pudo generar la imagen.");
 
-                // 3. Subir a Storage
                 const fileName = `finalizacion_${trabajoId}_${Date.now()}.jpg`;
                 const storagePath = `pruebas_finalizacion/${trabajoId}/${fileName}`;
                 const fileRef = ref(storage, storagePath);
                 await uploadBytes(fileRef, blob);
                 const imageUrl = await getDownloadURL(fileRef);
 
-                // 4. Actualizar Estado en Firestore (NO cambiamos estado, solo añadimos la prueba)
                 await actualizarTrabajo(trabajoId, {
                     prueba_finalizado: imageUrl
                 });
 
-                // 4.1 Notificar al publicador (usamos icono de tarea en curso como pidió el usuario)
                 const recipientId = currentTrabajo?.id_publicador;
                 if (recipientId) {
                     await crearNotificacion(
@@ -156,7 +151,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         { id_trabajo: trabajoId }
                     );
 
-                    // 5. Enviar al chat automáticamente
                     await enviarMensajeTrabajo(trabajoId, imageUrl, "imagen", recipientId);
                     await enviarMensajeTrabajo(trabajoId, "¡He terminado el trabajo! Aquí tienes la foto de prueba.", "texto", recipientId);
                 }
@@ -174,15 +168,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-/**
- * Función para inyectar los datos del trabajo en el HTML
- */
 function renderTrabajo(trabajo) {
-    // Imagen
+   
     const imgEl = document.querySelector('.job-img');
     if (imgEl && trabajo.foto_trabajo) imgEl.src = trabajo.foto_trabajo;
 
-    // Info principal
     const titleEl = document.querySelector('.job-title');
     if (titleEl) titleEl.innerText = trabajo.titulo;
 
@@ -192,26 +182,22 @@ function renderTrabajo(trabajo) {
     const locEl = document.querySelector('.italic');
     if (locEl) locEl.innerText = trabajo.direccion || "Ubicación no especificada";
 
-    // Pagos y XP
     const statValues = document.querySelectorAll('.stat-value');
     if (statValues.length >= 2) {
-        // EL TRABAJADOR VE PAGO_CLIENTE (precio original)
+       // --- EL TRABAJADOR VE PAGO_CLIENTE (PRECIO ORIGINAL) ---
         const pago = trabajo.pago_cliente || 0;
         statValues[0].innerText = `${Number(pago).toFixed(2)} €`;
         statValues[1].innerText = `${trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10)} XP`;
     }
 
-    // Información detallada
     const infoTexts = document.querySelectorAll('.info-text');
     if (infoTexts.length >= 3) {
-        // Categoría
+       
         const catName = trabajo.id_categoria ? trabajo.id_categoria.charAt(0).toUpperCase() + trabajo.id_categoria.slice(1) : "Otros";
         infoTexts[0].innerText = catName;
 
-        // Tiempo
         infoTexts[1].innerText = `${trabajo.tiempo_estimado_horas}h`;
 
-        // Fecha Límite
         let fechaStr = "Sin fecha";
         if (trabajo.fecha_limite) {
             const f = trabajo.fecha_limite.toDate ? trabajo.fecha_limite.toDate() : new Date(trabajo.fecha_limite);
@@ -220,18 +206,17 @@ function renderTrabajo(trabajo) {
         infoTexts[2].innerText = fechaStr;
     }
 
-    // Actualizar badge de estado
     const badgeEl = document.getElementById('displayEstado');
     if (badgeEl) {
         let estado = trabajo.estado || 'Pendiente';
-        // Normalización para visualización
+       
         if (estado === "Aceptado") estado = "Aceptada";
 
         badgeEl.textContent = estado;
         badgeEl.className = `estado-badge ${estado.toLowerCase().replace(" ", "-")}`;
     }
 
-    // Lógica de botones de acción
+   // --- LÓGICA DE BOTONES DE ACCIÓN ---
     const btnEmpezar = document.getElementById("btn-empezar");
     const btnFinalizar = document.getElementById("btn-finalizar");
 
@@ -242,11 +227,11 @@ function renderTrabajo(trabajo) {
         if (trabajo.estado === "En curso" || (trabajo.estado === "Cancelada" && haEmpezado)) {
             btnFinalizar.style.display = "flex";
             if (trabajo.prueba_finalizado) {
-                // Ya envió la foto
+               
                 btnFinalizar.disabled = true;
                 btnFinalizar.innerHTML = '<img src="../assets/img/icons/icono-si-blanco.png" style="width: 20px;"> FINALIZADO';
             } else {
-                // No ha enviado la foto aún
+               
                 btnFinalizar.disabled = false;
                 btnFinalizar.innerHTML = '<img src="../assets/img/icons/icono-foto.png" style="width: 20px; filter: invert(1);"> FINALIZAR';
             }
@@ -255,7 +240,6 @@ function renderTrabajo(trabajo) {
         }
     }
 
-    // Inicializar Mini Mapa
     if (trabajo.latitud && trabajo.longitud) {
         initMiniMap(trabajo.latitud, trabajo.longitud, trabajo.id_categoria);
     }

@@ -1,10 +1,6 @@
 @import "paleta-colores.css";
 
-/* ==========================================================================
-   ESTILOS DE LISTA DE TRABAJOS (TABLÓN)
-   Establece el diseño en tarjetas horizontales para los trabajos disponibles,
-   además de su interacción por hover y los filtros laterales.
-   ========================================================================== */
+
 #container {
     display: flex;
     max-width: 1300px;
@@ -39,7 +35,7 @@
     margin-right: 10px;
 }
 
-/* --- TARJETAS DE TRABAJO (Imágenes 200px) --- */
+/* --- TARJETAS DE TRABAJO (IMÁGENES 200PX) --- */
 .job-card {
     background: var(--neutral-white);
     border-radius: 15px;
@@ -165,7 +161,7 @@
     font-size: 0.9rem;
 }
 
-/* Alineación Desde/Hasta (Flebox uniforme) */
+
 .input-row {
     display: flex;
     gap: 15px;
@@ -397,7 +393,7 @@
     .job-info {
         grid-area: info;
         display: contents;
-        /* Super important! Allows details to escape to bottom! */
+        
     }
 
     .job-card-header {

@@ -2,7 +2,7 @@ import { auth } from './firebase-config.js';
 import { obtenerTrabajoPorId, obtenerPostulacionesDeUnTrabajo, obtenerUsuarioPorId, aceptarPostulacion, rechazarPostulacion, completarTrabajo, dejarValoracion, obtenerMetodosPago, actualizarTrabajo } from './database.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Obtener el ID de la tarea desde la URL
+   
     const urlParams = new URLSearchParams(window.location.search);
     const tareaId = urlParams.get('id');
 
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentTarea = null;
 
-    // --- ELEMENTOS DE PANTALLA ---
+   // --- ELEMENTOS DE PANTALLA ---
     const displayTitle = document.getElementById('displayTitle');
     const displayDesc = document.getElementById('displayDesc');
     const displayLoc = document.getElementById('displayLoc');
@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayTime = document.getElementById('displayTime');
     const displayDate = document.getElementById('displayDate');
 
-    // 2. Cargar datos reales
     auth.onAuthStateChanged(user => {
         if (user) {
             loadTareaData(tareaId);
@@ -39,20 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTarea = tarea;
                 renderTarea(tarea);
 
-                // Ocultar botones de edición si está en curso o completada
                 if (tarea.estado === "En curso" || tarea.estado === "Completada") {
                     const editBtns = document.querySelectorAll('.icon-edit, .icon-edit-small');
                     editBtns.forEach(btn => btn.style.display = 'none');
                 }
 
-                // Si la tarea está pendiente, cargamos candidatos
                 if (tarea.estado && tarea.estado.toLowerCase() === "pendiente") {
                     loadApplicants(id);
                 } else {
                     document.getElementById('applicantsSection').style.display = 'none';
                 }
 
-                // Mostrar botón de completar solo si está en curso o finalizada por el trabajador
                 const btnCompletar = document.getElementById('btnCompletar');
                 if (btnCompletar) {
                     if (tarea.estado === "En curso" && tarea.id_trabajador) {
@@ -62,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Cargar trabajador asignado si existe
                 if (tarea.id_trabajador && tarea.estado !== "Pendiente") {
                     loadAssignedWorker(tarea.id_trabajador);
                 } else {
@@ -119,12 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Ir a perfil
         const goToProfile = () => window.location.href = `usuario.html?id=${user.uid}`;
         card.querySelector('.applicant-avatar').onclick = goToProfile;
         card.querySelector('.applicant-name').onclick = goToProfile;
 
-        // Eventos
         card.querySelector('.btn-accept').onclick = () => {
             const modal = document.getElementById('modalAceptarTrabajador');
             const montoEl = document.getElementById('montoRetenerModal');
@@ -133,10 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectMetodo = document.getElementById('selectMetodoAceptar');
             const noMethods = document.getElementById('noMethodsAceptar');
 
-            // Cargar datos en el modal
+           // --- CARGAR DATOS EN EL MODAL ---
             montoEl.textContent = Number(currentTarea.pago_cliente).toFixed(2);
 
-            // Cargar métodos específicos para este modal
+           // --- CARGAR MÉTODOS ESPECÍFICOS PARA ESTE MODAL ---
             const userAuth = auth.currentUser;
             if (userAuth) {
                 obtenerMetodosPago(userAuth.uid).then(metodos => {
@@ -219,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = document.getElementById('workerList');
         const avatar = user.foto_perfil || "../assets/img/avatar-defecto.png";
 
-        list.innerHTML = ""; // Solo puede haber uno
+        list.innerHTML = "";
         const card = document.createElement('div');
         card.className = 'applicant-card';
         card.innerHTML = `
@@ -232,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Ir a perfil
         const goToProfile = () => window.location.href = `usuario.html?id=${user.uid}`;
         card.querySelector('.applicant-avatar').onclick = goToProfile;
         card.querySelector('.applicant-name').onclick = goToProfile;
@@ -264,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
             displayDate.textContent = "Sin fecha";
         }
 
-        // Actualizar badge de estado
         const badgeEl = document.getElementById('displayEstado');
         if (badgeEl) {
             let estado = tarea.estado || 'Pendiente';
@@ -279,16 +270,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- MODALES Y LÓGICA DE EDICIÓN ---
+   // --- MODALES Y LÓGICA DE EDICIÓN ---
 
-    // Modal 1: Principal
+   // --- MODAL 1: PRINCIPAL ---
     const modalMain = document.getElementById('modalMain');
     const btnEditMain = document.getElementById('btnEditMain');
     const inputTitle = document.getElementById('inputTitle');
     const inputDesc = document.getElementById('inputDesc');
     const inputLoc = document.getElementById('inputLoc');
 
-    // --- SUBIDA DIRECTA DE FOTO DE TAREA ---
+   // --- SUBIDA DIRECTA DE FOTO DE TAREA ---
     const jobImageContainer = document.getElementById('jobImageContainer');
     const inputPhotoDirect = document.getElementById('inputPhotoDirect');
     const jobImg = document.querySelector('.job-img');
@@ -301,13 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!file) return;
 
             try {
-                // Previsualización inmediata
+               
                 const reader = new FileReader();
                 reader.onload = async (event) => {
                     const base64 = event.target.result;
                     if (jobImg) jobImg.src = base64;
 
-                    // Guardar en Firestore
                     await actualizarTrabajo(tareaId, { foto_trabajo: base64 });
                     showCustomAlert("Imagen Actualizada", "La foto de la tarea se ha guardado correctamente.");
                 };
@@ -349,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Modal 2: Pago
+   // --- MODAL 2: PAGO ---
     const modalPay = document.getElementById('modalPay');
     const btnEditPay = document.getElementById('btnEditPay');
     const inputPay = document.getElementById('inputPay');
@@ -378,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Modal 3: Info
+   // --- MODAL 3: INFO ---
     const modalInfo = document.getElementById('modalInfo');
     const btnEditInfo = document.getElementById('btnEditInfo');
     const inputCat = document.getElementById('inputCat');
@@ -401,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnSaveInfo').onclick = async () => {
         try {
             const dataToUpdate = {
-                id_categoria: inputCat.value.split(" ")[0].toLowerCase(), // Ejemplo: "Jardinería"
+                id_categoria: inputCat.value.split(" ")[0].toLowerCase(),
                 tiempo_estimado_horas: parseInt(inputTime.value) || 0
             };
 
@@ -434,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const modalAceptar = document.getElementById('modalAceptarTrabajador');
 
-    // Cerrar al clicar fuera
     window.onclick = (event) => {
         if (event.target == modalMain) modalMain.classList.add('hidden');
         if (event.target == modalPay) modalPay.classList.add('hidden');
@@ -444,7 +433,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target == modalAceptar) modalAceptar.classList.add('hidden');
     };
 
-    // Botón de Chat
     const btnChat = document.getElementById("btn-chat");
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
@@ -454,7 +442,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Botón de Completar Tarea: Confirmación de pago y luego valoración
     const btnCompletar = document.getElementById('btnCompletar');
     if (btnCompletar) {
         btnCompletar.addEventListener('click', () => {
@@ -473,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LÓGICA DEL MODAL DE VALORACIÓN
+   // --- LÓGICA DEL MODAL DE VALORACIÓN ---
     let currentRating = 0;
     const stars = document.querySelectorAll('.star-rating .star');
     const hint = document.getElementById('starHint');
@@ -498,16 +485,13 @@ document.addEventListener('DOMContentLoaded', () => {
             stars.forEach(s => s.classList.remove('selected'));
             this.classList.add('selected');
 
-            // Actualizar texto descriptivo
             const hints = ["Pésimo", "Malo", "Regular", "Bueno", "Excelente"];
             hint.textContent = `${currentRating} Estrella(s) - ${hints[currentRating - 1]}`;
 
-            // Habilitar botón de enviar
             btnConfirmarValoracion.disabled = false;
         };
     });
 
-    // --- ACCIÓN FINAL: Guardar valoración y completar tarea ---
     if (btnConfirmarValoracion) {
         btnConfirmarValoracion.onclick = async () => {
             if (!currentTarea || !currentTarea.id_trabajador) return;
@@ -519,10 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const puntuacion = currentRating;
                 const comentario = inputComentario.value.trim();
 
-                // 1. Guardar la valoración
                 await dejarValoracion(currentTarea.id_trabajador, tareaId, puntuacion, comentario);
 
-                // 2. Marcar como completada y transferir dinero (liberar escrow)
                 await completarTrabajo(tareaId, currentTarea.id_trabajador);
 
                 showCustomAlert("¡Tarea Finalizada!", "El pago se ha liberado al trabajador y la tarea está ahora completada.", "Aceptar", () => {

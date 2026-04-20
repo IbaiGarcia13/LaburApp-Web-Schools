@@ -1,8 +1,7 @@
 import { auth, db } from './firebase-config.js';
 import { collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { obtenerUsuarioPorId, obtenerTodosPuntosCategorias, obtenerValoracionesRecibidas } from './database.js';
-
-// Lógica cargada al visualizar el perfil de un usuario externo
+// --- LÓGICA CARGADA AL VISUALIZAR EL PERFIL DE UN USUARIO EXTERNO ---
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const user = await obtenerUsuarioPorId(uid);
 
-            // Obtenemos los puntos con sus metadatos (fechas) para desempatar
             const q = query(collection(db, "usuarios", uid, "puntuaciones_categorias"));
             const snapshot = await getDocs(q);
             const ptsCat = [];
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.description').textContent = user.bio || "Este usuario aún no tiene biografia.";
         document.querySelector('.italic').textContent = user.direccion_principal || "Ubicación no especificada";
 
-        // CV logic
         const pdfRow = document.getElementById('pdfRow');
         const displayPDF = document.getElementById('displayPDF');
         if (user.curriculum_url) {
@@ -77,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const pic = document.querySelector('.profile-pic');
         if (pic) pic.src = user.foto_perfil || "../assets/img/avatar-defecto.png";
 
-        // Stats
         const nLvl = user.nivel || 1;
         const xpActual = user.experiencia_nivel_actual || 0;
         const maxXP = 100 + (nLvl - 1) * 50;
@@ -107,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     bestCatId = c.id_categoria;
                     oldestDate = c.fecha_creacion;
                 } else if (c.puntos === maxPts && c.puntos > 0) {
-                    // Desempate por antigüedad
+                   
                     if (c.fecha_creacion < oldestDate) {
                         bestCatId = c.id_categoria;
                         oldestDate = c.fecha_creacion;
@@ -125,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             stats[2].textContent = (user.dinero_ganado_total || 0).toLocaleString() + " €";
         }
 
-        // Categorías
         const grid = document.querySelector('.cat-grid');
         if (grid) {
             ptsCat.sort((a, b) => b.puntos - a.puntos);
@@ -221,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
             list.after(btnVerMas);
         }
     }
-
 
     const btnChat = document.getElementById('btn-chat');
     if (btnChat) {

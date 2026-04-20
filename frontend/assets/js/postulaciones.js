@@ -1,13 +1,6 @@
 import { auth } from './firebase-config.js';
 import { obtenerMisPostulaciones, obtenerPostulacionesParaMisTareas, obtenerUsuarioPorId, cancelarPostulacion, aceptarPostulacion, rechazarPostulacion, obtenerMetodosPago } from './database.js';
 
-// =====================================================
-// JS de la página de Postulaciones
-// Renderiza dos listas: trabajos donde te postulaste (izq)
-// y usuarios que se han postulado para tus tareas (der)
-// =====================================================
-
-// Variables de estado
 let misPostulaciones = [];
 let postulantesParaMisTareas = [];
 let itemsPerPage = window.innerWidth <= 768 ? 3 : 5;
@@ -24,12 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setupPaginationEvents();
 
-    // Escuchar cambios de tamaño de ventana para ajustar la paginación dinámicamente
     window.addEventListener('resize', () => {
         const newItemsPerPage = window.innerWidth <= 768 ? 3 : 5;
         if (newItemsPerPage !== itemsPerPage) {
             itemsPerPage = newItemsPerPage;
-            currentPage = 1; // Reiniciar a la primera página para evitar errores de índice
+            currentPage = 1;
             renderTrabajos();
         }
     });
@@ -42,7 +34,7 @@ async function loadAllData(uid) {
     if (usersContainer) usersContainer.innerHTML = "<p class='loading-text'>Cargando interesados...</p>";
 
     try {
-        // 1. Trabajos donde ME HE POSTULADO (Izquierda)
+       
         const rawMisPost = await obtenerMisPostulaciones(uid);
         misPostulaciones = rawMisPost.sort((a, b) => {
             const dateA = a.postulacion?.fecha_postulacion?.toDate ? a.postulacion.fecha_postulacion.toDate() : (a.postulacion?.fecha_postulacion || 0);
@@ -51,7 +43,6 @@ async function loadAllData(uid) {
         });
         renderTrabajos();
 
-        // 2. Usuarios que SE HAN POSTULADO a mis tareas (Derecha)
         const rawPostParaMi = await obtenerPostulacionesParaMisTareas(uid);
         postulantesParaMisTareas = rawPostParaMi.sort((a, b) => {
             const dateA = a.fecha_postulacion?.toDate ? a.fecha_postulacion.toDate() : (a.fecha_postulacion || 0);
@@ -64,7 +55,6 @@ async function loadAllData(uid) {
     }
 }
 
-// Renderiza la lista paginada de trabajos donde el usuario se ha postulado
 function renderTrabajos() {
     const container = document.getElementById('jobs-list');
     if (!container) return;
@@ -79,7 +69,6 @@ function renderTrabajos() {
         container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>No te has postulado a ningún trabajo aún.</p>";
     }
 
-    // Mapa de categorías (igual que en mensajes.js/usuario.js)
     const catInfo = {
         'gastronomia': 'Gastronomía',
         'informatica': 'Informática',
@@ -105,13 +94,11 @@ function renderTrabajos() {
         const img = trabajo.foto_trabajo || "../assets/img/trabajo-defecto.png";
 
         let categoriaNom = catInfo[trabajo.id_categoria] || trabajo.id_categoria || trabajo.categoria || "General";
-        // Si es un ID de categoría, lo ponemos bonito si no estaba en el mapa (opcional, pero mejor prevenir)
+       
         if (categoriaNom && categoriaNom.length > 2 && !catInfo[trabajo.id_categoria]) {
             categoriaNom = categoriaNom.charAt(0).toUpperCase() + categoriaNom.slice(1).replace('_', ' ');
         }
 
-        // Logic for red dot notification
-        // We store the last seen status in localStorage to know if it has changed
         const lastSeenStatusKey = `lastSeenStatus_${trabajo.id}`;
         const lastSeenStatus = localStorage.getItem(lastSeenStatusKey);
         const isUnread = lastSeenStatus && lastSeenStatus !== estadoRaw && estadoRaw !== 'Pendiente';
@@ -120,11 +107,10 @@ function renderTrabajos() {
         card.className = `job-card ${isUnread ? 'unread' : ''}`;
 
         card.onclick = () => {
-            localStorage.setItem(lastSeenStatusKey, estadoRaw); // Mark as seen
+            localStorage.setItem(lastSeenStatusKey, estadoRaw);
             window.location.href = `trabajo.html?id=${trabajo.id}`;
         };
 
-        // If it's the first time we see this job, we save the status but don't show the dot
         if (!lastSeenStatus) {
             localStorage.setItem(lastSeenStatusKey, estadoRaw);
         }
@@ -161,7 +147,6 @@ function renderTrabajos() {
     document.getElementById('next-page').style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
-// Renderiza la lista de usuarios postulantes (sin paginación, scroll vertical)
 async function renderUsuarios() {
     const container = document.getElementById('users-list');
     if (!container) return;
@@ -209,19 +194,16 @@ async function renderUsuarios() {
         `;
         container.appendChild(card);
 
-        // Click en el título de la tarea
         card.querySelector('.user-task-link').addEventListener('click', (e) => {
             e.stopPropagation();
             window.location.href = `mi-tarea.html?id=${app.id_trabajo}`;
         });
 
-        // Click en chat
         card.querySelector('.user-chat-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             window.location.href = `chat.html?id=${app.id_trabajo}&userId=${user.uid}`;
         });
 
-        // Click en Aceptar
         card.querySelector('.btn-accept-small').addEventListener('click', (e) => {
             e.stopPropagation();
 
@@ -234,7 +216,6 @@ async function renderUsuarios() {
 
             if (!modal || !montoEl || !btnConfirm || !btnCancel || !selectMetodo || !noMethods) return;
 
-            // Cargar datos
             montoEl.textContent = Number(app.pago_cliente || 0).toFixed(2);
 
             const userAuth = auth.currentUser;
@@ -282,7 +263,6 @@ async function renderUsuarios() {
             };
         });
 
-        // Click en Rechazar
         card.querySelector('.btn-reject-small').addEventListener('click', (e) => {
             e.stopPropagation();
             showCustomConfirm("Rechazar Candidato", `¿Estás seguro de rechazar la solicitud de ${user.nombre} para "${app.trabajo_titulo}"?`, async () => {
@@ -319,8 +299,7 @@ function setupPaginationEvents() {
         }
     });
 }
-
-// Cerrar modal al clicar fuera
+// --- CERRAR MODAL AL CLICAR FUERA ---
 window.onclick = (event) => {
     const modalAceptar = document.getElementById('modalAceptarTrabajador');
     if (event.target == modalAceptar) {
@@ -338,7 +317,7 @@ window.confirmarCancelarPostulacion = function (jobId) {
         async () => {
             try {
                 await cancelarPostulacion(jobId, user.uid);
-                // Actualizar lista local y renderizar
+               
                 misPostulaciones = misPostulaciones.filter(p => p.id !== jobId);
                 renderTrabajos();
                 showCustomAlert("Éxito", "Postulación cancelada correctamente.");

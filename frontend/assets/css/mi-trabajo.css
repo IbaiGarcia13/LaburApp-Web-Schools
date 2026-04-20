@@ -1,6 +1,6 @@
 @import "paleta-colores.css";
 
-/* Mi Trabajo UI */
+
 .main-content {
     margin: 40px auto;
     padding: 0 20px;
@@ -108,7 +108,7 @@
     text-align: center;
 }
 
-/* Información section */
+
 .info-section {
     background-color: var(--neutral-white);
     color: var(--gray-9);
@@ -150,7 +150,7 @@
     color: var(--gray-4);
 }
 
-/* Container Chat */
+
 .message-container {
     text-align: right;
 }
@@ -183,7 +183,7 @@
     transform: scale(1.1);
 }
 
-/* Acciones del trabajo */
+
 .job-actions {
     margin-top: 30px;
     display: flex;
@@ -206,7 +206,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    /* Controlado por JS */
+    
 }
 
 .btn-empezar:hover,
@@ -223,7 +223,7 @@
     transform: none;
 }
 
-/* Mini Mapa */
+
 .mini-map {
     height: 300px;
     width: 100%;
@@ -279,7 +279,7 @@
 @media (max-width: 768px) {
     .main-content {
         min-width: 0;
-        margin: 20px auto;
+        margin: 30px auto;
         padding: 0 15px;
     }
 
@@ -290,15 +290,22 @@
         text-align: center;
     }
 
+    .job-image-wrapper {
+        align-self: center;
+    }
+
     .job-img {
         width: 100%;
-        max-width: 260px;
+        max-width: 240px;
+        min-width: 240px;
         height: auto;
         aspect-ratio: 1/1;
+        display: block;
+        margin: 0 auto;
     }
 
     .job-title {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
 
     .job-description {
@@ -306,10 +313,20 @@
     }
 
     .job-info-footer {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
         gap: 15px;
         margin-top: 20px;
+    }
+
+    .contact-links {
+        text-align: left;
+    }
+
+    .message-container {
+        text-align: right;
     }
 
     .truncate-text {
@@ -323,6 +340,7 @@
         padding: 20px 0;
         min-width: 0;
         width: 100%;
+        margin-bottom: -39px;
     }
 
     .stat-label,
@@ -342,6 +360,10 @@
     .info-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+
+    .info-item {
+        font-size: 0.8rem;
     }
 
     .job-actions {

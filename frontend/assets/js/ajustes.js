@@ -4,18 +4,16 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Referencias UI Cuenta
     const passLabel = document.getElementById('passLabel');
     const btnChangePass = document.getElementById('btnChangePass');
     const btnDeleteAccount = document.getElementById('btnDeleteAccount');
 
-    // --- MODAL DE EDICIÓN DE DATOS PERSONALES ---
+   // --- MODAL DE EDICIÓN DE DATOS PERSONALES ---
     const editModal = document.getElementById('editSettingsModal');
     const btnEditProfile = document.getElementById('btnEditProfile');
     const btnCancelEditSettings = document.getElementById('btnCancelEditSettings');
     const btnSaveSettings = document.getElementById('btnSaveSettings');
 
-    // Referencias a textos a rellenar
     const displayNombre = document.getElementById('displayNombre');
     const displayApellidos = document.getElementById('displayApellidos');
     const displayDireccion = document.getElementById('displayDireccion');
@@ -23,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayDni = document.getElementById('displayDni');
     const displayTelefono = document.getElementById('displayTelefono');
 
-    // Contenedores para Suscripciones, Pagos e Historial
     const settingsCards = document.querySelectorAll('.settings-card, .info-card');
     let subsBody = null;
     let paymentsList = null;
@@ -36,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (title.includes('Historial de Pagos')) historyContainer = document.getElementById('paymentHistoryContainer');
     });
 
-    // Cargar los datos reales desde Firestore
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             sessionStorage.setItem('redirectAfterLogin', window.location.href);
@@ -54,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (displayDni) displayDni.textContent = perfil.dni || "";
                     if (displayTelefono) displayTelefono.textContent = perfil.telefono || "No especificado";
 
-                    // Update email on the view
                     const emailDisplays = document.querySelectorAll('p strong');
                     emailDisplays.forEach(el => {
                         if (el.textContent.includes('Correo electrónico')) {
@@ -62,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    // --- 1. RENDER SUSCRIPCIONES ---
+                   // --- 1. RENDER SUSCRIPCIONES ---
                     if (subsBody) {
                         const sTrabajador = perfil.id_suscripcion_trabajador || "ninguna";
                         const sCliente = perfil.id_suscripcion_cliente || "ninguna";
@@ -100,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             clientSubRow.innerHTML = clientHtml;
                         }
 
-                        // Eventos para cancelar suscripción
                         document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
                             btn.onclick = () => {
                                 const tipo = btn.dataset.tipo;
@@ -123,29 +117,28 @@ document.addEventListener('DOMContentLoaded', () => {
                                 );
                             };
                         });
-                    } // fin if (subsBody)
+                    }
 
-                    // --- 2. RENDER MÉTODOS DE PAGO ---
+                   // --- 2. RENDER MÉTODOS DE PAGO ---
                     if (paymentsList) {
                         await renderizarMetodosPago(user.uid);
                     }
 
-                    // --- 3. RENDER HISTORIAL DE PAGOS ---
+                   // --- 3. RENDER HISTORIAL DE PAGOS ---
                     if (historyContainer) {
                         const historial = await obtenerHistorialPagos(user.uid);
                         renderHistorialPagos(historial, false);
                     }
 
-                } // fin if (perfil)
+                }
             } catch (error) {
                 console.error("Error obteniendo perfil/pagos en Ajustes:", error);
             }
     });
 
-    // --- LÓGICA DE CERRAR SESIÓN (Manejada globalmente por general.js clase .logout-action) ---
+   // --- LÓGICA DE CERRAR SESIÓN (MANEJADA GLOBALMENTE POR GENERAL.JS CLASE .LOGOUT-ACTION) ---
 
-
-    // --- LÓGICA PARA CAMBIAR LA CONTRASEÑA ---
+   // --- LÓGICA PARA CAMBIAR LA CONTRASEÑA ---
     if (btnChangePass) {
         btnChangePass.addEventListener('click', (e) => {
             e.preventDefault();
@@ -156,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA PARA BORRAR LA CUENTA ---
+   // --- LÓGICA PARA BORRAR LA CUENTA ---
     if (btnDeleteAccount) {
         btnDeleteAccount.addEventListener('click', (e) => {
             e.preventDefault();
@@ -187,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ABRIR MODAL EDITAR ---
+   // --- ABRIR MODAL EDITAR ---
     if (btnEditProfile) {
         btnEditProfile.onclick = () => {
             editModal.classList.remove('hidden');
@@ -196,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const dirSana = displayDireccion.innerText === 'No especificada' ? '' : displayDireccion.innerText;
             document.getElementById('inputSetDireccion').value = dirSana;
 
-            // Formatear date (Si viene del register como DD-MM-YYYY hay que pasarlo a YYYY-MM-DD para el input type="date")
             const dateStr = displayFechaNac.innerText;
             if (dateStr && dateStr.includes("-") && dateStr.split("-")[0].length === 2) {
                 const parts = dateStr.split("-");
@@ -213,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnCancelEditSettings) btnCancelEditSettings.onclick = () => editModal.classList.add('hidden');
 
-    // --- GUARDAR EN FIREBASE ---
+   // --- GUARDAR EN FIREBASE ---
     if (btnSaveSettings) {
         btnSaveSettings.onclick = async () => {
             const user = auth.currentUser;
@@ -221,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const nom = document.getElementById('inputSetNombre').value.trim();
             const ape = document.getElementById('inputSetApellidos').value.trim();
-            const rawFnac = document.getElementById('inputSetFechaNac').value.trim(); // YYYY-MM-DD
+            const rawFnac = document.getElementById('inputSetFechaNac').value.trim();// --- YYYY-MM-DD ---
             const dni = document.getElementById('inputSetDni').value.trim();
             const dir = document.getElementById('inputSetDireccion').value.trim();
             const tel = document.getElementById('inputSetTelefono').value.trim();
@@ -231,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Cambiar formato a DD-MM-YYYY
             let formattedFnac = rawFnac;
             if (rawFnac.includes("-") && rawFnac.split("-")[0].length === 4) {
                 const parts = rawFnac.split("-");
@@ -239,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                // Guardar en Firestore
+               
                 await actualizarPerfilUsuario(user.uid, {
                     nombre: nom,
                     apellidos: ape,
@@ -250,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     telefono: tel
                 });
 
-                // Actualizar interfaz
                 displayNombre.innerText = nom;
                 displayApellidos.innerText = ape;
                 displayFechaNac.innerText = formattedFnac;
@@ -268,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- MODAL Y LOGICA AÑADIR MÉTODO DE PAGO ---
+   // --- MODAL Y LOGICA AÑADIR MÉTODO DE PAGO ---
     const paymentModal = document.getElementById('paymentModal');
     const selectPaymentType = document.getElementById('selectPaymentType');
     const tarjetaFields = document.getElementById('tarjetaFields');
@@ -373,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- RENDERIZADO DE HISTORIAL CON PAGINACIÓN ---
+   // --- RENDERIZADO DE HISTORIAL CON PAGINACIÓN ---
     function renderHistorialPagos(historial, showAll) {
         if (!historyContainer) return;
 
@@ -410,7 +400,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         historyContainer.innerHTML = html;
 
-        // Añadir evento al botón si existe
         const btnMore = document.getElementById('btnViewMoreHistory');
         if (btnMore) {
             btnMore.addEventListener('click', () => {
@@ -433,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             const favorStar = m.favorito
                 ? `<img src="../assets/img/icons/icono-estrella.png" class="icon-star-favorite" title="Favorito">`
-                : ``; // No spacer here
+                : ``;
 
             li.innerHTML = `
                 ${favorStar}
@@ -443,7 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
             paymentsList.appendChild(li);
         });
 
-        // Event listeners para borrar
         paymentsList.querySelectorAll('.btn-delete-payment').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const idMetodo = e.target.getAttribute('data-id');

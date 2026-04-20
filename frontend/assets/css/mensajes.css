@@ -1,9 +1,5 @@
 @import "paleta-colores.css";
-/* ==========================================================================
-   HOJA DE ESTILO: MENSAJES
-   Diseño con sidebar de filtros idéntico al de trabajos.css/usuarios.css,
-   y tarjetas de conversación con chips de nivel/valoración/especialidad.
-   ========================================================================== */
+
 
 #container {
     display: flex;
@@ -23,7 +19,7 @@
     align-items: stretch;
 }
 
-/* Título principal */
+
 .section-title {
     width: 100%;
     color: var(--neutral-white);
@@ -41,9 +37,7 @@
 }
 
 
-/* ==========================================
-   TARJETA DE CONVERSACIÓN
-   ========================================== */
+/* --- TARJETA DE CONVERSACIÓN --- */
 .msg-card {
     background: var(--neutral-white);
     border-radius: 15px;
@@ -68,7 +62,7 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
 }
 
-/* Indicador de mensaje no leído (punto rojo arriba a la derecha) */
+
 .msg-card.unread::before {
     content: '';
     position: absolute;
@@ -82,7 +76,7 @@
     box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
 }
 
-/* Foto del usuario */
+
 .msg-avatar {
     width: 200px;
     height: 200px;
@@ -92,7 +86,7 @@
     cursor: pointer;
 }
 
-/* Bloque de info */
+
 .msg-info {
     flex: 1;
     min-width: 0;
@@ -208,7 +202,7 @@
     background: #fff3f3;
 }
 
-/* Icono de chat en esquina inferior derecha */
+
 .msg-chat-btn {
     position: absolute;
     right: 15px;
@@ -230,7 +224,7 @@
     opacity: 0.8;
 }
 
-/* Botón de ocultar */
+
 .msg-hide-btn {
     position: absolute;
     right: 15px;
@@ -242,10 +236,10 @@
     transition: transform 0.2s, opacity 0.3s;
     z-index: 5;
     opacity: 0;
-    /* Oculto por defecto */
+    
 }
 
-/* Mostrar botón cuando el card está en hover */
+
 .msg-card:hover .msg-hide-btn {
     opacity: 0.6;
 }
@@ -260,7 +254,7 @@
     height: 28px;
 }
 
-/* Estado vacío */
+
 .msgs-empty {
     color: white;
     text-align: center;
@@ -271,9 +265,7 @@
     width: 100%;
 }
 
-/* ==========================================
-   SIDEBAR Y FILTROS  (idéntico a trabajos/usuarios)
-   ========================================== */
+
 #sidebar {
     flex: 0 0 370px;
     min-width: 200px;
@@ -309,7 +301,7 @@
     font-size: 0.9rem;
 }
 
-/* Alineación Desde/Hasta */
+
 .input-row {
     display: flex;
     gap: 15px;
@@ -344,9 +336,7 @@
     background-color: var(--neutral-white);
 }
 
-/* ==========================================
-   PAGINACIÓN
-   ========================================== */
+/* --- PAGINACIÓN --- */
 .pagination {
     width: 100%;
     max-width: 900px;

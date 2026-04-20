@@ -1,8 +1,6 @@
-/* ==========================================================================
-   HOJA DE ESTILOS PRINCIPAL (GLOBAL)
-   Define la tipografía base, reset de márgenes, barra superior (header), barra lateral (sidebar) 
-   y ventanas modales globales de LaburApp.
-   ========================================================================== */
+/* --- HOJA DE ESTILOS PRINCIPAL (GLOBAL)
+   DEFINE LA TIPOGRAFÍA BASE, RESET DE MÁRGENES, BARRA SUPERIOR (HEADER), BARRA LATERAL (SIDEBAR) 
+   Y VENTANAS MODALES GLOBALES DE LABURAPP. --- */
 @import "paleta-colores.css";
 @import "cookies.css";
 
@@ -13,7 +11,7 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     -webkit-tap-highlight-color: transparent;
-    /* Quitar el recuadro gris al tocar en móviles */
+    
 }
 
 body {
@@ -27,19 +25,19 @@ body {
     overflow-wrap: break-word;
 }
 
-/* Ocultar scrollbar en Chrome, Safari y Opera */
+
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
     display: none;
 }
 
-/* Ocultar scrollbar en IE, Edge y Firefox */
+
 html,
 body {
     -ms-overflow-style: none;
-    /* IE and Edge */
+    
     scrollbar-width: none;
-    /* Firefox */
+    
 }
 
 main#container,
@@ -47,7 +45,7 @@ main.main-content {
     flex: 1;
 }
 
-/* --- HEADER  --- */
+/* --- HEADER --- */
 header {
     background-color: var(--neutral-black);
     color: var(--neutral-white);
@@ -125,7 +123,7 @@ header nav a:hover {
     display: block;
 }
 
-/* Botón - Panel Lateral */
+
 .hamburger {
     display: flex;
     flex-direction: column;
@@ -172,7 +170,7 @@ header nav a:hover {
 }
 
 
-/* Dropdown Perfil */
+
 .profile-dropdown {
     position: absolute;
     top: 75px;
@@ -343,7 +341,7 @@ header nav a:hover {
     width: 24px;
 }
 
-/* -- FOOTER --- */
+/* --- FOOTER --- */
 footer {
     background-color: var(--neutral-black);
     color: var(--neutral-white);
@@ -402,6 +400,22 @@ footer {
     font-size: 0.82rem;
 }
 
+.footer-logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.footer-logo {
+    height: 80px;
+    width: auto;
+    opacity: 0.9;
+    transition: transform 0.3s ease;
+}
+
+.footer-logo:hover {
+    transform: scale(1.05);
+}
 
 
 .icon-img-small {
@@ -412,7 +426,7 @@ footer {
     margin-bottom: 2px;
 }
 
-/* --- MODAL GLOBAL (Alerts & Confirms) --- */
+/* --- MODAL GLOBAL (ALERTS & CONFIRMS) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -457,7 +471,7 @@ footer {
     font-size: 1rem;
 }
 
-/* Password Modal Specifics */
+/* --- PASSWORD MODAL SPECIFICS --- */
 .modal-input-group {
     margin-bottom: 15px;
     text-align: left;
@@ -615,7 +629,7 @@ footer {
     font-style: italic;
 }
 
-/* Badge de notificaciones en el side menu */
+
 .side-menu li {
     position: relative;
 }
@@ -752,7 +766,7 @@ footer {
     height: 20px;
 }
 
-/* Invertimos solo los iconos que el usuario ha pedido para que se vean blancos */
+
 .notif-item.type-nueva_postulacion .notif-icon-box img,
 .notif-item.type-suscripcion .notif-icon-box img {
     filter: brightness(0) invert(1);
@@ -823,7 +837,7 @@ footer {
     transform: scale(1.1);
 }
 
-/* --- ESTILOS COMPONENTES MOVILES PÁGINAS RUTA (Legal, Manual) --- */
+/* --- ESTILOS COMPONENTES MOVILES PÁGINAS RUTA (LEGAL, MANUAL) --- */
 .show-only-mobile {
     display: none !important;
 }
@@ -861,7 +875,7 @@ footer {
         display: none !important;
     }
 
-    /* --- SIDE MENU RESPONSIVE (Global) --- */
+    /* --- SIDE MENU RESPONSIVE (GLOBAL) --- */
     .side-menu {
         width: 180px !important;
         top: 60px !important;
@@ -875,7 +889,7 @@ footer {
     }
 
     .side-menu li {
-        padding: 0 !important; /* Movemos el padding al enlace para que todo sea clicable */
+        padding: 0 !important; 
         position: relative !important;
         gap: 0 !important;
     }
@@ -887,7 +901,7 @@ footer {
         transform: translateY(-50%) !important;
         width: 18px !important;
         height: 18px !important;
-        pointer-events: none !important; /* El icono no bloquea la pulsación */
+        pointer-events: none !important; 
         z-index: 5;
     }
 
@@ -895,7 +909,7 @@ footer {
         display: flex !important;
         align-items: center !important;
         width: 100% !important;
-        padding: 10px 20px 10px 55px !important; /* Hueco para el icono absoluto */
+        padding: 10px 20px 10px 55px !important; 
         font-size: 0.85rem !important;
         margin-bottom: 0 !important;
         min-height: 45px !important;
@@ -942,7 +956,7 @@ footer {
     }
 
     /* --- GLOBAL PROFILE DROPDOWN RESPONSIVE --- */
-    /* Transformado en una barra horizontal debajo del header */
+    /* --- TRANSFORMADO EN UNA BARRA HORIZONTAL DEBAJO DEL HEADER --- */
     .profile-dropdown {
         position: fixed !important;
         top: 60px !important;
@@ -953,7 +967,7 @@ footer {
         border-radius: 0 !important;
         padding: 10px 20px !important;
         display: none;
-        /* Se activa con .show */
+        
         grid-template-areas: "avatar name logout"
             "avatar email logout" !important;
         grid-template-columns: auto 1fr auto !important;
@@ -970,7 +984,7 @@ footer {
 
     .profile-dropdown::before {
         display: none !important;
-        /* Quita la flechita */
+        
     }
 
     .profile-dropdown a:first-child {
@@ -1019,7 +1033,7 @@ footer {
 
     .profile-dropdown .dropdown-footer a {
         display: none !important;
-        /* Oculta el texto "Cerrar Sesión" */
+        
     }
 
     .profile-dropdown .dropdown-footer img {
@@ -1073,7 +1087,7 @@ footer {
         display: none;
     }
 
-    /* Map Icon specific treatment */
+    
     .nav-item[href="mapa.html"] img {
         content: url("../img/icons/icono-mapa-blanco.png");
         filter: invert(1);
@@ -1134,13 +1148,13 @@ footer {
         font-size: 0.8rem !important;
     }
 
-    /* Solo en móviles, el botón vuelve a ser absoluto para que se mueva con la página */
+    
     .btn-back-global {
         position: absolute;
-        top: 80px;
+        top: 90px;
         left: 15px;
         z-index: 999;
-        /* Por debajo del header (1000) al hacer scroll */
+        /* --- POR DEBAJO DEL HEADER (1000) AL HACER SCROLL --- */
     }
 
     header.show-only-mobile {
@@ -1160,7 +1174,7 @@ footer {
         display: flex !important;
     }
 
-    /* Añadir espacio para que el menu arriba fijo de 60px no tape el titulo */
+    
     .legal-container,
     .cookies-container,
     .terms-container,
@@ -1174,6 +1188,20 @@ footer {
 
     .footer-bottom p {
         font-size: 0.8rem;
+    }
+
+    .logo a:first-child img {
+        content: url("../img/logo/LaburApp4.png");
+        width: auto;
+        margin-bottom: -5px;
+    }
+
+    .footer-logo {
+        height: 60px;
+    }
+
+    .footer-logo-container {
+        margin-bottom: 0;
     }
 
     .login-btn-header {
@@ -1193,7 +1221,7 @@ footer {
         padding-bottom: 80px !important;
     }
 
-    /* Añadir un efecto de escala sutil al tocar para feedback táctil premium */
+    
     button:active,
     a:active,
     .nav-item:active,
@@ -1243,12 +1271,24 @@ footer {
     .modal-input {
         padding: 8px !important;
         font-size: 0.75rem !important;
-        margin-bottom: 15px !important;
+        margin-bottom: 15px;
+    }
+
+    .modal-input-pass {
+        padding: 8px !important;
+        font-size: 0.75rem !important;
+        margin-bottom: 10px;
+    }
+
+    .modal-input-group label {
+        font-size: 0.75rem !important;
+        margin-bottom: 5px !important;
+        display: block !important;
     }
 
     .modal-btn {
         padding: 6px 12px !important;
-        font-size: 0.7rem !important;
+        font-size: 0.75rem !important;
         border-radius: 4px !important;
     }
 

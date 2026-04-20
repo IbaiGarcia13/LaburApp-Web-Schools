@@ -1,8 +1,8 @@
 @import "paleta-colores.css";
 
-/* Chat Container */
+
 body {
-    /* Forzamos que la página principal (fondo oscuro) no pueda ser scrolleada nunca. */
+    
     overflow: hidden !important;
     height: 100vh;
     margin: 0;
@@ -10,14 +10,14 @@ body {
 
 .chat-page {
     height: calc(100vh - 70px) !important;
-    /* Exactamente la ventana menos el header */
+    /* --- EXACTAMENTE LA VENTANA MENOS EL HEADER --- */
     background-color: var(--primary);
     display: flex;
     justify-content: center;
     padding: 0;
     margin: 0;
     overflow: hidden;
-    /* Evitar scroll en la pagina principal */
+    
 }
 
 .chat-wrapper {
@@ -28,10 +28,10 @@ body {
     background: transparent;
     position: relative;
     overflow: hidden;
-    /* Que ni el contenido de adentro cause doble scroll */
+    
 }
 
-/* Chat Header */
+/* --- CHAT HEADER --- */
 .chat-header {
     background-color: var(--neutral-white);
     display: flex;
@@ -61,9 +61,9 @@ body {
 .btn-back img {
     width: 24px;
     height: 24px;
-    /* Filtrar para conseguir el color #888888 (gris medio) */
+    
     filter: invert(20%) sepia(0%) saturate(0%) hue-rotate(177deg) brightness(91%) contrast(88%);
-    /* Rotar 180 grados para que apunte a la izquierda (atrás) */
+    
     transform: rotate(180deg);
 }
 
@@ -129,7 +129,7 @@ body {
     cursor: pointer;
 }
 
-/* Report Modal */
+/* --- REPORT MODAL --- */
 .report-modal {
     position: absolute;
     top: 55px;
@@ -222,7 +222,7 @@ body {
     color: var(--neutral-white);
 }
 
-/* Messages Area */
+
 .messages-container {
     flex: 1;
     padding: 20px 10%;
@@ -241,7 +241,7 @@ body {
     border-radius: 4px;
 }
 
-/* Message Groups */
+
 .message-group {
     display: flex;
     flex-direction: column;
@@ -320,7 +320,7 @@ body {
     color: rgba(255, 255, 255, 0.55);
 }
 
-/* Input Area */
+
 .chat-input-area {
     padding: 15px 10%;
     display: flex;
@@ -440,7 +440,7 @@ body {
     display: none;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
 
     .messages-container,
@@ -458,24 +458,22 @@ body {
     }
 }
 
-/* Chat Modals (Handled by styles.css) */
+/* --- CHAT MODALS (HANDLED BY STYLES.CSS) --- */
 #cameraStream {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* ==========================================================================
-   RESPONSIVE (Max 768px)
-   ========================================================================== */
+/* --- RESPONSIVE (MAX 768PX) --- */
 @media (max-width: 768px) {
 
-    /* Ocultar footer */
+    /* --- OCULTAR FOOTER --- */
     footer {
         display: none !important;
     }
 
-    /* Reducir barra superior (Estilo WhatsApp) */
+    /* --- REDUCIR BARRA SUPERIOR (ESTILO WHATSAPP) --- */
     .chat-header {
-        padding: 5px 8px !important;
+        padding: 5px 15px !important;
         min-height: 56px !important;
         height: 56px !important;
     }
@@ -501,7 +499,7 @@ body {
         font-weight: 600 !important;
     }
 
-    /* Contexto del trabajo: Mostrar dropdown, ocultar texto completo */
+    
     #jobTitle {
         display: none !important;
     }
@@ -555,7 +553,7 @@ body {
         text-align: left !important;
     }
 
-    /* Reducir cuadros de mensajes estilo WhatsApp */
+    /* --- REDUCIR CUADROS DE MENSAJES ESTILO WHATSAPP --- */
     .messages-container {
         padding: 10px !important;
         gap: 10px !important;
@@ -563,21 +561,21 @@ body {
 
     .message-group {
         margin-bottom: 8px !important;
-        /* Más pegados como en WA */
+        
     }
 
     .message-wrapper {
         gap: 6px !important;
         max-width: 85% !important;
-        /* Burbujas ocupan hasta 85% */
+        
     }
 
-    /* WhatsApp no suele mostrar avatar en chats 1a1, pero si se muestran, muy pequeños */
+    /* --- WHATSAPP NO SUELE MOSTRAR AVATAR EN CHATS 1A1, PERO SI SE MUESTRAN, MUY PEQUEÑOS --- */
     .msg-avatar {
         width: 24px !important;
         height: 24px !important;
         align-self: flex-end !important;
-        /* Alineado abajo a la burbuja */
+        
         margin-bottom: 2px !important;
     }
 
@@ -609,7 +607,7 @@ body {
         opacity: 0.7;
     }
 
-    /* Reducir zona de escribir */
+    
     .chat-input-area {
         padding: 0px 15px 10px 15px !important;
         background-color: transparent !important;
@@ -670,5 +668,58 @@ body {
 
     #image-preview-container img {
         max-height: 80px !important;
+    }
+
+    .report-modal {
+        width: 170px !important;
+        padding: 10px !important;
+    }
+
+    .report-modal h4 {
+        font-size: 0.8rem !important;
+    }
+
+    .report-modal-subtitle {
+        font-size: 0.7rem !important;
+    }
+
+    .report-modal-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        margin-bottom: 0px !important;
+    }
+
+    .report-modal-avatar img {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    .report-modal-content p {
+        margin-bottom: 15px !important;
+    }
+
+    .report-modal-content p:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    .report-modal-content p {
+        margin-bottom: 15px !important;
+    }
+
+    .btn-submit-report {
+        font-size: 0.7rem !important;
+        padding: 6px 12px !important;
+        border-radius: 5px !important;
+    }
+
+    #reportReason {
+        font-size: 0.7rem !important;
+        margin-bottom: 10px !important;
+        margin-top: 10px !important;
+        height: 38px !important;
+    }
+
+    .report-modal::before {
+        top: -9px;
     }
 }

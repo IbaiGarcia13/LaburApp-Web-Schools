@@ -1,22 +1,22 @@
 :root {
 
-  /* PRINCIPAL */
+  /* --- PRINCIPAL --- */
   --primary: #b45050;
 
-  /* NEUTROS */
+  /* --- NEUTROS --- */
   --neutral-white: #fff;
   --neutral-black: #000;
 
-  /* GRISES */
-  --gray-1:  #f0f0f0; /* #efefef  -   */
+  /* --- GRISES --- */
+  --gray-1:  #f0f0f0; 
 
-  --gray-2: #DDD; /* #e0e0e0  -   */
+  --gray-2: #DDD; 
 
-  --gray-3: #CCC; /* #d0d0d0  -   */
+  --gray-3: #CCC; 
 
-  --gray-4: #BBB; /* #A0A0A0  - #b5b5b5  */
+  --gray-4: #BBB; 
 
-  --gray-5: #888; /* #999999  -   */
+  --gray-5: #888; 
 
   --gray-6: #666;
 
@@ -26,11 +26,11 @@
 
   --gray-9: #333;
 
-  --gray-10: #222; /* NO USO */
+  --gray-10: #222; /* --- NO USO --- */
 
   --gray-11: #111;
 
-  /* CATEGORÍAS */
+  /* --- CATEGORÍAS --- */
   --cat-1: #A52A2A;
   --cat-2: #808080;
   --cat-3: #FFC0CB;
@@ -46,7 +46,7 @@
   --cat-13: #000000;
 
 
-  /* OTROS */
+  /* --- OTROS --- */
   --red-1: #c1272d;
 
   --red-2: #cc0000;

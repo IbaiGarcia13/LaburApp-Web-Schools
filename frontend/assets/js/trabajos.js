@@ -1,13 +1,11 @@
 import { auth } from './firebase-config.js';
 import { obtenerTrabajos } from './database.js';
 
-// Variables de estado para los filtros y la paginación de la lista de trabajos
 let allJobs = [];
 let filteredJobs = [];
 let currentPage = 1;
 const itemsPerPage = 5;
 
-// Variables de los filtros actuales (para persistencia en memoria)
 let currentFilters = {
     cat: "todas",
     tMin: 1,
@@ -16,9 +14,6 @@ let currentFilters = {
     pMax: 1000
 };
 
-/**
- * Carga inicial y obtención de datos desde Firestore
- */
 async function loadJobs() {
     const container = document.getElementById('jobs-list');
     if (container) container.innerHTML = "<p class='loading-text'>Cargando trabajos...</p>";
@@ -26,13 +21,11 @@ async function loadJobs() {
     try {
         let rawJobs = await obtenerTrabajos(currentFilters.cat);
 
-        // Filtrar para que no salgan los trabajos propios
         const user = auth.currentUser;
         if (user) {
             rawJobs = rawJobs.filter(j => j.id_publicador !== user.uid);
         }
 
-        // Ordenamos: Primero por prioridad de suscripción (actividad reciente), luego por fecha de publicación
         allJobs = rawJobs.sort((a, b) => {
             const prioA = a.prioridad_suscripcion?.toMillis ? a.prioridad_suscripcion.toMillis() : (Number(a.prioridad_suscripcion) || 0);
             const prioB = b.prioridad_suscripcion?.toMillis ? b.prioridad_suscripcion.toMillis() : (Number(b.prioridad_suscripcion) || 0);
@@ -41,7 +34,6 @@ async function loadJobs() {
                 return prioB - prioA;
             }
 
-            // Si ambos coinciden (p.ej. ambos 0), se ordena por fecha de publicación (más reciente primero)
             const dateA = a.fecha_publicacion?.toMillis ? a.fecha_publicacion.toMillis() : (a.fecha_publicacion || 0);
             const dateB = b.fecha_publicacion?.toMillis ? b.fecha_publicacion.toMillis() : (b.fecha_publicacion || 0);
 
@@ -56,9 +48,6 @@ async function loadJobs() {
     }
 }
 
-/**
- * Aplica los filtros que Firestore no puede hacer fácilmente sin índices compuestos (tiempo y pago)
- */
 function applyClientFilters() {
     filteredJobs = allJobs.filter(j => {
         const matchTime = (j.tiempo_estimado_horas || 0) >= currentFilters.tMin && (j.tiempo_estimado_horas || 0) <= currentFilters.tMax;
@@ -70,15 +59,11 @@ function applyClientFilters() {
     displayJobs();
 }
 
-/**
- * Función principal que renderiza el listado de trabajos en la página actual o filtrada
- */
 function displayJobs() {
     const container = document.getElementById('jobs-list');
     if (!container) return;
     container.innerHTML = "";
 
-    // Título dinámico
     const isFiltered = currentFilters.cat !== "todas" || currentFilters.tMin !== 1 || currentFilters.tMax !== 100 || currentFilters.pMin !== 2 || currentFilters.pMax !== 1000;
     const iconHtml = '<img src="../assets/img/icons/icono-trabajos-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     const titleEl = document.querySelector('.section-title');
@@ -86,7 +71,6 @@ function displayJobs() {
         titleEl.innerHTML = isFiltered ? iconHtml + "TRABAJOS: Filtrados" : iconHtml + "TRABAJOS: Todos";
     }
 
-    // Cálculos para saber qué trabajos extraer del array según la página actual
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const pageItems = filteredJobs.slice(start, end);
@@ -95,7 +79,6 @@ function displayJobs() {
         container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron trabajos.</p>";
     }
 
-    // Crear e inyectar cada tarjeta de trabajo para la página activa
     pageItems.forEach((job) => {
         const dateObj = job.fecha_publicacion?.toDate ? job.fecha_publicacion.toDate() : (job.fecha_publicacion ? new Date(job.fecha_publicacion) : null);
         const dateStr = dateObj ? dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Reciente";
@@ -154,7 +137,6 @@ function getStandardName(catId) {
     return names[catId] || catId || 'Otros';
 }
 
-// Evento del botón de filtrado: actualiza la lista basándose en los criterios elegidos
 const btnUpdate = document.getElementById('update-btn');
 if (btnUpdate) {
     btnUpdate.onclick = async () => {
@@ -175,14 +157,13 @@ if (btnUpdate) {
         };
 
         if (categoryChanged) {
-            // Si cambió la categoría, re-solicitamos a Firestore
+           
             await loadJobs();
         } else {
-            // Si solo cambiaron precios o tiempos, filtramos sobre lo que ya tenemos
+           
             applyClientFilters();
         }
 
-        // Cerrar filtros si estamos en móvil
         const sidebar = document.getElementById('sidebar');
         const mobileFilterBtn = document.getElementById('mobile-filter-btn');
         if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
@@ -192,7 +173,6 @@ if (btnUpdate) {
     };
 }
 
-// Navegación de página
 const btnNext = document.getElementById('next-page');
 if (btnNext) {
     btnNext.onclick = () => {
@@ -215,8 +195,6 @@ if (btnPrev) {
     };
 }
 
-// Inicio
-// Escuchar clic en botón de filtros para versión móvil
 const mobileFilterBtn = document.getElementById('mobile-filter-btn');
 const sidebar = document.getElementById('sidebar');
 if (mobileFilterBtn && sidebar) {
@@ -238,7 +216,6 @@ if (mobileFilterBtn && sidebar) {
         mobileFilterBtn.style.opacity = '1';
     });
 
-    // Cerrar filtros al hacer clic fuera
     document.addEventListener('click', (e) => {
         if (sidebar.classList.contains('show-mobile-filters') &&
             !sidebar.contains(e.target) &&

@@ -1,18 +1,11 @@
 @import "paleta-colores.css";
 
-/* Ajustes GLOBALS Y LAYOUT */
+/* --- AJUSTES GLOBALS Y LAYOUT --- */
 .icon-btn-mobile,
 .icon-add-payment {
     display: none;
 }
 
-/* Usa el fondo global que tengan las otras pantallas. Si styles.css centraliza esto, aquí no definimos body */
-
-/* ==========================================================================
-   ESTILOS ESPECÍFICOS: PANTALLA DE AJUSTES
-   Controla el diseño en cuadrícula de los datos personales, el historial 
-   de métodos de pago y el espaciado de las diversas "tarjetas" de opciones.
-   ========================================================================== */
 .main-content {
     width: 100%;
     max-width: 1100px;
@@ -108,7 +101,7 @@
     transform: scale(1.1);
 }
 
-/* CARD BODY AND TYPOGRAPHY */
+/* --- CARD BODY AND TYPOGRAPHY --- */
 .card-body p {
     margin: 15px 0;
     font-size: 15px;
@@ -181,7 +174,7 @@
     width: 20px;
     height: 20px;
     margin-left: auto;
-    /* Red filter for white icon (icono-no-blanco.png) */
+    
     filter: brightness(0) saturate(100%) invert(27%) sepia(91%) saturate(2351%) hue-rotate(346deg) brightness(101%) contrast(106%);
     transition: transform 0.2s, opacity 0.2s ease;
     opacity: 0;
@@ -210,7 +203,7 @@
     margin-right: 5px;
 }
 
-/* INFO GRID */
+/* --- INFO GRID --- */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -222,7 +215,7 @@
     margin: 0px;
 }
 
-/* ACCOUNT ACTIONS */
+/* --- ACCOUNT ACTIONS --- */
 .card-actions {
     display: flex;
     justify-content: space-between;
@@ -263,7 +256,7 @@
     text-align: right;
 }
 
-/* PAYMENTS AND LISTS */
+/* --- PAYMENTS AND LISTS --- */
 .payment-methods {
     list-style: none;
     padding: 0;
@@ -276,7 +269,7 @@
     display: flex;
     align-items: center;
     padding: 10px 10px 10px 0;
-    /* No left padding */
+    
     background: transparent;
     border-radius: 8px;
     transition: background 0.2s ease;
@@ -301,7 +294,7 @@
     width: 20px;
     height: 20px;
     margin-left: auto;
-    /* Red filter for white icon (icono-no-blanco.png) */
+    
     filter: brightness(0) saturate(100%) invert(27%) sepia(91%) saturate(2351%) hue-rotate(346deg) brightness(101%) contrast(106%);
     transition: transform 0.2s, opacity 0.2s ease;
     opacity: 0;
@@ -348,7 +341,7 @@
     color: var(--red-2) !important;
 }
 
-/* DELETE ACCOUNT */
+/* --- DELETE ACCOUNT --- */
 .delete-account-container {
     width: 100%;
     max-width: 900px;
@@ -376,7 +369,7 @@
     width: 20px;
 }
 
-/* MODALES */
+/* --- MODALES --- */
 .modal {
     display: none;
     position: fixed;
@@ -561,10 +554,10 @@
 
     .payment-row strong {
         display: inline !important;
-        /* Volver a inline */
+        
     }
 
-    /* Botón añadir método de pago (Mobile) */
+    
     #btnAddPayment {
         display: flex !important;
         align-items: center !important;
@@ -575,7 +568,7 @@
         border-radius: 5px !important;
         padding: 0 !important;
         margin-left: auto;
-        /* Alinear a la derecha si es necesario */
+        
     }
 
     #btnAddPayment span {
@@ -589,7 +582,7 @@
         filter: invert(1) !important;
     }
 
-    /* Forzar visibilidad de eliminar método y cancelar suscripciones */
+    
     .btn-delete-payment,
     .btn-cancel-subscription {
         opacity: 1 !important;
@@ -617,10 +610,52 @@
         padding: 20px;
     }
 
+    .modal-content h3 {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .modal-content p {
+        font-size: 0.7rem;
+    }
+
+    .input-group label {
+        font-size: 0.75rem;
+    }
+
+    .input-group input, .input-group select {
+        font-size: 0.75rem;
+    }
+
     .sub-renewal-date {
         display: block;
         margin-left: 0;
         margin-top: 4px;
         font-size: 0.75rem;
+    }
+
+    .modal-content .input-group {
+        margin-bottom: 10px !important;
+        margin-top: 10px !important;
+    }
+
+    .modal-input {
+        margin-bottom: 0px !important;
+    }
+
+    .modal-buttons {
+        margin-top: 0px !important;
+    }
+
+    .modal-input-pass {
+        margin-bottom: 0px !important;
+    }
+
+    .modal-input-group {
+        margin-bottom: 10px !important;
+    }
+
+    .modal-content p {
+        margin-bottom: 15px !important;
     }
 }

@@ -18,9 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCancel = document.getElementById('btnCancelSub');
     const btnConfirm = document.getElementById('btnConfirmPurchase');
 
-
-
-    let selectedSub = null; // { type, id, price, name }
+    let selectedSub = null;
     let userProfile = null;
 
     onAuthStateChanged(auth, async (user) => {
@@ -29,9 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
-
-    // --- CARGAR MÉTODOS DE PAGO AL ABRIR EL MODAL ---
+   // --- CARGAR MÉTODOS DE PAGO AL ABRIR EL MODAL ---
     async function cargarMetodosPago(uid) {
         try {
             const metodos = await obtenerMetodosPago(uid);
@@ -61,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- CLIC EN TARJETA DE SUSCRIPCIÓN ---
+   // --- CLIC EN TARJETA DE SUSCRIPCIÓN ---
     cards.forEach(card => {
         card.addEventListener('click', () => {
             const user = auth.currentUser;
@@ -70,10 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const subType = card.dataset.type; // 'trabajador' o 'cliente'
-            const subId = card.dataset.id;     // 'currante' o 'jefe'
+            const subType = card.dataset.type;
+            const subId = card.dataset.id;    
 
-            // Si ya tiene esta suscripción activa, no hacer nada
             if (userProfile) {
                 const alreadyHas = (subType === 'trabajador' && userProfile.id_suscripcion_trabajador === subId) ||
                     (subType === 'cliente' && userProfile.id_suscripcion_cliente === subId);
@@ -96,13 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- CERRAR MODAL ---
+   // --- CERRAR MODAL ---
     btnCancel.onclick = () => {
         modal.classList.add('hidden');
         selectedSub = null;
     };
 
-    // --- CONFIRMAR COMPRA ---
+   // --- CONFIRMAR COMPRA ---
     btnConfirm.onclick = async () => {
         const user = auth.currentUser;
         if (!user || !selectedSub) return;
@@ -117,17 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConfirm.disabled = true;
             btnConfirm.textContent = "Procesando...";
 
-            // 1. Actualizar suscripción en el perfil
             await actualizarSuscripcionUsuario(user.uid, selectedSub.type, selectedSub.id);
 
-            // 2. Registrar en el historial de pagos
             const detalle = `Compra suscripción ${selectedSub.name}`;
             const montoNegativo = -Math.abs(Number(selectedSub.price));
             await registrarPagoHistorial(user.uid, idMetodo, montoNegativo, detalle);
 
             window.showCustomAlert("¡Éxito!", `Suscripción ${selectedSub.name} activada correctamente.`);
             modal.classList.add('hidden');
-            location.reload(); // Recargar para mostrar el estado actualizado
+            location.reload();
 
         } catch (error) {
             console.error("Error al procesar compra:", error);
@@ -138,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Cerrar al hacer clic fuera
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.classList.add('hidden');

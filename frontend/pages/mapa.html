@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mapa</title>
-    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="shortcut icon" href="../assets/img/icons/icono-app.png" type="image/x-icon">`n    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/mapa.css">
@@ -19,9 +19,9 @@
 
 <body>
 
-    <!-- ================= CABECERA SUPERIOR ================= -->
+    <!-- === CABECERA SUPERIOR === -->
     <header>
-        <!-- Logotipo a la izquierda. Al pulsarlo lleva al dashboard principal -->
+        
         <div class="logo">
             <a href="../index.html">
                 <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
@@ -63,7 +63,7 @@
         </div>
     </header>
 
-    <!-- ================= MENÚ LATERAL (SIDEBAR) ================= -->
+    <!-- === MENÚ LATERAL (SIDEBAR) === -->
     <nav class="side-menu" id="sideMenu">
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
@@ -83,7 +83,7 @@
         </div>
     </nav>
 
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <!-- === CONTENIDO PRINCIPAL === -->
     <main class="main-content" id="page-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h2 id="mapa-title" class="section-title" style="margin-bottom: 0;"><img
@@ -97,12 +97,12 @@
         </div>
         <div id="main-layout">
 
-            <!-- COLUMNA IZQUIERDA -->
+            <!-- === COLUMNA IZQUIERDA === -->
             <div class="left-column">
-                <!-- MAPA -->
+                <!-- === MAPA === -->
                 <div id="map"></div>
 
-                <!-- FORMULARIO CREAR TRABAJO (Bajo el mapa) -->
+                <!-- === FORMULARIO CREAR TRABAJO (BAJO EL MAPA) === -->
                 <div id="marker-form-box" class="hidden">
                     <h3>Configurar Trabajo</h3>
                     <label>Título<input type="text" id="job-title"></label>
@@ -137,7 +137,7 @@
                     </div>
                 </div>
 
-                <!-- FORMULARIO VER MÁS (Bajo el mapa) -->
+                <!-- === FORMULARIO VER MÁS (BAJO EL MAPA) === -->
                 <div id="marker-view-box" class="hidden">
                     <h3 id="view-title"></h3>
                     <p id="view-desc" style="margin-bottom: 15px;"></p>
@@ -163,10 +163,10 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA -->
+            <!-- === COLUMNA DERECHA === -->
             <div class="right-column">
 
-                <!-- PANEL FILTRAR -->
+                <!-- === PANEL FILTRAR === -->
                 <div id="filter-panel" class="filter-box">
                     <h2 class="text-center" style="margin-bottom: 20px;">FILTRAR</h2>
 
@@ -266,6 +266,11 @@
                 <li><a href="#" class="disabled-link">TikTok</a></li>
             </ul>
         </div>
+    </div>
+    <div class="footer-logo-container">
+        <a href="../index.html">
+            <img src="../assets/img/logo/LaburApp4-sin-fondo.png" alt="LaburApp Logo" class="footer-logo">
+        </a>
     </div>
     <div class="footer-bottom">
         <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>

@@ -1,4 +1,1 @@
-// app.js
-// Este archivo está actualmente vacío ya que la lógica del chat
-// fue migrada a su propio archivo: assets/js/chat.js.
-// Puedes utilizar este archivo para lógica global de la aplicación si es necesario en el futuro.
+// --- APP.JS ---// --- ESTE ARCHIVO ESTÁ ACTUALMENTE VACÍO YA QUE LA LÓGICA DEL CHAT ---// --- PUEDES UTILIZAR ESTE ARCHIVO PARA LÓGICA GLOBAL DE LA APLICACIÓN SI ES NECESARIO EN EL FUTURO. ---

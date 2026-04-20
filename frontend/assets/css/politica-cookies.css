@@ -9,7 +9,7 @@
     color: var(--gray-9);
 }
 
-/* Header y Botón Volver */
+/* --- HEADER Y BOTÓN VOLVER --- */
 .legal-header {
     display: flex;
     align-items: center;

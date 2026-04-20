@@ -1,9 +1,7 @@
 import { auth } from './firebase-config.js';
 import { obtenerTrabajos, crearTrabajo, obtenerMetodosPago, usuarioTieneMetodoPago } from './database.js';
 
-// Variables globales para almacenar trabajos, marcadores en el mapa y controlar el modo de creación
 let allTrabajosDB = [], myMarkers = [], tempMarker = null, creatingMode = false;
-// Inicialización del mapa pasándole el elemento HTML con id 'map'
 const map = L.map('map').setView([0, 0], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
@@ -11,8 +9,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:
 let userMarker = null, userCircle = null;
 let userLat = 0, userLng = 0;
 
-/* ===== UBICACIÓN REAL USUARIO ===== */
-// Escuchar clic en botón de filtros para versión móvil
+/* --- UBICACIÓN REAL USUARIO --- */
 const mobileFilterBtn = document.getElementById('mobile-filter-btn');
 const filterPanel = document.getElementById('filter-panel');
 if (mobileFilterBtn && filterPanel) {
@@ -34,7 +31,6 @@ if (mobileFilterBtn && filterPanel) {
         mobileFilterBtn.style.opacity = '1';
     });
 
-    // Cerrar panel de filtros al hacer clic fuera
     document.addEventListener('click', (e) => {
         if (filterPanel.classList.contains('show-mobile-filters') &&
             !filterPanel.contains(e.target) &&
@@ -46,12 +42,10 @@ if (mobileFilterBtn && filterPanel) {
     });
 }
 
-// Cargar trabajos cuando el usuario esté listo (para poder filtrar sus propios trabajos)
 auth.onAuthStateChanged(user => {
     loadRealJobs();
 });
 
-// Forzar redibujado del mapa para evitar cuadros grises/azules
 setTimeout(() => {
     map.invalidateSize();
 }, 500);
@@ -67,9 +61,9 @@ if (navigator.geolocation) {
         map.setView([userLat, userLng], 13);
 
         updateVisibleMarkers();
-        aplicarFiltros(); // Re-aplicar para filtrar por distancia si ya tenemos ubicación
+        aplicarFiltros();
     }, () => {
-        // Fallback Bilbao
+       
         userLat = 43.2630; userLng = -2.9349;
         if (userMarker) map.removeLayer(userMarker);
         userMarker = L.marker([userLat, userLng], { icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png', iconSize: [25, 25] }) })
@@ -80,18 +74,14 @@ if (navigator.geolocation) {
     });
 }
 
-/**
- * Carga los trabajos reales de la base de datos y los pinta como marcadores
- */
 async function loadRealJobs() {
     try {
-        // Borrar marcadores anteriores
+       
         myMarkers.forEach(m => map.removeLayer(m));
         myMarkers = [];
 
-        allTrabajosDB = await obtenerTrabajos(); // Obtenemos todos los pendientes
+        allTrabajosDB = await obtenerTrabajos();
 
-        // Filtrar para no mostrar mis propios trabajos
         const user = auth.currentUser;
         if (user) {
             allTrabajosDB = allTrabajosDB.filter(t => t.id_publicador !== user.uid);
@@ -136,7 +126,6 @@ async function loadRealJobs() {
 
                 marker.bindPopup(popupContent);
 
-                // Evento para el botón dentro del popup
                 marker.on('popupopen', () => {
                     const btn = document.querySelector(`.popup-btn[data-id="${t.id}"]`);
                     if (btn) btn.onclick = () => verMasReal(t.id);
@@ -146,7 +135,7 @@ async function loadRealJobs() {
             }
         });
 
-        aplicarFiltros(); // Aplicar filtros iniciales
+        aplicarFiltros();
     } catch (e) {
         console.error("Error cargando marcadores:", e);
     }
@@ -171,7 +160,7 @@ function getStandardName(catId) {
     return names[catId] || catId || 'Otros';
 }
 
-/* ===== COLORES ===== */
+/* --- COLORES --- */
 function getColor(cat) {
     const categoryMap = {
         "carpinteria": "#A52A2A",
@@ -191,7 +180,6 @@ function getColor(cat) {
 
     if (!cat) return categoryMap["otros"];
 
-    // Normalizar: quitar tildes, comillas y pasar a minúscula limpia
     let key = cat.toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .trim();
@@ -199,7 +187,7 @@ function getColor(cat) {
     return categoryMap[key] || categoryMap[key.replace(" ", "_")] || categoryMap["otros"];
 }
 
-/* CREAR MARCADOR */
+/* --- CREAR MARCADOR --- */
 function crearMarcador(latlng) {
     if (tempMarker) map.removeLayer(tempMarker);
     const initialColor = getColor(document.getElementById("job-category").value);
@@ -210,7 +198,6 @@ function crearMarcador(latlng) {
     document.getElementById("marker-form-box").scrollIntoView({ behavior: "smooth" });
 }
 
-// Cuando cambia la categoría en el formulario de creación, actualizamos el color del marcador temporal
 document.getElementById("job-category").addEventListener("change", (e) => {
     if (tempMarker) {
         const newColor = getColor(e.target.value);
@@ -220,7 +207,7 @@ document.getElementById("job-category").addEventListener("change", (e) => {
 
 map.on("click", e => { if (creatingMode) { creatingMode = false; crearMarcador(e.latlng); } });
 
-/* GUARDAR TRABAJO REAL */
+/* --- GUARDAR TRABAJO REAL --- */
 document.getElementById("save-job-btn").addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) {
@@ -228,7 +215,6 @@ document.getElementById("save-job-btn").addEventListener("click", async () => {
         return;
     }
 
-    // Doble verificación de seguridad
     try {
         const metodos = await obtenerMetodosPago(user.uid);
         if (metodos.length === 0) {
@@ -279,21 +265,21 @@ document.getElementById("save-job-btn").addEventListener("click", async () => {
         if (tempMarker) map.removeLayer(tempMarker);
         tempMarker = null;
 
-        await loadRealJobs(); // Recargar todos
+        await loadRealJobs();
     } catch (e) {
         console.error("Error al guardar:", e);
         showCustomAlert("Error", "No se pudo publicar el trabajo.");
     }
 });
 
-/* CANCELAR CREACIÓN */
+/* --- CANCELAR CREACIÓN --- */
 document.getElementById("cancel-job-btn").addEventListener("click", () => {
     if (tempMarker) map.removeLayer(tempMarker);
     tempMarker = null;
     document.getElementById("marker-form-box").classList.add("hidden");
 });
 
-/* VER MÁS REAL */
+/* --- VER MÁS REAL --- */
 function verMasReal(jobId) {
     const t = allTrabajosDB.find(x => x.id === jobId);
     if (!t) return;
@@ -330,7 +316,7 @@ function verMasReal(jobId) {
 
 document.getElementById("close-view-btn").addEventListener("click", () => document.getElementById("marker-view-box").classList.add("hidden"));
 
-/* BOTÓN AÑADIR MARCADOR */
+/* --- BOTÓN AÑADIR MARCADOR --- */
 const btnAdd = document.getElementById("create-marker-btn");
 if (btnAdd) {
     btnAdd.addEventListener("click", async () => {
@@ -346,7 +332,7 @@ if (btnAdd) {
         }
 
         try {
-            // Verificar si el usuario tiene métodos de pago antes de dejarle añadir un marcador
+           
             const tienePago = await usuarioTieneMetodoPago(user.uid);
             if (!tienePago) {
                 showCustomConfirm(
@@ -382,7 +368,6 @@ function aplicarFiltros() {
     const priceMin = parseFloat(document.getElementById("filter-price-min").value);
     const priceMax = parseFloat(document.getElementById("filter-price-max").value);
 
-    // Actualizar título
     const isFiltered = cat !== "" || range !== 1 || priceMin !== 2 || priceMax !== 1000;
     const title = document.getElementById('mapa-title');
     const iconHtml = '<img src="../assets/img/icons/icono-mapa-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
@@ -392,7 +377,6 @@ function aplicarFiltros() {
 
     updateVisibleMarkers();
 
-    // Mostrar/ocultar marcadores según distancia y filtros
     myMarkers.forEach(m => map.removeLayer(m));
 
     allTrabajosDB.forEach((t, index) => {
@@ -403,7 +387,7 @@ function aplicarFiltros() {
         const pagoFiltro = t.pago_cliente || 0;
 
         const matchCat = cat === "" || (t.id_categoria && t.id_categoria.toLowerCase() === cat);
-        // Si no tenemos ubicación (userLat === 0), ignoramos el filtro de rango para mostrar todos los trabajos
+       
         const matchRange = userLat === 0 || dist <= range;
         const matchPrice = pagoFiltro >= priceMin && pagoFiltro <= priceMax;
 
@@ -420,7 +404,6 @@ function calcDist(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-// Eventos de filtros
 document.getElementById("filter-range").addEventListener("input", function () {
     document.getElementById("range-val").textContent = this.value;
     updateVisibleMarkers();
@@ -429,7 +412,6 @@ document.getElementById("filter-range").addEventListener("input", function () {
 document.getElementById("apply-filters-btn").addEventListener("click", () => {
     aplicarFiltros();
 
-    // Cerrar filtros si estamos en móvil
     const filterPanel = document.getElementById('filter-panel');
     const mobileFilterBtn = document.getElementById('mobile-filter-btn');
     if (filterPanel && filterPanel.classList.contains('show-mobile-filters')) {

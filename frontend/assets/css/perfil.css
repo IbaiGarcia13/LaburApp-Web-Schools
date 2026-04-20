@@ -1,16 +1,14 @@
-/* Perfil */
+
 @import "paleta-colores.css";
 
-/* Perfil GLOBALS Y LAYOUT */
+/* --- PERFIL GLOBALS Y LAYOUT --- */
 .icon-btn-mobile {
     display: none;
 }
 
-/* ==========================================================================
-   ESTILOS DE VISUALIZACIÓN DE PERFIL PÚBLICO
-   Define la cuadrícula de información, la barra de progreso de experiencia XP,
-   el bloque de categorías por puntos de colores y el panel modal de edición.
-   ========================================================================== */
+/* --- ESTILOS DE VISUALIZACIÓN DE PERFIL PÚBLICO
+   DEFINE LA CUADRÍCULA DE INFORMACIÓN, LA BARRA DE PROGRESO DE EXPERIENCIA XP,
+   EL BLOQUE DE CATEGORÍAS POR PUNTOS DE COLORES Y EL PANEL MODAL DE EDICIÓN. --- */
 .main-content {
     max-width: 1100px;
     margin: 40px auto;
@@ -64,7 +62,7 @@
     height: 40px !important;
     transform: rotate(45deg);
     filter: brightness(0) invert(1);
-    /* Fuerza blanco */
+    
 }
 
 .profile-pic {
@@ -145,7 +143,7 @@
     cursor: pointer;
 }
 
-/* Stats Box */
+
 .stats-card {
     border-left: 3px solid var(--neutral-white);
     padding: 15px 25px;
@@ -211,7 +209,7 @@
     font-size: 15px;
 }
 
-/* Categorías */
+
 .categories-container {
     background-color: var(--neutral-white);
     color: var(--gray-9);
@@ -249,7 +247,7 @@
     border-radius: 50%;
 }
 
-/* Colores por categoría (usando paleta-colores.css) */
+
 .cat-dot-carpinteria {
     background-color: var(--cat-1);
 }
@@ -302,7 +300,7 @@
     background-color: var(--cat-13);
 }
 
-/* Botón Editar superior */
+
 .edit-container {
     text-align: right;
 }
@@ -317,7 +315,7 @@
     font-weight: bold;
 }
 
-/* Tarjetas de Información (Cuenta y Suscripciones) */
+
 .info-card {
     background-color: var(--neutral-white);
     color: var(--gray-9);
@@ -370,7 +368,7 @@
     width: 20px;
     height: 20px;
     margin-left: auto;
-    /* Red filter for white icon (icono-no-blanco.png) */
+    
     filter: brightness(0) saturate(100%) invert(27%) sepia(91%) saturate(2351%) hue-rotate(346deg) brightness(101%) contrast(106%);
     transition: transform 0.2s, opacity 0.2s ease;
     opacity: 0;
@@ -395,7 +393,7 @@
     margin: 0;
 }
 
-/* Acciones de la tarjeta cuenta */
+
 .card-actions {
     display: flex;
     justify-content: space-between;
@@ -421,7 +419,7 @@
     color: var(--gray-9);
 }
 
-/* Icono de editar */
+
 .edit-container {
     text-align: right;
 }
@@ -449,7 +447,7 @@
     width: 20px;
 }
 
-/* Estilos del Modal (Ventana emergente) */
+/* --- ESTILOS DEL MODAL (VENTANA EMERGENTE) --- */
 .modal-content .input-group {
     margin-bottom: 10px;
     color: var(--gray-7);
@@ -464,7 +462,6 @@
 }
 
 .modal-content .input-group input {
-    color: var(--gray-7);
     font-size: 1rem;
     text-align: left;
     width: 100%;
@@ -520,7 +517,7 @@
     margin-top: 25px;
 }
 
-/* Añade esto para que el enlace no cambie de color */
+
 #displayPDF {
     color: var(--neutral-black);
     text-decoration: underline;
@@ -531,7 +528,7 @@
     color: var(--gray-9);
 }
 
-/* Nuevo botón Tu Usuario */
+
 .user-view-action {
     display: flex;
     justify-content: center;
@@ -573,7 +570,7 @@
 @media (max-width: 768px) {
     .main-content {
         min-width: 0;
-        margin: 20px auto;
+        margin: 30px auto;
         padding: 0 15px;
     }
 
@@ -587,13 +584,13 @@
 
     .avatar-wrapper {
         align-self: center;
-        /* Override flex-end from desktop */
+        
     }
 
     .profile-pic {
         width: 100%;
         max-width: 240px;
-        /* Reducimos ligeramente para que no se vea gigante */
+        
         height: auto;
         aspect-ratio: 1/1;
         display: block;
@@ -710,7 +707,7 @@
         width: 16px;
     }
 
-    /* Forzar visibilidad de cancelar suscripciones en perfil */
+    
     .btn-cancel-subscription {
         opacity: 1 !important;
         visibility: visible !important;
@@ -724,10 +721,40 @@
         margin: 5% auto;
     }
 
+    .modal-content h3 {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .modal-content p {
+        font-size: 0.7rem;
+    }
+
+    .modal-content .input-group label {
+        font-size: 0.75rem;
+    }
+
+    .modal-content .input-group input, .input-group textarea, .input-group select {
+        font-size: 0.75rem;
+    }
+
+    .input-group #inputPDF {
+        font-size: 0.65rem !important;
+    }
+
     .sub-renewal-date {
         display: block;
         margin-left: 0;
         margin-top: 4px;
         font-size: 0.75rem;
+    }
+
+    .modal-buttons {
+        margin-top: 0px;
+    }
+
+    .modal-content .input-group {
+        margin-bottom: 10px;
+        margin-top: 10px;
     }
 }

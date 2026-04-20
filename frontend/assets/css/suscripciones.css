@@ -75,7 +75,7 @@
 }
 
 
-/* CARD NINGUNA */
+/* --- CARD NINGUNA --- */
 .card-none {
     background: var(--neutral-white);
     color: var(--gray-5);
@@ -94,7 +94,7 @@
 }
 
 
-/* CARD CURRANTE (Azul Neón) */
+/* --- CARD CURRANTE (AZUL NEÓN) --- */
 .card-currante {
     background: var(--blue-3);
     color: var(--neutral-white);
@@ -118,7 +118,7 @@
     font-weight: bold;
 }
 
-/* CARD JEFE */
+/* --- CARD JEFE --- */
 .card-jefe {
     background: var(--blue-3);
     color: var(--neutral-white);
@@ -142,7 +142,7 @@
     font-weight: bold;
 }
 
-/* Alinear Precios y Botones (Footer fijo) */
+/* --- ALINEAR PRECIOS Y BOTONES (FOOTER FIJO) --- */
 .card-bottom {
     position: absolute;
     bottom: 30px;
@@ -165,7 +165,7 @@
     text-align: center;
 }
 
-/* CANCELAR SUSCRIPCIÓN EN CARD */
+/* --- CANCELAR SUSCRIPCIÓN EN CARD --- */
 .cancel-placeholder {
     margin-top: 10px;
     text-align: center;
@@ -198,7 +198,7 @@
     display: none !important;
 }
 
-/* RESPONSIVE */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
     #container {
         margin: 20px auto;
@@ -231,7 +231,7 @@
         height: auto;
         padding: 30px 20px;
         padding-bottom: 30px;
-        /* Reducido ya que card-bottom será static */
+        
     }
 
     .sub-card h3 {
@@ -252,7 +252,7 @@
         font-size: 2.5rem !important;
     }
 
-    /* Cancelar suscripción responsive: "X" arriba a la derecha */
+    
     .cancel-placeholder {
         position: absolute !important;
         top: 15px !important;
@@ -264,7 +264,7 @@
 
     .btn-cancel-sub {
         font-size: 0 !important;
-        /* Oculta el texto */
+        
         width: 32px !important;
         height: 32px !important;
         padding: 0 !important;

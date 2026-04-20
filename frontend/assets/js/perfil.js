@@ -6,24 +6,20 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/fi
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Referencias a la UI Base
     const passLabel = document.getElementById('passLabel');
     const btnChangePass = document.getElementById('btnChangePass');
 
-    // Referencias a los datos mostrados
     const displayName = document.getElementById('displayName');
     const displayDescription = document.getElementById('displayDescription');
     const displayAddress = document.getElementById('displayAddress');
     const displayPic = document.getElementById('displayPic');
 
-    // Referencias Estadísticas Nuevas
-    const lvlVal = document.querySelector('.lvl-val'); // Nivel
-    const lvlBars = document.querySelectorAll('.xp-header span'); // [0 XP, Actual XP, Max XP]
-    const xpFill = document.querySelector('.xp-fill'); // Barra de XP
-    const statItems = document.querySelectorAll('.stat-item strong'); // [Valoracion, Especialidad, Dinero]
+    const lvlVal = document.querySelector('.lvl-val');
+    const lvlBars = document.querySelectorAll('.xp-header span');// --- [0 XP, ACTUAL XP, MAX XP] ---
+    const xpFill = document.querySelector('.xp-fill');
+    const statItems = document.querySelectorAll('.stat-item strong');
     const catGrid = document.querySelector('.cat-grid');
 
-    // Referencias a las Tarjetas de Cuenta y Suscripciones
     const infoCards = document.querySelectorAll('.info-card');
     let subsBody = null;
     let cuentaBody = null;
@@ -36,13 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Referencias Modal
+   // --- REFERENCIAS MODAL ---
     const modal = document.getElementById('editModal');
     const btnOpen = document.getElementById('btnOpenEdit');
     const btnClose = document.getElementById('modal-btn cancel');
     const btnSave = document.getElementById('modal-btn confirm');
 
-    // Referencias Direct Upload Foto
     const avatarEditBtn = document.getElementById('avatarEditBtn');
     const inputPhotoDirect = document.getElementById('inputPhotoDirect');
 
@@ -62,24 +57,24 @@ document.addEventListener('DOMContentLoaded', () => {
         'otros': { nombre: 'Otros', color: 'cat-dot-otros' }
     };
 
-    // Cargar los datos desde Firebase al abrir la app o iniciar sesión
+   // --- CARGAR LOS DATOS DESDE FIREBASE AL ABRIR LA APP O INICIAR SESIÓN ---
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            // Guardamos la URL actual por si acaso
+           
             sessionStorage.setItem('redirectAfterLogin', window.location.href);
             window.location.href = '../index.html';
             return;
         }
 
         try {
-            // Actualizar correo real en la tarjeta 'Cuenta'
+           
             if (cuentaBody) {
                 const emailP = cuentaBody.querySelector('p');
                 if (emailP) emailP.innerHTML = `<strong>Correo electrónico:</strong> ${user.email}`;
             }
 
                 const perfil = await obtenerPerfilUsuario(user.uid);
-                // Obtenemos los puntos con sus metadatos (fechas) para desempatar
+               
                 const q = query(collection(db, "usuarios", user.uid, "puntuaciones_categorias"));
                 const snapshot = await getDocs(q);
                 const ptsCat = [];
@@ -92,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (perfil) {
-                    // Cadenas principales
+                   
                     displayName.textContent = perfil.nombre_completo || (perfil.nombre + " " + perfil.apellidos);
 
                     if (perfil.bio) {
@@ -105,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         displayAddress.textContent = perfil.direccion_principal;
                     }
 
-                    // --- 1. LÓGICA DE NIVEL Y BARRA DE XP ---
+                   // --- 1. LÓGICA DE NIVEL Y BARRA DE XP ---
                     const nLvl = perfil.nivel || 1;
                     const xpActual = perfil.experiencia_nivel_actual || 0;
                     const maxXP = 100 + (nLvl - 1) * 50;
@@ -122,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         xpFill.style.width = percent + "%";
                     }
 
-                    // --- 2. VALORACIÓN, ESPECIALIDAD Y DINERO ---
+                   // --- 2. VALORACIÓN, ESPECIALIDAD Y DINERO ---
                     if (statItems.length >= 3) {
                         const valMedia = perfil.valoracion_media !== undefined ? perfil.valoracion_media : 2.5;
                         statItems[0].textContent = valMedia.toFixed(1);
@@ -137,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 bestCat = c.id_categoria;
                                 oldestDate = c.fecha_creacion;
                             } else if (c.puntos === maxPts && c.puntos > 0) {
-                                // Desempate por antigüedad
+                               
                                 if (c.fecha_creacion < oldestDate) {
                                     bestCat = c.id_categoria;
                                     oldestDate = c.fecha_creacion;
@@ -155,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         statItems[2].textContent = (perfil.dinero_ganado_total || 0).toLocaleString() + " €";
                     }
 
-                    // --- 3. RENDIMIENTO DE TABLA DE CATEGORIAS ---
+                   // --- 3. RENDIMIENTO DE TABLA DE CATEGORIAS ---
                     if (catGrid) {
                         ptsCat.sort((a, b) => b.puntos - a.puntos);
                         catGrid.innerHTML = "";
@@ -175,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // --- 4. RENDER DE SUSCRIPCIONES ---
+                   // --- 4. RENDER DE SUSCRIPCIONES ---
                     if (subsBody) {
                         const sTrabajador = perfil.id_suscripcion_trabajador || "ninguna";
                         const sCliente = perfil.id_suscripcion_cliente || "ninguna";
@@ -213,7 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             clientSubRow.innerHTML = clientHtml;
                         }
 
-                        // Eventos para cancelar suscripción
                         document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
                             btn.onclick = () => {
                                 const tipo = btn.dataset.tipo;
@@ -238,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
 
-                    // --- 5. RENDER FOTO DE PERFIL Y CV ---
+                   // --- 5. RENDER FOTO DE PERFIL Y CV ---
                     if (displayPic) {
                         displayPic.src = perfil.foto_perfil || "../assets/img/avatar-defecto.png";
                     }
@@ -251,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             displayPDF.removeAttribute('href');
                             displayPDF.style.display = "none";
-                            // Ocultar fila entera si no hay CV
+                           
                             const pdfRow = displayPDF.closest('.link-row');
                             if (pdfRow) pdfRow.style.display = "none";
                         }
@@ -262,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
     });
 
-    // --- LÓGICA DE SUBIDA DIRECTA DE FOTO DE PERFIL ---
+   // --- LÓGICA DE SUBIDA DIRECTA DE FOTO DE PERFIL ---
     if (avatarEditBtn && inputPhotoDirect) {
         avatarEditBtn.onclick = () => inputPhotoDirect.click();
     
@@ -273,23 +267,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = e.target.files[0];
             if (file) {
                 try {
-                    // 1. Mostrar localmente de inmediato (UX / Preview)
+                   
                     const previewUrl = URL.createObjectURL(file);
                     if (displayPic) displayPic.src = previewUrl;
     
-                    // Actualizar también la foto del header y dropdown si existen (Preview)
+                   // --- ACTUALIZAR TAMBIÉN LA FOTO DEL HEADER Y DROPDOWN SI EXISTEN (PREVIEW) ---
                     const headerPic = document.querySelector('.profile-toggle');
                     const dropdownPic = document.querySelector('.dropdown-avatar');
                     if (headerPic) headerPic.src = previewUrl;
                     if (dropdownPic) dropdownPic.src = previewUrl;
-    
-                    // 2. Subir a Firebase Storage
-                    // Usamos una ruta única para el avatar del usuario
+
                     const photoRef = ref(storage, `avatars/${user.uid}/profile.jpg`);
                     await uploadBytes(photoRef, file, { contentType: file.type });
                     const downloadUrl = await getDownloadURL(photoRef);
-    
-                    // 3. Guardar la URL en Firestore (Mucho más eficiente que Base64)
+
                     await actualizarPerfilUsuario(user.uid, { foto_perfil: downloadUrl });
     
                     showCustomAlert("¡Éxito!", "Tu foto de perfil se ha actualizado correctamente.");
@@ -301,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- LÓGICA DE CAMBIAR CONTRASEÑA ---
+   // --- LÓGICA DE CAMBIAR CONTRASEÑA ---
     if (btnChangePass) {
         btnChangePass.addEventListener('click', (e) => {
             e.preventDefault();
@@ -312,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DEL MODAL DE EDICIÓN ---
+   // --- LÓGICA DEL MODAL DE EDICIÓN ---
     if (btnOpen) {
         btnOpen.onclick = async () => {
             const user = auth.currentUser;
@@ -324,7 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputName').value = perfil.nombre || "";
             document.getElementById('inputLastname').value = perfil.apellidos || "";
 
-            // Si la bio es la por defecto, vaciar el input para que pueda escribir la suya.
             const currDesc = displayDescription.textContent.trim();
             if (currDesc.includes("Todavía no he escrito mi biografía")) {
                 document.getElementById('inputDescription').value = "";
@@ -340,7 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnClose) btnClose.onclick = () => modal.style.display = "none";
 
-    // GUARDAR CAMBIOS: Enviar a Firestore y refrescar interfaz localmente
     if (btnSave) {
         btnSave.onclick = async () => {
             const user = auth.currentUser;
@@ -349,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Datos Extraidos del Modal
+           // --- DATOS EXTRAIDOS DEL MODAL ---
             const newName = document.getElementById('inputName').value.trim();
             const newLastname = document.getElementById('inputLastname').value.trim();
             const newDescription = document.getElementById('inputDescription').value.trim();
@@ -365,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     direccion_principal: newAddress
                 };
 
-                // Actualizar CV PDF (subir a Firebase Storage, no guardar base64 en Firestore)
                 if (pdfFile) {
                     const pdfRef = ref(storage, `curricula/${user.uid}/cv.pdf`);
                     await uploadBytes(pdfRef, pdfFile, { contentType: 'application/pdf' });
@@ -381,10 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Escribir en la Base de Datos NoSQL
                 await actualizarPerfilUsuario(user.uid, updateData);
 
-                // Refrescar Visual Texto
                 displayName.textContent = updateData.nombre_completo;
                 displayDescription.textContent = newDescription || "¡Hola! Soy nuevo en LaburApp. Todavía no he escrito mi biografía.";
                 displayAddress.textContent = newAddress || "Ubicación no establecida";
@@ -399,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- LÓGICA DEL BOTÓN TU USUARIO (Ver Perfil Público) ---
+   // --- LÓGICA DEL BOTÓN TU USUARIO (VER PERFIL PÚBLICO) ---
     const btnViewMyUser = document.getElementById('btnViewMyUser');
     if (btnViewMyUser) {
         btnViewMyUser.onclick = () => {
@@ -410,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Cerrar al hacer clic fuera del modal
+   // --- CERRAR AL HACER CLIC FUERA DEL MODAL ---
     window.onclick = (event) => {
         if (event.target == modal) modal.style.display = "none";
     };

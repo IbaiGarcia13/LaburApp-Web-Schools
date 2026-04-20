@@ -10,25 +10,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const statDinero = document.getElementById('stat-dinero');
     const dashboardStats = document.getElementById('dashboardStats');
 
-    // Header elements (Using querySelector because they don't have IDs in HTML)
+   // --- HEADER ELEMENTS (USING QUERYSELECTOR BECAUSE THEY DON'T HAVE IDS IN HTML) ---
     const dropdownName = document.querySelector('.dropdown-name');
     const dropdownEmail = document.querySelector('.dropdown-email');
 
-    // Escuchar el estado de autenticación en tiempo real
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                // 1. Obtener datos del usuario desde Firestore
+               
                 const perfil = await obtenerPerfilUsuario(user.uid);
 
                 if (perfil) {
-                    // 2. Mostrar la sección de estadísticas
+                   
                     if (dashboardStats) dashboardStats.style.display = 'flex';
 
-                    // 3. Rellenar los datos en formato visual
                     if (statNivel) statNivel.textContent = perfil.nivel || 1;
 
-                    // Lógica para mostrar lo que más tenga (Subidas vs Realizadas)
+                   // --- LÓGICA PARA MOSTRAR LO QUE MÁS TENGA (SUBIDAS VS REALIZADAS) ---
                     const trabajosSubidos = await obtenerTrabajosPublicadosPorMi(user.uid);
                     const numSubidas = trabajosSubidos ? trabajosSubidos.length : 0;
                     const numRealizadas = perfil.tareas_realizadas || 0;
@@ -41,11 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (statTareas) statTareas.textContent = numRealizadas.toLocaleString();
                     }
 
-                    // Formatear el dinero como moneda (Euros)
                     const dinero = perfil.dinero_ganado_total || 0;
                     if (statDinero) statDinero.textContent = dinero.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
 
-                    // 4. Actualizar dinámicamente el Header (Desplegable superior derecho)
+                   // --- 4. ACTUALIZAR DINÁMICAMENTE EL HEADER (DESPLEGABLE SUPERIOR DERECHO) ---
                     if (dropdownName) dropdownName.textContent = (perfil.nombre || "Usuario").split(' ')[0];
                     if (dropdownEmail) dropdownEmail.textContent = user.email;
                 }
@@ -53,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Error cargando el perfil del usuario:", error);
             }
         } else {
-            // Si no hay usuario logueado, ocultar las estadísticas o redirigir
+           
             if (dashboardStats) dashboardStats.style.display = 'none';
-            // window.location.href = '../index.html'; // Opcional: Echarlo si intenta entrar sin sesión
+           
         }
     });
 

@@ -16,7 +16,7 @@
     object-fit: contain;
 }
 
-/* Header y Botón Volver */
+/* --- HEADER Y BOTÓN VOLVER --- */
 .legal-header {
     display: flex;
     align-items: center;

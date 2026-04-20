@@ -1,11 +1,6 @@
 import { auth } from './firebase-config.js';
 import { obtenerTrabajosAceptadosPorMi, gestionarBorradoTarea } from './database.js';
 
-/**
- * MIS TRABAJOS: Trabajos que el usuario VA A HACER (Trabajador/Worker)
- */
-
-// Variables de estado
 let allJobs = [];
 let filteredJobs = [];
 let currentPage = 1;
@@ -21,7 +16,7 @@ let currentFilters = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Escuchar clic en botón de filtros para versión móvil
+   
     const mobileFilterBtn = document.getElementById('mobile-filter-btn');
     const sidebar = document.getElementById('sidebar');
     if (mobileFilterBtn && sidebar) {
@@ -43,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
             mobileFilterBtn.style.opacity = '1';
         });
 
-        // Cerrar filtros al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (sidebar.classList.contains('show-mobile-filters') &&
                 !sidebar.contains(e.target) &&
@@ -85,7 +79,7 @@ async function loadMyAcceptedJobs(uid) {
 
 function applyClientFilters() {
     filteredJobs = allJobs.filter(j => {
-        // Ocultar si fue cancelado por el propio trabajador O borrado por él tras completarse
+       
         if (j.cancelado_por === "trabajador") return false;
         if (j.borrado_por_trabajador === true) return false;
 
@@ -94,8 +88,7 @@ function applyClientFilters() {
         const statusVal = (j.estado || "pendiente").toLowerCase();
         let matchStatus = false;
         if (currentFilters.status === "todas") {
-            // "Todas" muestra todo lo que no esté borrado por el usuario.
-            // Si el publicador la canceló, el trabajador SÍ la ve como "Cancelada".
+
             matchStatus = true;
         } else {
             matchStatus = statusVal === currentFilters.status.toLowerCase();
@@ -182,7 +175,6 @@ function setupEventListeners() {
         currentFilters.pMax = parseFloat(document.getElementById('pay-max').value) || 1000;
         applyClientFilters();
 
-        // Cerrar filtros si estamos en móvil
         const sidebar = document.getElementById('sidebar');
         const mobileFilterBtn = document.getElementById('mobile-filter-btn');
         if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
@@ -214,7 +206,6 @@ window.confirmarAbandonar = function (id) {
 
     const isCompletada = (job.estado || "").toLowerCase() === "completada";
 
-    // Calcular si estamos dentro de la fecha límite
     const ahora = new Date();
     const fechaLim = job.fecha_limite?.toDate ? job.fecha_limite.toDate() : (job.fecha_limite ? new Date(job.fecha_limite) : null);
     const dentroDePlazo = !fechaLim || fechaLim > ahora;
@@ -238,11 +229,10 @@ window.confirmarAbandonar = function (id) {
         }
     };
 
-    // Si el usuario abandona dentro del plazo, no se pregunta nada (reembolso automático)
     if (!isCompletada && dentroDePlazo) {
         realizarAbandono();
     } else {
-        // Para tareas completadas (borrar historial) u otras, mantenemos el modal por seguridad
+       // --- PARA TAREAS COMPLETADAS (BORRAR HISTORIAL) U OTRAS, MANTENEMOS EL MODAL POR SEGURIDAD ---
         const modalTitle = isCompletada ? "Eliminar del Historial" : "Abandonar Trabajo";
         const modalDesc = isCompletada
             ? "¿Quieres eliminar este trabajo de tu lista? Solo desaparecerá para ti, el registro se mantiene para el publicador."

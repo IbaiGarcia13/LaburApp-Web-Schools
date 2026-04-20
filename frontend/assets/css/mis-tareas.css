@@ -1,11 +1,7 @@
 @import "paleta-colores.css";
 
-/* ==========================================================================
-   HOJA DE ESTILO: MIS TAREAS
-   Derivada del diseño del tablón general, pero adapta los botones de edición
-   y borrado flotantes posicionados dentro de las tarjetas propias.
-   ========================================================================== */
-/* Reutilizamos gran parte del comportamiento base desde styles.css */
+
+
 #container {
     display: flex;
     max-width: 1300px;
@@ -40,7 +36,7 @@
     margin-top: -10px;
 }
 
-/* --- TARJETAS DE TRABAJO (Imágenes 200px) --- */
+/* --- TARJETAS DE TRABAJO (IMÁGENES 200PX) --- */
 .job-card {
     background: var(--neutral-white);
     border-radius: 15px;
@@ -79,7 +75,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    /* Necesario para que el truncamiento de texto funcione en flexbox */
+    
 }
 
 .job-card-header {
@@ -88,7 +84,7 @@
     align-items: flex-start;
     margin-bottom: 8px;
     padding-right: 60px;
-    /* Espacio para los botones de acción */
+    
 }
 
 .job-info h3 {
@@ -100,7 +96,7 @@
     text-overflow: ellipsis;
 }
 
-/* Badge de estado (Igual que en postulaciones.css) */
+
 .status-badge {
     font-size: 0.8rem;
     font-weight: bold;
@@ -109,7 +105,7 @@
     border-radius: 5px;
 }
 
-/* Colores de estado (Sólo texto, sin backgrounds para coincidir con postulaciones) */
+
 .status-pendiente {
     color: var(--neutral-white);
     background-color: var(--orange-1);
@@ -268,7 +264,7 @@
     font-size: 0.9rem;
 }
 
-/* Alineación Desde/Hasta (Flebox uniforme) */
+
 .input-row {
     display: flex;
     gap: 15px;
@@ -306,7 +302,7 @@
     transform: translateY(-2px);
 }
 
-/* --- MODAL ---*/
+/* --- MODAL --- */
 .modal-content p {
     text-align: center;
 }
@@ -462,7 +458,7 @@
     #content {
         width: 100%;
         align-items: stretch;
-        /* Ensure cards take full width regardless of content */
+        
     }
 
     .section-title {
@@ -482,7 +478,7 @@
         display: grid;
         grid-template-columns: 120px minmax(0, 1fr);
         grid-template-rows: auto 1fr auto;
-        /* 1: header, 2: desc, 3: details */
+        /* --- 1: HEADER, 2: DESC, 3: DETAILS --- */
         height: auto;
         min-height: auto;
         padding: 12px;

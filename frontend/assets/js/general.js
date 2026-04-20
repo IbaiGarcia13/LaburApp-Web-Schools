@@ -12,9 +12,7 @@ import {
 } from './database.js';
 import { onSnapshot, collection, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initCookieConsent } from './cookies.js';
-
-// --- UTILIDAD GLOBAL: VERIFICAR SESIÓN ---
-// Esta función comprueba si el usuario está logueado. Si no, muestra el modal de bloqueo.
+// --- UTILIDAD GLOBAL: VERIFICAR SESIÓN ---// --- ESTA FUNCIÓN COMPRUEBA SI EL USUARIO ESTÁ LOGUEADO. SI NO, MUESTRA EL MODAL DE BLOQUEO. ---
 window.verificarSesion = function (callback, mensajeAux = "realizar esta acción") {
     const user = auth.currentUser;
     if (user) {
@@ -28,7 +26,7 @@ window.verificarSesion = function (callback, mensajeAux = "realizar esta acción
             "Acceso Restringido",
             `Para ${mensajeAux} necesitas una cuenta en LaburApp. ¿Quieres iniciar sesión ahora?`,
             () => {
-                // Guardamos la URL actual para intentar volver después del login si fuera posible (opcional)
+               // --- GUARDAMOS LA URL ACTUAL PARA INTENTAR VOLVER DESPUÉS DEL LOGIN SI FUERA POSIBLE (OPCIONAL) ---
                 sessionStorage.setItem('redirectAfterLogin', window.location.href);
                 window.location.href = loginUrl;
             },
@@ -41,16 +39,14 @@ window.verificarSesion = function (callback, mensajeAux = "realizar esta acción
     }
 };
 
-// Evento global que inicializa el menú lateral y las acciones comunes en la barra superior al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    // Forzar scroll arriba si venimos de una página legal (detectado por bandera en sessionStorage)
+   
     if (sessionStorage.getItem('forceScrollTop') === 'true') {
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
         window.scrollTo(0, 0);
-        
-        // Timeout para asegurar que el scroll se mantiene arriba tras la carga completa
+
         setTimeout(() => {
             window.scrollTo(0, 0);
             sessionStorage.removeItem('forceScrollTop');
@@ -60,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 
-    // -- LÓGICA DE USUARIO EN CABECERA --
+   // --- LÓGICA DE USUARIO EN CABECERA ---
     auth.onAuthStateChanged(async (user) => {
         const isPage = window.location.pathname.includes('/pages/');
         const assetsBase = isPage ? '../assets/img/' : 'assets/img/';
@@ -68,13 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const loginUrl = isPage ? 'login.html' : 'pages/login.html';
 
         if (user) {
-            // Mostrar avatar y ocultar botón de login de invitado
+           // --- MOSTRAR AVATAR Y OCULTAR BOTÓN DE LOGIN DE INVITADO ---
             const headerAvatar = document.getElementById('profileBtn');
             if (headerAvatar) headerAvatar.style.display = 'block';
             const guestLoginBtn = document.getElementById('guestLoginBtn');
             if (guestLoginBtn) guestLoginBtn.style.display = 'none';
 
-            // Mostrar pie de menús
             const sideFooter = document.querySelector('.side-menu-footer');
             if (sideFooter) sideFooter.style.display = 'flex';
             const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
@@ -82,11 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setupNotificationBadgeListener(user.uid);
 
-            // Inyectar notificaciones solo para usuarios autenticados
             injectNotificationsHtml();
             setupNotificationsLogic();
 
-            // Comprobar si han pasado más de 7 días (si se usó "Recordarme")
             const loginTimestamp = localStorage.getItem("loginTimestamp");
             if (loginTimestamp) {
                 const sieteDiasEnMs = 7 * 24 * 60 * 60 * 1000;
@@ -112,18 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const avatarUrl = perfil.foto_perfil || guestAvatar;
 
-                // Actualizar avatars en la cabecera
                 const dropdownAvatar = document.querySelector('.dropdown-avatar');
                 if (headerAvatar) headerAvatar.src = avatarUrl;
                 if (dropdownAvatar) dropdownAvatar.src = avatarUrl;
 
-                // Actualizar nombre y email
                 const dropdownName = document.querySelector('.dropdown-name');
                 const dropdownEmail = document.querySelector('.dropdown-email');
                 if (dropdownName) dropdownName.innerText = perfil.nombre || user.displayName || "Usuario";
                 if (dropdownEmail) dropdownEmail.innerText = user.email;
 
-                // Cambiar link de pie de dropdown si estaba en "Iniciar Sesion" (por si acaso)
                 const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
                 if (dropFooter) {
                     const dropLink = dropFooter.querySelector('a');
@@ -133,14 +123,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // --- Chequeo de tareas vencidas que requieren confirmación ---
                 setTimeout(() => checkExpiredTasks(user.uid), 0);
             }
         } else {
-            // USUARIO INVITADO (GUEST)
+           // --- USUARIO INVITADO (GUEST) ---
             console.log("Navegando como invitado.");
             
-            // 1. Ocultar avatar y mostrar botón de login
+           // --- 1. OCULTAR AVATAR Y MOSTRAR BOTÓN DE LOGIN ---
             const headerAvatar = document.getElementById('profileBtn');
             if (headerAvatar) headerAvatar.style.display = 'none';
 
@@ -154,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const headerIcons = document.querySelector('.header-icons');
                 if (headerIcons) {
-                    // Insertar antes del botón de hamburguesa (menuBtn)
+                   
                     const menuBtn = document.getElementById('menuBtn');
                     headerIcons.insertBefore(guestLoginBtn, menuBtn);
                 }
@@ -162,19 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 guestLoginBtn.style.display = 'block';
             }
 
-            // 2. Textos en dropdown (por si acaso se llegara a abrir, aunque ahora no es accesible fácilmente)
             const dropdownName = document.querySelector('.dropdown-name');
             const dropdownEmail = document.querySelector('.dropdown-email');
             if (dropdownName) dropdownName.innerText = "Invitado";
             if (dropdownEmail) dropdownEmail.innerText = "Inicia sesión para más funciones";
 
-            // 3. Ocultar pie de menús (Cerrar Sesión) para invitados
             const sideFooter = document.querySelector('.side-menu-footer');
             if (sideFooter) sideFooter.style.display = 'none';
             const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
             if (dropFooter) dropFooter.style.display = 'none';
 
-            // 4. Adaptar Side Menu (Proteger items restringidos)
             const restrictedItems = [
                 'Perfil', 'Mis Tareas', 'Mis Trabajos', 'Postulaciones', 'Mensajes', 'Ajustes'
             ];
@@ -189,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // 5. Interceptar link al perfil en el dropdown
             const dropdownProfileLink = document.querySelector('.profile-dropdown a[href*="perfil.html"]');
             if (dropdownProfileLink) {
                 dropdownProfileLink.addEventListener('click', (e) => {
@@ -200,11 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Referencias al botón del menú hamburguesa y al contenedor del menú lateral
     const menuBtn = document.getElementById('menuBtn');
     const sideMenu = document.getElementById('sideMenu');
 
-    // Función auxiliar global para cerrar filtros móviles si existen en la página
     function closeMobileFilters() {
         const filters = document.querySelectorAll('.show-mobile-filters');
         filters.forEach(f => f.classList.remove('show-mobile-filters'));
@@ -219,24 +202,21 @@ document.addEventListener('DOMContentLoaded', () => {
         menuBtn.addEventListener('click', (e) => {
             const isOpening = !sideMenu.classList.contains('active');
             if (isOpening) {
-                // Cerrar otros si estamos abriendo este
+               
                 if (profileDropdown) profileDropdown.classList.remove('show');
                 toggleNotificationsPanel(false);
                 closeMobileFilters();
             }
 
-            // Alterna la clase 'active' en el menú lateral para abrirlo
             sideMenu.classList.toggle('active');
 
-            // Alterna la clase 'active' en el botón para el fondo gris
             menuBtn.classList.toggle('active');
 
             e.stopPropagation();
         });
 
-        // Cerrar el menú y quitar el fondo gris al hacer clic fuera
         document.addEventListener('click', (e) => {
-            // No cerrar si el clic es dentro del menú o del botón
+           
             if (!sideMenu.contains(e.target) && !menuBtn.contains(e.target)) {
                 sideMenu.classList.remove('active');
                 menuBtn.classList.remove('active');
@@ -244,8 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // -- LÓGICA DEL MENÚ DESPLEGABLE DEL PERFIL --
-    // Referencias al botón del perfil (avatar) y su contenedor desplegable (dropdown)
+   // --- LÓGICA DEL MENÚ DESPLEGABLE DEL PERFIL ---
+   
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');
 
@@ -253,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         profileBtn.addEventListener('click', (e) => {
             const isOpening = !profileDropdown.classList.contains('show');
             if (isOpening) {
-                // Cerrar otros
+               
                 if (sideMenu) {
                     sideMenu.classList.remove('active');
                     if (menuBtn) menuBtn.classList.remove('active');
@@ -272,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA GLOBAL DE CERRAR SESIÓN ---
+   // --- LÓGICA GLOBAL DE CERRAR SESIÓN ---
     function procesarCerrarSesion() {
         showCustomConfirm(
             "Cerrar Sesión",
@@ -280,8 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             () => {
                 localStorage.removeItem("loginTimestamp");
                 auth.signOut().then(() => {
-                    // No redirigimos. onAuthStateChanged se encargará de adaptar la UI
-                    // o redirigir si la página es restringida (mediante los guards locales).
+
                     console.log("Sesión cerrada con éxito.");
                 }).catch((error) => {
                     console.error("Error al cerrar sesión:", error);
@@ -289,12 +268,11 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             "Cerrar Sesión",
             "Cancelar",
-            "delete", // Se le pasa la clase 'delete' para que sea rojo
+            "delete",
             true
         );
     }
 
-    // 1. Enlaces individuales (en el dropdown del perfil, etc.)
     const logoutLinks = document.querySelectorAll('a[href="login.html"], a[href="pages/login.html"]');
     logoutLinks.forEach(link => {
         if (link.textContent.toLowerCase().includes('cerrar sesi') || link.parentElement.innerHTML.includes('icono-cerrar-sesion')) {
@@ -305,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Caja completa del Side Menu Footer
+   // --- 2. CAJA COMPLETA DEL SIDE MENU FOOTER ---
     const sideMenuFooter = document.querySelector('.side-menu-footer');
     if (sideMenuFooter) {
         sideMenuFooter.addEventListener('click', (e) => {
@@ -313,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Caja completa del Dropdown Footer (especialmente para móvil donde el texto está oculto)
+   // --- 3. CAJA COMPLETA DEL DROPDOWN FOOTER (ESPECIALMENTE PARA MÓVIL DONDE EL TEXTO ESTÁ OCULTO) ---
     const dropdownFooter = document.querySelector('.profile-dropdown .dropdown-footer');
     if (dropdownFooter) {
         dropdownFooter.addEventListener('click', (e) => {
@@ -321,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Botones de Logout generales en tarjetas (clase .logout-action)
     document.querySelectorAll('.logout-action').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -329,18 +306,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
+   // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
     initCookieConsent();
 
 });
-
 
 function setupNotificationsLogic() {
     const sideMenu = document.getElementById('sideMenu');
     if (!sideMenu) return;
 
-    // Buscamos el enlace de notificaciones (que añadiremos a los HTML)
-    // O lo añadimos dinámicamente si no existe para asegurar cobertura
     let notifLink = document.getElementById('notifLink');
     if (!notifLink) {
         const ul = sideMenu.querySelector('ul');
@@ -357,11 +331,8 @@ function setupNotificationsLogic() {
             e.preventDefault();
             e.stopPropagation();
 
-            // Cerrar otros al abrir notificaciones
             if (profileDropdown) profileDropdown.classList.remove('show');
-            // Nota: Aquí no cerramos el sideMenu obligatoriamente porque 
-            // a veces las notificaciones salen ENCIMA del sideMenu, 
-            // pero el usuario pidió que se cierren.
+
             if (sideMenu) {
                 sideMenu.classList.remove('active');
                 if (menuBtn) menuBtn.classList.remove('active');
@@ -383,11 +354,11 @@ async function toggleNotificationsPanel(show) {
 
     if (show) {
         panel.classList.add('active');
-        // Al abrir, cargamos notificaciones
+       
         await renderNotifications();
     } else {
         panel.classList.remove('active');
-        // Al cerrar, marcamos como leídas
+       
         const user = auth.currentUser;
         if (user) {
             await marcarNotificacionesComoLeidas(user.uid);
@@ -396,7 +367,7 @@ async function toggleNotificationsPanel(show) {
 }
 
 async function renderNotifications() {
-    const container = document.getElementById('notifHeaderList'); // El contenedor de la lista
+    const container = document.getElementById('notifHeaderList');
     if (!container) return;
 
     const user = auth.currentUser;
@@ -449,7 +420,6 @@ async function renderNotifications() {
                 }
             };
 
-            // Redirección al hacer click
             item.style.cursor = 'pointer';
             item.onclick = async () => {
                 let targetUrl = null;
@@ -483,7 +453,6 @@ async function renderNotifications() {
                         break;
                 }
 
-                // Si tiene destino, redirigimos y borramos
                 if (targetUrl) {
                     try {
                         await eliminarNotificacion(user.uid, n.id);
@@ -505,7 +474,7 @@ async function renderNotifications() {
 function getNotifIcon(tipo) {
     const base = window.location.pathname.includes('/pages/') ? '../assets/img/icons/' : 'frontend/assets/img/icons/';
     switch (tipo) {
-        // Nuevos tipos
+       
         case 'nivel': return base + 'noti/icono-noti-nivel.png';
         case 'mensaje': return base + 'noti/icono-noti-nuevo-mensaje.png';
         case 'pago': return base + 'noti/icono-noti-pago.png';
@@ -518,7 +487,7 @@ function getNotifIcon(tipo) {
         case 'tarea_abandonada': return base + 'icono-no-blanco.png';
         case 'rechazado': return base + 'icono-no-blanco.png';
         case 'aceptado': return base + 'icono-si-blanco.png';
-        // Base / Otros
+       
         case 'info': return base + 'icono-notificaciones.png';
         default: return base + 'icono-notificaciones.png';
     }
@@ -542,8 +511,7 @@ function injectNotificationsHtml() {
     document.body.appendChild(panel);
 }
 
-/* --- MODAL GLOBAL (Alerts & Confirms) --- */
-// Función principal que inyecta en tiempo de ejecución o recupera (si ya existe) la estructura base del modal de alertas global en el body de la página.
+/* --- MODAL GLOBAL (ALERTS & CONFIRMS) --- */// --- FUNCIÓN PRINCIPAL QUE INYECTA EN TIEMPO DE EJECUCIÓN O RECUPERA (SI YA EXISTE) LA ESTRUCTURA BASE DEL MODAL DE ALERTAS GLOBAL EN EL BODY DE LA PÁGINA. ---
 function injectModalHtml() {
     let modal = document.getElementById('global-custom-modal');
     if (!modal) {
@@ -562,14 +530,13 @@ function injectModalHtml() {
     return modal;
 }
 
-// Función para mostrar una alerta genérica con 1 solo botón
 window.showCustomAlert = function (title, message, btnText = "Aceptar", onClose = null) {
     const modal = injectModalHtml();
     document.getElementById('global-modal-title').innerText = title;
 
     const msgEl = document.getElementById('global-modal-message');
     msgEl.innerText = message;
-    msgEl.style.textAlign = ''; // Reset alignment
+    msgEl.style.textAlign = '';
 
     const btnContainer = document.getElementById('global-modal-buttons');
     btnContainer.innerHTML = `<button class="modal-btn confirm" id="global-modal-ok">${btnText}</button>`;
@@ -582,7 +549,6 @@ window.showCustomAlert = function (title, message, btnText = "Aceptar", onClose 
     };
 };
 
-// Función genérica para solicitar una confirmación binaria al usuario (Aceptar / Cancelar)
 window.showCustomConfirm = function (title, message, onConfirm, confirmText = "Aceptar", cancelText = "Cancelar", confirmClass = "confirm", centerText = false) {
     const modal = injectModalHtml();
     document.getElementById('global-modal-title').innerText = title;
@@ -608,16 +574,14 @@ window.showCustomConfirm = function (title, message, onConfirm, confirmText = "A
         if (typeof onConfirm === 'function') onConfirm();
     };
 };
-
-// Función genérica para cuando se requiere pedir un dato al usuario de manera activa usando modales (como el cambio de contraseña)
+// --- FUNCIÓN GENÉRICA PARA CUANDO SE REQUIERE PEDIR UN DATO AL USUARIO DE MANERA ACTIVA USANDO MODALES (COMO EL CAMBIO DE CONTRASEÑA) ---
 window.showCustomPrompt = function (title, message, onConfirm, confirmText = "Aceptar", cancelText = "Cancelar", inputType = "text") {
     const modal = injectModalHtml();
     document.getElementById('global-modal-title').innerText = title;
 
     const msgEl = document.getElementById('global-modal-message');
-    msgEl.style.textAlign = ''; // Reset alignment
+    msgEl.style.textAlign = '';
 
-    // Convertir el message en HTML para incluir un input
     msgEl.innerHTML = `
         <span>${message}</span><br>
         <input type="${inputType}" id="global-modal-input" class="modal-input" style="margin-top: 15px;">
@@ -631,7 +595,6 @@ window.showCustomPrompt = function (title, message, onConfirm, confirmText = "Ac
 
     modal.classList.remove('hidden');
 
-    // Enfocar el input
     setTimeout(() => document.getElementById('global-modal-input').focus(), 100);
 
     document.getElementById('global-modal-cancel').onclick = () => {
@@ -643,13 +606,11 @@ window.showCustomPrompt = function (title, message, onConfirm, confirmText = "Ac
         const val = document.getElementById('global-modal-input').value;
         if (typeof onConfirm === 'function') onConfirm(val);
     };
-};
-// --- LÓGICA DEL BADGE DE NOTIFICACIONES ---
+};// --- LÓGICA DEL BADGE DE NOTIFICACIONES ---
 function setupNotificationBadgeListener(uid) {
     const notifLink = document.getElementById('notifLink');
     if (!notifLink) return;
 
-    // Buscamos o creamos el badge dentro del link de notificaciones
     let badge = notifLink.querySelector('.notif-badge');
     if (!badge) {
         badge = document.createElement('span');
@@ -672,7 +633,6 @@ function setupNotificationBadgeListener(uid) {
     });
 }
 
-// Función específica para el cambio de contraseña con doble campo e iconos de ojo
 window.showChangePasswordModal = function (onConfirm) {
     const modal = injectModalHtml();
     document.getElementById('global-modal-title').innerText = "Cambiar Contraseña";
@@ -692,7 +652,7 @@ window.showChangePasswordModal = function (onConfirm) {
                 </div>
             </div>
 
-            <div class="modal-input-group" style="margin-top: 20px;">
+            <div class="modal-input-group">
                 <label>Repetir Contraseña:</label>
                 <div class="modal-pass-wrapper">
                     <input type="password" id="passRepeat" class="modal-input-pass" placeholder="Repite la clave" autocomplete="new-password">
@@ -713,7 +673,6 @@ window.showChangePasswordModal = function (onConfirm) {
 
     modal.classList.remove('hidden');
 
-    // Toggle eye icons
     modal.querySelectorAll('.eye-toggle').forEach(btn => {
         btn.onclick = (e) => {
             e.preventDefault();
@@ -758,22 +717,20 @@ window.showChangePasswordModal = function (onConfirm) {
     }
 };
 
-/**
- * --- LÓGICA DE CONFIRMACIÓN DE TAREAS VENCIDAS ---
- */
+/* --- *
+ * --- LÓGICA DE CONFIRMACIÓN DE TAREAS VENCIDAS --- */
 
 async function checkExpiredTasks(uid) {
     try {
         const tareas = await obtenerTareasPendientesConfirmacion(uid);
         
-        // --- LIMPIEZA SILENCIOSA ---
-        // Para cada tarea vencida, intentamos una resolución automática (ej: si pasaron 7 días)
-        // Esto permite que el sistema cumpla con el manual incluso si el usuario ignora el modal.
+       // --- LIMPIEZA SILENCIOSA ---
+       
+       // --- ESTO PERMITE QUE EL SISTEMA CUMPLA CON EL MANUAL INCLUSO SI EL USUARIO IGNORA EL MODAL. ---
         for (const tarea of tareas) {
             await ejecutarResolucionTarea(tarea.id);
         }
 
-        // Volvemos a obtener las tareas que aún requieren confirmación manual
         const tareasPendientes = await obtenerTareasPendientesConfirmacion(uid);
         if (tareasPendientes.length > 0) {
             showMandatoryCompletionModal(tareasPendientes[0]);
@@ -792,7 +749,6 @@ function showMandatoryCompletionModal(tarea) {
 
     const modal = injectModalHtml();
 
-    // Configurar contenido
     document.getElementById('global-modal-title').innerText = title;
     const msgEl = document.getElementById('global-modal-message');
     msgEl.innerText = question;
@@ -806,7 +762,7 @@ function showMandatoryCompletionModal(tarea) {
         <button class="modal-btn" id="modal-resp-espera" style="flex: 1; background: var(--gray-3); color: white;">Espera</button>
     `;
 
-    // Mostrar modal
+   // --- MOSTRAR MODAL ---
     modal.classList.remove('hidden');
 
     const responder = async (respuesta) => {
@@ -814,7 +770,6 @@ function showMandatoryCompletionModal(tarea) {
             await registrarRespuestaConfirmacion(tarea.id, auth.currentUser.uid, respuesta);
             modal.classList.add('hidden');
 
-            // Si hay más tareas, el siguiente recargo las mostrará.
             if (respuesta === 'si' || respuesta === 'no') {
                 showCustomAlert("Respuesta Registrada", "Gracias por tu respuesta. Se procesará la resolución adecuada.");
             }
@@ -828,3 +783,54 @@ function showMandatoryCompletionModal(tarea) {
     document.getElementById('modal-resp-no').onclick = () => responder('no');
     document.getElementById('modal-resp-espera').onclick = () => responder('espera');
 }
+
+/* --- *
+ * --- LÓGICA DE INSTALACIÓN PWA --- */
+
+const swPath = window.location.pathname.includes('/pages/') ? '../sw.js' : 'sw.js';
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register(swPath).then(registration => {
+            console.log('Service Worker registrado con éxito:', registration.scope);
+        }).catch(err => {
+            console.log('Error al registrar el Service Worker:', err);
+        });
+    });
+}
+
+window.deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+   
+    e.preventDefault();
+   // --- GUARDAR EL EVENTO PARA DISPARARLO CUANDO EL USUARIO HAGA CLIC EN "DESCARGAR APP" ---
+    window.deferredPrompt = e;
+    console.log('Evento beforeinstallprompt guardado y listo.');
+});
+
+window.instalarPWA = async function() {
+    if (window.deferredPrompt) {
+       
+        window.deferredPrompt.prompt();
+       
+        const { outcome } = await window.deferredPrompt.userChoice;
+        console.log(`El usuario decidió: ${outcome}`);
+       
+        window.deferredPrompt = null;
+    } else {
+       // --- COMPROBAR SI ES UN DISPOSITIVO IOS, DONDE APPLE NO PERMITE LANZAR EL PROMPT ---
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            window.showCustomAlert(
+                "Instalar LaburApp", 
+                "Para instalar la app en iOS, toca el botón 'Compartir' (el cuadrado con la flecha hacia arriba) en la barra de tu navegador y selecciona 'Añadir a la pantalla de inicio'."
+            );
+        } else {
+           
+            window.showCustomAlert(
+                "Error al instalar", 
+                "La aplicación ya está instalada en tu dispositivo o tu navegador no permite usar este botón. Puedes instalarla manualmente desde el menú superior de tu navegador."
+            );
+        }
+    }
+};

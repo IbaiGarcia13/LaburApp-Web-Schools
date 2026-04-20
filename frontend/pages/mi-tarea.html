@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mi Tarea</title>
-    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="shortcut icon" href="../assets/img/icons/icono-app.png" type="image/x-icon">`n    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/mi-tarea.css">
     <meta name="robots" content="noindex, nofollow">
@@ -154,7 +154,7 @@
             </div>
         </section>
 
-        <!-- ESTADO Y BOTÓN DE COMPLETAR -->
+        <!-- === ESTADO Y BOTÓN DE COMPLETAR === -->
         <section class="complete-section" id="completeSection"
             style="margin-top: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
             <span id="displayEstado" class="estado-badge">Cargando...</span>
@@ -165,27 +165,27 @@
             </button>
         </section>
 
-        <!-- SECCIÓN DE TRABAJADOR ASIGNADO -->
+        <!-- === SECCIÓN DE TRABAJADOR ASIGNADO === -->
         <section class="applicants-section" id="workerSection" style="margin-top: 30px; display: none;">
             <h2 class="cat-title" style="margin-bottom: 20px; color: var(--neutral-white);">Trabajador Asignado</h2>
             <div id="workerList" class="applicants-grid">
-                <!-- Se rellena por JS -->
+                
             </div>
         </section>
 
-        <!-- SECCIÓN DE POSTULANTES -->
+        <!-- === SECCIÓN DE POSTULANTES === -->
         <section class="applicants-section" id="applicantsSection" style="margin-top: 30px; display: none;">
             <h2 class="cat-title" style="margin-bottom: 20px; color: var(--neutral-white); border-bottom: 1px solid var(--gray-1);
     padding-bottom: 10px;">Candidatos Postulados</h2>
             <div id="applicantsList" class="applicants-grid">
-                <!-- Se rellena por JS -->
+                
                 <p style="color: var(--gray-3); font-style: italic;">Cargando candidatos...</p>
             </div>
         </section>
 
     </main>
 
-    <!-- Modal 1: Editar Principal (Título, Descripción, Ubicación) -->
+    <!-- === MODAL 1: EDITAR PRINCIPAL (TÍTULO, DESCRIPCIÓN, UBICACIÓN) === -->
     <div id="modalMain" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Editar Detalles de Tarea</h3>
@@ -213,7 +213,7 @@
         </div>
     </div>
 
-    <!-- Modal 2: Editar Pago -->
+    <!-- === MODAL 2: EDITAR PAGO === -->
     <div id="modalPay" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Editar Pago</h3>
@@ -232,7 +232,7 @@
         </div>
     </div>
 
-    <!-- Modal 3: Editar Información -->
+    <!-- === MODAL 3: EDITAR INFORMACIÓN === -->
     <div id="modalInfo" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Editar Información Extra</h3>
@@ -273,7 +273,7 @@
         </div>
     </div>
 
-    <!-- Modal Valoración -->
+    <!-- === MODAL VALORACIÓN === -->
     <div id="modalValoracion" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Valorar al Trabajador</h3>
@@ -304,7 +304,7 @@
         </div>
     </div>
 
-    <!-- Modal Pago (Completar Tarea) -->
+    <!-- === MODAL PAGO (COMPLETAR TAREA) === -->
     <div id="modalPago" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Realizar Pago</h3>
@@ -333,7 +333,7 @@
         </div>
     </div>
 
-    <!-- Modal Aceptar Trabajador (Retención Escrow) -->
+    <!-- === MODAL ACEPTAR TRABAJADOR (RETENCIÓN ESCROW) === -->
     <div id="modalAceptarTrabajador" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Confirmar y Retener Pago</h3>
@@ -419,6 +419,11 @@
                 <li><a href="#" class="disabled-link">TikTok</a></li>
             </ul>
         </div>
+    </div>
+    <div class="footer-logo-container">
+        <a href="../index.html">
+            <img src="../assets/img/logo/LaburApp4-sin-fondo.png" alt="LaburApp Logo" class="footer-logo">
+        </a>
     </div>
     <div class="footer-bottom">
         <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>

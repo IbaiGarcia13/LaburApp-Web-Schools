@@ -3,7 +3,6 @@ import { collection, query, orderBy, onSnapshot, updateDoc, doc } from "https://
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 import { enviarMensajeTrabajo, obtenerTrabajoPorId, obtenerUsuarioPorId, enviarMensajeDirecto, generarIdChat, enviarDenuncia, registrarConversacionActiva } from './database.js';
 
-
 const listaMensajes = document.getElementById('messages');
 const formulario = document.getElementById('chat-form');
 const inputTexto = document.getElementById('message-input');
@@ -11,7 +10,6 @@ const otherAvatar = document.getElementById('otherAvatar');
 const otherName = document.getElementById('otherName');
 const jobTitle = document.getElementById('jobTitle');
 
-// Elementos de Previsualización de Imagen
 const previewContainer = document.getElementById('image-preview-container');
 const previewImage = document.getElementById('image-preview');
 const btnRemovePreview = document.getElementById('btn-remove-preview');
@@ -20,12 +18,10 @@ const inputGallery = document.getElementById('input-file-gallery');
 let currentUserData = null;
 let otherUserData = null;
 
-// 1. Obtener ID de la URL
 const urlParams = new URLSearchParams(window.location.search);
-const idTrabajo = urlParams.get('id'); // ID of the job
-const userIdDirect = urlParams.get('userId'); // Target user ID
-
-// PRIORIZAR MODO TRABAJO si hay id de trabajo
+const idTrabajo = urlParams.get('id');
+const userIdDirect = urlParams.get('userId');
+// --- PRIORIZAR MODO TRABAJO SI HAY ID DE TRABAJO ---
 let chatMode = 'direct';
 if (idTrabajo) {
     chatMode = 'job';
@@ -35,7 +31,6 @@ if (idTrabajo) {
     });
 }
 
-// 2. Cargar Info
 async function loadChatMeta() {
     try {
         auth.onAuthStateChanged(async (user) => {
@@ -50,7 +45,6 @@ async function loadChatMeta() {
                         const url = (user.uid === trabajo.id_publicador) ? `mi-tarea.html?id=${idTrabajo}` : `trabajo.html?id=${idTrabajo}`;
                         jobTitle.innerHTML = `Trabajo: <a href="${url}" class="job-link">${trabajo.titulo}</a>`;
 
-                        // Mobile dropdown logic
                         const jobContextMobile = document.getElementById('jobContextMobile');
                         const jobMobileLink = document.getElementById('jobMobileLink');
                         const btnJobMobile = document.getElementById('btnJobMobile');
@@ -66,7 +60,6 @@ async function loadChatMeta() {
                                 jobMobileDropdown.classList.toggle('hidden');
                             };
 
-                            // Close dropdown when clicking outside
                             document.addEventListener('click', (e) => {
                                 if (!jobContextMobile.contains(e.target)) {
                                     jobMobileDropdown.classList.add('hidden');
@@ -74,7 +67,6 @@ async function loadChatMeta() {
                             });
                         }
 
-                        // If otherId wasn't in URL, we find it from the job
                         if (!otherId) {
                             otherId = (user.uid === trabajo.id_publicador) ? trabajo.id_trabajador : trabajo.id_publicador;
                         }
@@ -94,7 +86,7 @@ async function loadChatMeta() {
                         otherName.textContent = nameToDisplay;
                         otherAvatar.src = avatarToDisplay;
 
-                        // Links header
+                       // --- LINKS HEADER ---
                         const headerImgLink = document.getElementById("headerProfileLinkImg");
                         const headerTextLink = document.getElementById("headerProfileLinkText");
                         if (headerImgLink) headerImgLink.href = `usuario.html?id=${otherId}`;
@@ -105,23 +97,22 @@ async function loadChatMeta() {
                         if (reportModalName) reportModalName.textContent = nameToDisplay;
                         if (reportModalAvatar) reportModalAvatar.src = avatarToDisplay;
 
-                        // Links modal
+                       // --- LINKS MODAL ---
                         const modalImgLink = document.getElementById("modalProfileLinkImg");
                         const modalTextLink = document.getElementById("modalProfileLinkText");
                         if (modalImgLink) modalImgLink.href = `usuario.html?id=${otherId}`;
                         if (modalTextLink) modalTextLink.href = `usuario.html?id=${otherId}`;
 
-                        // --- RE-REGISTRAR CONVERSACIÓN ---
-                        // Si el usuario llega aquí (desde perfil o buscador), nos aseguramos de que el chat aparezca en mensajes.html
+                       // --- RE-REGISTRAR CONVERSACIÓN ---
+                       
                         const idChat = chatMode === 'job' ? generarIdChat(user.uid, otherId, idTrabajo) : generarIdChat(user.uid, otherId);
                         registrarConversacionActiva(user.uid, otherId, idChat, idTrabajo).catch(err => console.error("Error al re-registrar conv:", err));
                     }
                 } else {
-                    // This fallback is only reached if there's no info at all
+                   
                     otherName.textContent = "Chat";
                 }
 
-                // --- A: ESCUCHAR MENSAJES (Se inicia al saber el usuario) ---
                 startMessageListener(user.uid, otherId);
             } else {
                 sessionStorage.setItem('redirectAfterLogin', window.location.href);
@@ -143,7 +134,7 @@ function startMessageListener(myUid, otherUid) {
     } else if (chatMode === 'direct' && otherUid) {
         chatId = generarIdChat(myUid, otherUid);
     } else {
-        return; // Sin info para iniciar chat
+        return;
     }
 
     const mensajesRef = collection(db, "chats", chatId, "mensajes");
@@ -151,7 +142,7 @@ function startMessageListener(myUid, otherUid) {
     const q = query(mensajesRef, orderBy("fecha_envio", "asc"));
 
     onSnapshot(q, (snapshot) => {
-        // Marcar como leídos los mensajes del otro usuario que aún no están leídos
+       
         snapshot.docs.forEach((msgDoc) => {
             const data = msgDoc.data();
             if (data.id_emisor !== myUid && data.leido === false) {
@@ -203,7 +194,6 @@ function startMessageListener(myUid, otherUid) {
                 }
             }
 
-            // Mensajes de texto o imagen
             if (data.tipo_contenido === 'imagen') {
                 bubbleDiv.innerHTML = `<img src="${data.contenido}" alt="Imagen enviada" style="max-width:200px; border-radius:10px; display:block;">
                     <span class="msg-time">${timeString}</span>`;
@@ -215,7 +205,6 @@ function startMessageListener(myUid, otherUid) {
             wrapperDiv.appendChild(bubbleDiv);
             groupDiv.appendChild(wrapperDiv);
 
-            // Indicador de estado solo en mensajes propios
             if (isOwn) {
                 const isRead = data.leido === true;
                 const statusDiv = document.createElement('div');
@@ -229,7 +218,6 @@ function startMessageListener(myUid, otherUid) {
         listaMensajes.scrollTop = listaMensajes.scrollHeight;
     });
 }
-
 // --- B: ENVIAR MENSAJE ---
 let currentImageBlob = null;
 
@@ -263,7 +251,6 @@ if (formulario && (idTrabajo || userIdDirect)) {
             try {
                 let imageUrl = null;
 
-                // Si hay una imagen en el preview, la subimos primero
                 if (currentImageBlob) {
                     const fileName = currentImageBlob.name || `capture_${Date.now()}.jpg`;
                     const path = `chat-images/${Date.now()}_${fileName}`;
@@ -298,7 +285,6 @@ if (formulario && (idTrabajo || userIdDirect)) {
         }
     });
 }
-
 // --- C: MODAL DE DENUNCIA ---
 const btnReport = document.getElementById('btnReport');
 const reportModal = document.getElementById('reportModal');
@@ -349,7 +335,6 @@ if (btnReport && reportModal) {
         });
     }
 }
-
 // --- D: SELECCIÓN DE IMAGEN (GALERÍA) ---
 const btnImage = document.getElementById('btnImage');
 
@@ -360,8 +345,7 @@ if (btnImage && inputGallery) {
         if (file) showPreview(file);
     });
 }
-
-// --- E: MODAL CÁMARA (getUserMedia) ---
+// --- E: MODAL CÁMARA (GETUSERMEDIA) ---
 const btnCamera = document.getElementById('btnCamera');
 const modalCamera = document.getElementById('modalCamera');
 const cameraStream = document.getElementById('cameraStream');
@@ -403,14 +387,12 @@ if (btnCapture) {
     btnCapture.addEventListener('click', () => {
         if (!cameraStream.srcObject) return;
 
-        // Capturar fotograma en canvas
         cameraCanvas.width = cameraStream.videoWidth;
         cameraCanvas.height = cameraStream.videoHeight;
         cameraCanvas.getContext('2d').drawImage(cameraStream, 0, 0);
 
         stopCamera();
 
-        // Convertir a Blob y mostrar en el preview (NO subir aún)
         cameraCanvas.toBlob((blob) => {
             if (blob) showPreview(blob);
         }, 'image/jpeg', 0.85);

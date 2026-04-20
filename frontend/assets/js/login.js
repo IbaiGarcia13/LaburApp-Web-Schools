@@ -1,16 +1,14 @@
-// Esperamos a que la página se cargue totalmente antes de vincular eventos
+
 import { auth } from './firebase-config.js';
 import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-// Referencias a los contenedores y los dos campos clave del login
+// --- REFERENCIAS A LOS CONTENEDORES Y LOS DOS CAMPOS CLAVE DEL LOGIN ---
 const formulario = document.getElementById("formLogin");
-const usuarioInput = document.getElementById("username"); // It's username visually but an email practically for Firebase
+const usuarioInput = document.getElementById("username");
 const contraseñaInput = document.getElementById("password");
 const recordarCheckbox = document.getElementById("remember");
 const mensajeError = document.getElementById("mensajeError");
 const togglePassword = document.getElementById("togglePassword");
 
-// 1. Mostrar/Ocultar contraseña
 function toggleVisibility() {
     const img = togglePassword.querySelector('img');
     if (contraseñaInput.type === "password") {
@@ -26,10 +24,9 @@ if (togglePassword) {
     togglePassword.addEventListener("click", toggleVisibility);
 }
 
-// Redirección automática si ya hay una sesión iniciada
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // Comprobar si han pasado más de 7 días (si se usó "Recordarme")
+       
         const loginTimestamp = localStorage.getItem("loginTimestamp");
         if (loginTimestamp) {
             const sieteDiasEnMs = 7 * 24 * 60 * 60 * 1000;
@@ -44,30 +41,27 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Escuchador que intercepta la recarga de página al darle al botón "Iniciar Sesión"
 if (formulario) {
     formulario.addEventListener("submit", async function (evento) {
-        evento.preventDefault(); // Evita que se recargue la web
+        evento.preventDefault();
 
         const email = usuarioInput.value.trim();
         const contraseña = contraseñaInput.value.trim();
         const recordar = recordarCheckbox.checked;
 
-        // Validación básica frontend
         if (email === "" || contraseña === "") {
             mensajeError.textContent = "Todos los campos son obligatorios.";
             return;
         }
 
         try {
-            // Establecer la persistencia según el checkbox
+           
             const persistence = recordar ? browserLocalPersistence : browserSessionPersistence;
             await setPersistence(auth, persistence);
 
-            // Intentar hacer login en Firebase
+           // --- INTENTAR HACER LOGIN EN FIREBASE ---
             const userCredential = await signInWithEmailAndPassword(auth, email, contraseña);
 
-            // Si recordó la sesión, guardamos el timestamp para el límite de 7 días
             if (recordar) {
                 localStorage.setItem("loginTimestamp", Date.now().toString());
             } else {
@@ -76,7 +70,7 @@ if (formulario) {
 
             const user = userCredential.user;
 
-            // Login exitoso, borrar error y redirigir
+           // --- LOGIN EXITOSO, BORRAR ERROR Y REDIRIGIR ---
             mensajeError.textContent = "";
             window.location.href = "../index.html";
         } catch (error) {
@@ -94,7 +88,6 @@ if (formulario) {
     });
 }
 
-// 2. ¿Has olvidado tu contraseña?
 const olvidarLink = document.getElementById("olvidar");
 if (olvidarLink) {
     olvidarLink.addEventListener("click", async (e) => {

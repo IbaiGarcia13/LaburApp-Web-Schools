@@ -3,7 +3,7 @@ import { obtenerTrabajoPorId, postularseATrabajo, usuarioTieneMetodoPago } from 
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
-    // 1. Obtener el ID del trabajo desde la URL
+   
     const urlParams = new URLSearchParams(window.location.search);
     const trabajoId = urlParams.get('id');
 
@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     let currentTrabajo = null;
 
-    // 2. Cargar datos del trabajo desde Firestore
     try {
         currentTrabajo = await obtenerTrabajoPorId(trabajoId);
         if (currentTrabajo) {
@@ -46,19 +45,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
 
-            // Si soy el dueño, no puedo postularme
             if (user.uid === trabajo.id_publicador) {
                 if (btnPostular) btnPostular.style.display = 'none';
                 return;
             }
 
-            // Si el trabajo ya no está pendiente, no se puede postular
             if (trabajo.estado !== "Pendiente") {
                 if (btnPostular) btnPostular.style.display = 'none';
                 return;
             }
 
-            // Verificar si ya estoy postulado
             const postRef = doc(db, "trabajos", trabajo.id, "postulaciones", user.uid);
             const postSnap = await getDoc(postRef);
 
@@ -73,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (btnPostular) {
                     btnPostular.style.display = 'block';
                     btnPostular.onclick = async () => {
-                        // VERIFICAR MÉTODO DE PAGO
+                       // --- VERIFICAR MÉTODO DE PAGO ---
                         const tienePago = await usuarioTieneMetodoPago(user.uid);
                         if (!tienePago) {
                             showCustomConfirm(
@@ -107,15 +103,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-    // El listener del btnChat se maneja ahora dentro de checkUserRelation para invitados también
-
-    // 3. Lógica del botón de chat
+   // --- 3. LÓGICA DEL BOTÓN DE CHAT ---
     const btnChat = document.getElementById("btn-chat");
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
             e.preventDefault();
-            // Si el usuario está logueado, checkUserRelation reescribirá este onclick o ya lo habrá hecho
-            // Pero como fallback o para invitados:
+
             window.verificarSesion(() => {
                 if (currentTrabajo && currentTrabajo.id_publicador) {
                     window.location.href = `chat.html?id=${trabajoId}&userId=${currentTrabajo.id_publicador}`;
@@ -125,17 +118,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-/**
- * Función para inyectar los datos del trabajo en el HTML
- */
 function renderTrabajo(trabajo) {
-    // Imagen
+   
     const imgEl = document.querySelector('.job-img');
     if (imgEl) {
         imgEl.src = trabajo.foto_trabajo || "../assets/img/trabajo-defecto.png";
     }
 
-    // Info principal
     const titleEl = document.querySelector('.job-title');
     if (titleEl) titleEl.innerText = trabajo.titulo;
 
@@ -145,7 +134,6 @@ function renderTrabajo(trabajo) {
     const locEl = document.querySelector('.italic');
     if (locEl) locEl.innerText = trabajo.direccion || "Ubicación no especificada";
 
-    // Pagos y XP
     const xp = trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10);
 
     const statValues = document.querySelectorAll('.stat-value');
@@ -154,27 +142,23 @@ function renderTrabajo(trabajo) {
         statValues[1].innerText = `${xp} XP`;
     }
 
-    // Información detallada
     const infoTexts = document.querySelectorAll('.info-text');
     if (infoTexts.length >= 3) {
-        // Categoría
+       
         const catName = trabajo.id_categoria ? trabajo.id_categoria.charAt(0).toUpperCase() + trabajo.id_categoria.slice(1) : "Otros";
         infoTexts[0].innerText = catName;
 
-        // Tiempo
         infoTexts[1].innerText = `${trabajo.tiempo_estimado_horas}h`;
 
-        // Fecha Límite
         let fechaStr = "Sin fecha";
         if (trabajo.fecha_limite) {
-            // Si es Timestamp de Firebase
+           
             const f = trabajo.fecha_limite.toDate ? trabajo.fecha_limite.toDate() : new Date(trabajo.fecha_limite);
             fechaStr = f.toLocaleDateString();
         }
         infoTexts[2].innerText = fechaStr;
     }
 
-    // Inicializar Mini Mapa
     if (trabajo.latitud && trabajo.longitud) {
         initMiniMap(trabajo.latitud, trabajo.longitud, trabajo.id_categoria);
     }

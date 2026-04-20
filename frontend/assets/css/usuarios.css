@@ -1,10 +1,6 @@
 @import "paleta-colores.css";
 
-/* ==========================================================================
-   ESTILOS DE LISTA DE USUARIOS
-   Personaliza el contenedor de la lista de usuarios, las tarjetas individuales
-   (foto, descripción y estadísticas de nivel) y la paginación.
-   ========================================================================== */
+
 #container {
     display: flex;
     max-width: 1300px;
@@ -40,7 +36,7 @@
     margin-top: -10px;
 }
 
-/* --- TARJETAS DE USUARIO (Imágenes 200px) --- */
+/* --- TARJETAS DE USUARIO (IMÁGENES 200PX) --- */
 .user-card {
     background: var(--neutral-white);
     border-radius: 15px;
@@ -157,7 +153,7 @@
     font-size: 0.9rem;
 }
 
-/* Alineación Desde/Hasta (Flebox uniforme) */
+
 .input-row {
     display: flex;
     gap: 15px;

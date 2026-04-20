@@ -1,11 +1,6 @@
 import { auth } from './firebase-config.js';
 import { obtenerTrabajosPublicadosPorMi, gestionarBorradoTarea, cancelarTrabajo } from './database.js';
 
-/**
- * MIS TAREAS: Tareas que el usuario HA COLGADO (Publicador/Cliente)
- */
-
-// Variables de estado
 let allTareas = [];
 let filteredTareas = [];
 let currentPage = 1;
@@ -21,7 +16,7 @@ let currentFilters = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Escuchar clic en botón de filtros para versión móvil
+   
     const mobileFilterBtn = document.getElementById('mobile-filter-btn');
     const sidebar = document.getElementById('sidebar');
     if (mobileFilterBtn && sidebar) {
@@ -43,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
             mobileFilterBtn.style.opacity = '1';
         });
 
-        // Cerrar filtros al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (sidebar.classList.contains('show-mobile-filters') &&
                 !sidebar.contains(e.target) &&
@@ -71,7 +65,7 @@ async function loadMyPostedTasks(uid) {
     if (container) container.innerHTML = "<p class='loading-text'>Cargando mis tareas...</p>";
 
     try {
-        // Obtenemos lo que YO HE PUBLICADO
+       // --- OBTENEMOS LO QUE YO HE PUBLICADO ---
         const rawTareas = await obtenerTrabajosPublicadosPorMi(uid);
         allTareas = rawTareas.sort((a, b) => {
             const dateA = a.fecha_actividad?.toDate ? a.fecha_actividad.toDate() : (a.fecha_actividad || a.fecha_publicacion?.toDate?.() || a.fecha_publicacion || 0);
@@ -86,7 +80,7 @@ async function loadMyPostedTasks(uid) {
 
 function applyClientFilters() {
     filteredTareas = allTareas.filter(j => {
-        // Ocultar si fue cancelado por el propio publicador O borrado por él tras completarse
+       
         if (j.cancelado_por === "publicador") return false;
         if (j.borrado_por_publicador === true) return false;
 
@@ -95,8 +89,7 @@ function applyClientFilters() {
         const statusVal = (j.estado || "pendiente").toLowerCase();
         let matchStatus = false;
         if (currentFilters.status === "todas") {
-            // "Todas" muestra todo lo que no esté borrado o cancelado por el usuario.
-            // Si el trabajador la canceló, el publicador SÍ quiere verla como "Cancelada".
+
             matchStatus = true;
         } else {
             matchStatus = statusVal === currentFilters.status.toLowerCase();
@@ -184,7 +177,6 @@ function setupEventListeners() {
         currentFilters.pMax = parseFloat(document.getElementById('pay-max').value) || 1000;
         applyClientFilters();
 
-        // Cerrar filtros si estamos en móvil
         const sidebar = document.getElementById('sidebar');
         const mobileFilterBtn = document.getElementById('mobile-filter-btn');
         if (sidebar && sidebar.classList.contains('show-mobile-filters')) {
@@ -253,7 +245,7 @@ window.confirmarCancelarTarea = function (id) {
         async () => {
             try {
                 await cancelarTrabajo(id);
-                // Actualizar localmente para reflejar el cambio sin recargar todo
+               
                 const idx = allTareas.findIndex(t => t.id === id);
                 if (idx !== -1) allTareas[idx].estado = "Cancelada";
                 applyClientFilters();

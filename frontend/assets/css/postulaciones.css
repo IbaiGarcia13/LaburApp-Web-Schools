@@ -1,8 +1,5 @@
 @import "paleta-colores.css";
-/* ==========================================================================
-   HOJA DE ESTILO: POSTULACIONES
-   Dos columnas: Trabajos (izquierda) y Usuarios postulantes (derecha).
-   ========================================================================== */
+
 
 #container {
     max-width: 1600px;
@@ -10,7 +7,7 @@
     padding: 0 30px;
 }
 
-/* === TÍTULO PRINCIPAL === */
+/* --- TÍTULO PRINCIPAL --- */
 .section-title {
     color: var(--neutral-white);
     margin-bottom: 30px;
@@ -26,20 +23,20 @@
     margin-top: -10px;
 }
 
-/* === LAYOUT PRINCIPAL: DOS COLUMNAS === */
+/* --- LAYOUT PRINCIPAL: DOS COLUMNAS --- */
 .postulaciones-layout {
     display: flex;
     gap: 30px;
     align-items: flex-start;
 }
 
-/* Columna izquierda (trabajos) */
+
 .col-trabajos {
     flex: 1;
     min-width: 0;
 }
 
-/* Divisor visual entre columnas */
+
 .col-divider {
     width: 2px;
     background-color: var(--gray-1);
@@ -47,13 +44,13 @@
     min-height: 400px;
 }
 
-/* Columna derecha (usuarios) - más estrecha */
+
 .col-usuarios {
     flex: 0 0 370px;
     min-width: 0;
 }
 
-/* Encabezados de columna */
+
 .col-header {
     color: var(--neutral-white);
     font-size: 1rem;
@@ -63,9 +60,7 @@
     text-align: center;
 }
 
-/* ==========================================
-   TARJETA DE TRABAJO (columna izquierda)
-   ========================================== */
+
 .job-card {
     background: var(--neutral-white);
     border-radius: 12px;
@@ -92,7 +87,7 @@
     transform: translateY(-3px);
 }
 
-/* Edit/Delete buttons (similar to mis-trabajos.css) */
+
 .action-buttons {
     position: absolute;
     right: 10px;
@@ -130,7 +125,7 @@
     display: block;
 }
 
-/* Notificación de estado actualizado (punto rojo) */
+
 .job-card.unread::after {
     content: '';
     position: absolute;
@@ -169,7 +164,7 @@
     align-items: flex-start;
     margin-bottom: 10px;
     padding-right: 45px;
-    /* Espacio para el botón de acción */
+    
 }
 
 .job-card-title {
@@ -209,7 +204,7 @@
     height: 12px;
 }
 
-/* Estado de la postulación */
+
 .job-card-footer {
     display: flex;
     justify-content: flex-end;
@@ -253,9 +248,7 @@
     margin-right: 20px;
 }
 
-/* ==========================================
-   TARJETA DE USUARIO (columna derecha)
-   ========================================== */
+/* --- TARJETA DE USUARIO (COLUMNA DERECHA) --- */
 .user-app-card {
     background: var(--neutral-white);
     border-radius: 12px;
@@ -303,7 +296,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* Espacio para botones de acción removido ya que se movieron al fondo */
+    
 }
 
 .user-app-name:hover {
@@ -325,8 +318,8 @@
     text-decoration: underline;
 }
 
-/* Botón de chat: su posición absoluta se hereda de la tarjeta, 
-   pero ahora es relativo a .user-app-actions en el DOM */
+/* --- BOTÓN DE CHAT: SU POSICIÓN ABSOLUTA SE HEREDA DE LA TARJETA, 
+   PERO AHORA ES RELATIVO A .USER-APP-ACTIONS EN EL DOM --- */
 .user-chat-btn {
     position: absolute;
     right: 15px;
@@ -355,8 +348,7 @@
     display: block;
 }
 
-/* Acciones rápidas para candidatos: 
-   Ahora contiene tanto los botones de aceptar/rechazar como el chat */
+
 .user-app-actions {
     position: absolute;
     bottom: 0px;
@@ -367,12 +359,12 @@
     gap: 8px;
     z-index: 10;
     pointer-events: none;
-    /* No bloquea clics en la tarjeta */
+    
 }
 
 .user-app-actions * {
     pointer-events: auto;
-    /* Los botones sí reciben clics */
+    
 }
 
 .btn-group-left {
@@ -424,14 +416,12 @@
 }
 
 
-/* MODAL */
+/* --- MODAL --- */
 .modal-content p {
     text-align: center;
 }
 
-/* ==========================================
-   PAGINACIÓN
-   ========================================== */
+/* --- PAGINACIÓN --- */
 .pagination {
     margin: 30px 0 50px;
     display: flex;
@@ -589,7 +579,7 @@
         margin: 0;
     }
 
-    /* Tarjetas de Usuario */
+    
     .user-app-card {
         display: flex !important;
         flex-direction: column !important;
@@ -649,15 +639,15 @@
         align-items: center !important;
         border-top: 1px solid var(--gray-1);
         padding: 8px 5px !important;
-        /* Reducido vertical */
+        
         margin-top: auto !important;
-        /* El truco del margin-top auto */
+        
         margin-bottom: 0 !important;
         min-height: auto !important;
-        /* Quitamos altura mínima */
+        
         box-sizing: border-box;
         background: var(--neutral-white);
-        /* Para que no se vea nada detrás si hay scroll */
+        
     }
 
     .btn-group-left {

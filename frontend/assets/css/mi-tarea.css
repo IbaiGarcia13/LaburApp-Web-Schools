@@ -1,6 +1,6 @@
 @import "paleta-colores.css";
 
-/* Mi Tarea UI */
+
 .main-content {
     margin: 40px auto;
     padding: 0 20px;
@@ -143,7 +143,7 @@
     color: var(--gray-5);
 }
 
-/* Información section */
+
 .info-section {
     background-color: var(--neutral-white);
     color: var(--gray-9);
@@ -192,7 +192,7 @@
     color: var(--gray-4);
 }
 
-/* Edit Icons */
+
 .icon-edit {
     width: 20px;
     height: 20px;
@@ -218,7 +218,7 @@
     opacity: 1;
 }
 
-/* Estilos del Modal (Ventana emergente) */
+/* --- ESTILOS DEL MODAL (VENTANA EMERGENTE) --- */
 .modal-content .input-group {
     margin-bottom: 25px;
     color: var(--gray-7);
@@ -331,7 +331,7 @@
     gap: 10px;
     margin-top: 10px;
     flex-wrap: wrap;
-    /* Allow buttons to wrap if they don't fit */
+    
 }
 
 .app-btn {
@@ -379,7 +379,7 @@
 
 .app-btn img {
     width: 20px;
-    /* Slightly larger for better visibility */
+    
     height: 20px;
     filter: brightness(0) invert(1);
     display: block;
@@ -478,7 +478,7 @@
 @media (max-width: 768px) {
     .main-content {
         min-width: 0;
-        margin: 20px auto;
+        margin: 30px auto;
         padding: 0 15px;
     }
 
@@ -491,7 +491,8 @@
 
     .job-image-edit-container {
         width: 100%;
-        max-width: 260px;
+        max-width: 240px;
+        min-width: 240px;
         height: auto;
         aspect-ratio: 1/1;
     }
@@ -505,10 +506,20 @@
     }
 
     .job-info-footer {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
         gap: 15px;
         margin-top: 20px;
+    }
+
+    .contact-links {
+        text-align: left;
+    }
+
+    .edit-container {
+        text-align: right;
     }
 
     .truncate-text {
@@ -522,6 +533,7 @@
         padding: 20px 0;
         min-width: 0;
         width: 100%;
+        margin-bottom: -39px;
     }
 
     .info-section {
@@ -529,10 +541,10 @@
     }
 
     .info-header-row {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
         align-items: center;
         gap: 10px;
-        text-align: center;
     }
 
     .cat-title {
@@ -544,6 +556,10 @@
         gap: 15px;
     }
 
+    .info-item {
+        font-size: 0.8rem;
+    }
+
     .applicants-grid {
         grid-template-columns: 1fr;
     }
@@ -552,8 +568,47 @@
         max-width: 100%;
     }
 
+    .applicant-name {
+        font-size: 0.8rem;
+    }
+
+    .app-btn {
+        font-size: 0.75rem;
+    }
+
     .star-rating {
         font-size: 30px;
         gap: 5px;
+    }
+
+    .modal-content {
+        padding: 25px;
+        width: 95%;
+        margin: 5% auto;
+    }
+
+    .modal-content h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .modal-content p {
+        font-size: 0.8rem;
+    }
+
+    .modal-content .input-group label,
+    .input-group label {
+        font-size: 0.75rem;
+    }
+
+    .modal-content .input-group input,
+    .input-group input,
+    .input-group textarea, .input-group select {
+        font-size: 0.75rem;
+    }
+
+    .modal-content .input-group {
+        margin-bottom: 10px;
+        margin-top: 10px;
     }
 }
