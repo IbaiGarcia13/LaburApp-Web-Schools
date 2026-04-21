@@ -102,26 +102,26 @@ async function loadRealJobs() {
 
                 const popupContent = `
             <div style="font-family: inherit; min-width: 180px;">
-                <h3 style="margin: 0 0 8px; color: #333; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                <h3 style="margin: 0 0 8px; color: var(--gray-9); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
                     ${t.titulo}
-                    ${(t.prioridad_suscripcion || 0) !== 0 ? '<span style="background: var(--blue-2); color: #fff; font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
+                    ${(t.prioridad_suscripcion || 0) !== 0 ? '<span style="background: var(--blue-2); color: var(--neutral-white); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
                 </h3>
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
                     <img src="../assets/img/icons/icono-categoria-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;">
-                    <span style="font-size: 13px; color: #666;"><b>${getStandardName(t.id_categoria)}</b></span>
+                    <span style="font-size: 0.8125rem; color: var(--gray-6);"><b>${getStandardName(t.id_categoria)}</b></span>
                 </div>
 
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
                         <img src="../assets/img/icons/icono-dinero-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;"> 
-                        <span style="font-size: 13px; color: #666;"><b>${Number(t.pago_cliente).toFixed(2)} €</b></span>
+                        <span style="font-size: 0.8125rem; color: var(--gray-6);"><b>${Number(t.pago_cliente).toFixed(2)} €</b></span>
                 </div>
 
                 <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
                         <img src="../assets/img/icons/icono-xp-color.png" style="width:14px; vertical-align:middle; gap: 10px; margin-top: 2px;"> 
-                        <span style="font-size: 13px; color: #666;"><b>${xp} XP</b></span>
+                        <span style="font-size: 0.8125rem; color: var(--gray-6);"><b>${xp} XP</b></span>
                 </div>
 
-                <button class="popup-btn" data-id="${t.id}" style="cursor:pointer; background: black; color: white; border: none; padding: 2px 8px; border-radius: 4px; margin-top: 5px;">Más</button>
+                <button class="popup-btn" data-id="${t.id}" style="cursor:pointer; background: var(--neutral-black); color: var(--neutral-white); border: none; padding: 2px 8px; border-radius: 4px; margin-top: 5px;">Más</button>
             </div>`;
 
                 marker.bindPopup(popupContent);
@@ -163,19 +163,19 @@ function getStandardName(catId) {
 /* --- COLORES --- */
 function getColor(cat) {
     const categoryMap = {
-        "carpinteria": "#A52A2A",
-        "construccion": "#808080",
-        "cuidado_personal": "#FFC0CB",
-        "diseno": "#5F9EA0",
-        "evento": "#FF0000",
-        "gastronomia": "#FFD700",
-        "informatica": "#0000FF",
-        "jardineria": "#008000",
-        "limpieza": "#800080",
-        "mascotas": "#006400",
-        "mudanza": "#8B0000",
-        "transporte": "#FFA500",
-        "otros": "#000000"
+        "carpinteria": "var(--cat-1)",
+        "construccion": "var(--cat-2)",
+        "cuidado_personal": "var(--cat-3)",
+        "diseno": "var(--cat-4)",
+        "evento": "var(--cat-5)",
+        "gastronomia": "var(--cat-6)",
+        "informatica": "var(--cat-7)",
+        "jardineria": "var(--cat-8)",
+        "limpieza": "var(--cat-9)",
+        "mascotas": "var(--cat-10)",
+        "mudanza": "var(--cat-11)",
+        "transporte": "var(--cat-12)",
+        "otros": "var(--cat-13)"
     };
 
     if (!cat) return categoryMap["otros"];

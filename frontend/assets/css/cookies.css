@@ -71,7 +71,7 @@
 
 .cookie-btn.accept {
     background-color: var(--primary);
-    color: white;
+    color: var(--neutral-white);
 }
 
 .cookie-btn.accept:hover {
@@ -104,7 +104,7 @@
 }
 
 .cookie-modal-content {
-    background: white;
+    background: var(--neutral-white);
     padding: 30px;
     border-radius: 15px;
     width: 90%;
@@ -169,7 +169,7 @@
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--neutral-white);
     transition: .4s;
     border-radius: 50%;
 }

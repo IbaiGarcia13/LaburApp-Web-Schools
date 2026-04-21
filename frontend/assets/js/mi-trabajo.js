@@ -211,9 +211,11 @@ function renderTrabajo(trabajo) {
         let estado = trabajo.estado || 'Pendiente';
        
         if (estado === "Aceptado") estado = "Aceptada";
+        if (estado === "Pausada") estado = "En revisión";
 
         badgeEl.textContent = estado;
-        badgeEl.className = `estado-badge ${estado.toLowerCase().replace(" ", "-")}`;
+        const classEstado = (trabajo.estado === 'Pausada') ? 'en-revision' : estado.toLowerCase().replace(/\s+/g, "-");
+        badgeEl.className = `estado-badge ${classEstado}`;
     }
 
    // --- LÓGICA DE BOTONES DE ACCIÓN ---
@@ -259,11 +261,11 @@ function initMiniMap(lat, lng, cat) {
 
     const colorMap = {
         "carpinteria": "#A52A2A", "construccion": "#808080", "cuidado_personal": "#FFC0CB",
-        "diseno": "#5F9EA0", "evento": "#FF0000", "gastronomia": "#FFD700",
+        "diseno": "#5F9EA0", "evento": "#FF0000", "gastronomia": "var(--yellow-2)",
         "informatica": "#0000FF", "jardineria": "#008000", "limpieza": "#800080",
-        "mascotas": "#006400", "mudanza": "#8B0000", "transporte": "#FFA500", "otros": "#000000"
+        "mascotas": "#006400", "mudanza": "#8B0000", "transporte": "#FFA500", "otros": "var(--neutral-black)"
     };
-    const color = colorMap[cat?.toLowerCase()] || "#000000";
+    const color = colorMap[cat?.toLowerCase()] || "var(--neutral-black)";
 
     L.circleMarker([lat, lng], {
         radius: 10,

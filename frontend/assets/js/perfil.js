@@ -1,7 +1,7 @@
 import { auth, db, storage } from './firebase-config.js';
 import { collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cancelarSuscripcionUsuario } from './database.js';
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cancelarSuscripcionUsuario, cambiarPassword } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                         if (!hasCats) {
-                            catGrid.innerHTML = "<p style='color: #666; font-style: italic; grid-column: 1 / -1;'>Aún no tienes puntos en ninguna categoría de trabajo.</p>";
+                            catGrid.innerHTML = "<p style='color: var(--gray-6); font-style: italic; grid-column: 1 / -1;'>Aún no tienes puntos en ninguna categoría de trabajo.</p>";
                         }
                     }
 
@@ -296,9 +296,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnChangePass) {
         btnChangePass.addEventListener('click', (e) => {
             e.preventDefault();
-            showChangePasswordModal((nuevaPass) => {
-                showCustomAlert("¡Éxito!", "Tu contraseña ha sido actualizada correctamente en el servidor.");
-                if (passLabel) passLabel.textContent = " " + "*".repeat(nuevaPass.length);
+            showChangePasswordModal(async (nuevaPass) => {
+                try {
+                    await cambiarPassword(nuevaPass);
+                    showCustomAlert("¡Éxito!", "Tu contraseña ha sido actualizada correctamente.");
+                    if (passLabel) passLabel.textContent = " " + "*".repeat(nuevaPass.length);
+                } catch (error) {
+                    console.error("Error al cambiar contraseña:", error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        showCustomAlert(
+                            "Seguridad",
+                            "Por razones de seguridad, debes haber iniciado sesión recientemente para cambiar tu contraseña. Por favor, cierra sesión y vuelve a entrar antes de intentarlo de nuevo."
+                        );
+                    } else {
+                        showCustomAlert("Error", "No se pudo actualizar la contraseña. Inténtalo de nuevo más tarde.");
+                    }
+                }
             });
         });
     }

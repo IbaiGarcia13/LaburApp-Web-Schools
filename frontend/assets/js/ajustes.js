@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial, eliminarCuentaUsuario, eliminarMetodoPago, cancelarSuscripcionUsuario } from './database.js';
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial, eliminarCuentaUsuario, eliminarMetodoPago, cancelarSuscripcionUsuario, cambiarPassword } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -142,9 +142,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnChangePass) {
         btnChangePass.addEventListener('click', (e) => {
             e.preventDefault();
-            showChangePasswordModal((nuevaPass) => {
-                showCustomAlert("¡Éxito!", "Contraseña actualizada correctamente.");
-                if (passLabel) passLabel.textContent = " " + "*".repeat(nuevaPass.length);
+            showChangePasswordModal(async (nuevaPass) => {
+                try {
+                    await cambiarPassword(nuevaPass);
+                    showCustomAlert("¡Éxito!", "Contraseña actualizada correctamente.");
+                    if (passLabel) passLabel.textContent = " " + "*".repeat(nuevaPass.length);
+                } catch (error) {
+                    console.error("Error al cambiar contraseña:", error);
+                    if (error.code === 'auth/requires-recent-login') {
+                        showCustomAlert(
+                            "Seguridad",
+                            "Por razones de seguridad, debes haber iniciado sesión recientemente para cambiar tu contraseña. Por favor, cierra sesión y vuelve a entrar antes de intentarlo de nuevo."
+                        );
+                    } else {
+                        showCustomAlert("Error", "No se pudo actualizar la contraseña. Inténtalo de nuevo más tarde.");
+                    }
+                }
             });
         });
     }
@@ -368,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!historyContainer) return;
 
         if (historial.length === 0) {
-            historyContainer.innerHTML = "<p style='color: #666; font-style: italic;'>Aún no has realizado ningún movimiento de pago.</p>";
+            historyContainer.innerHTML = "<p style='color: var(--gray-6); font-style: italic;'>Aún no has realizado ningún movimiento de pago.</p>";
             return;
         }
 
@@ -414,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         paymentsList.innerHTML = "";
 
         if (metodos.length === 0) {
-            paymentsList.innerHTML = "<p style='color: #666; font-style: italic;'>No tienes métodos de pago registrados.</p>";
+            paymentsList.innerHTML = "<p style='color: var(--gray-6); font-style: italic;'>No tienes métodos de pago registrados.</p>";
             return;
         }
 

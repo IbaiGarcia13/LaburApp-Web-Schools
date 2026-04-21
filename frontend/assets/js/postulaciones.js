@@ -66,7 +66,7 @@ function renderTrabajos() {
     const items = misPostulaciones.slice(start, end);
 
     if (items.length === 0) {
-        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>No te has postulado a ningún trabajo aún.</p>";
+        container.innerHTML = "<p style='color: var(--gray-5); text-align: center; padding: 20px;'>No te has postulado a ningún trabajo aún.</p>";
     }
 
     const catInfo = {
@@ -153,7 +153,7 @@ async function renderUsuarios() {
     container.innerHTML = '';
 
     if (postulantesParaMisTareas.length === 0) {
-        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nadie se ha postulado a tus tareas todavía.</p>";
+        container.innerHTML = "<p style='color: var(--gray-5); text-align: center; padding: 20px;'>Nadie se ha postulado a tus tareas todavía.</p>";
         return;
     }
 
@@ -270,7 +270,7 @@ async function renderUsuarios() {
                     await rechazarPostulacion(app.id_trabajo, user.uid);
                     card.remove();
                     if (container.children.length === 0) {
-                        container.innerHTML = "<p style='color: #888; text-align: center; padding: 20px;'>Nadie se ha postulado a tus tareas todavía.</p>";
+                        container.innerHTML = "<p style='color: var(--gray-5); text-align: center; padding: 20px;'>Nadie se ha postulado a tus tareas todavía.</p>";
                     }
                 } catch (err) {
                     console.error("Error rechazando postulación:", err);

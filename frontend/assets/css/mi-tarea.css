@@ -91,7 +91,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .icon-img {
@@ -185,7 +185,7 @@
 }
 
 .info-icon {
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 
 .info-text {
@@ -253,7 +253,7 @@
 
 .input-group label {
     margin-bottom: 3px;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--neutral-black);
 }
 
@@ -577,7 +577,7 @@
     }
 
     .star-rating {
-        font-size: 30px;
+        font-size: 1.875rem;
         gap: 5px;
     }
 

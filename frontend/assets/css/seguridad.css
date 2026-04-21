@@ -73,7 +73,7 @@
 }
 
 .security-card {
-    background: #fdfdfd;
+    background: var(--gray-1);
     padding: 25px;
     border-radius: 10px;
     border: 1px solid var(--gray-2);

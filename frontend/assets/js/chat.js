@@ -114,6 +114,20 @@ async function loadChatMeta() {
                 }
 
                 startMessageListener(user.uid, otherId);
+
+                // --- LÓGICA DE SOLO LECTURA (PARA ADMIN) ---
+                if (urlParams.get('viewOnly') === 'true') {
+                    if (formulario) formulario.style.display = 'none';
+                    const chatActions = document.querySelector('.chat-actions');
+                    if (chatActions) chatActions.style.display = 'none';
+                    const btnReport = document.getElementById('btnReport');
+                    if (btnReport) btnReport.style.display = 'none';
+                    
+                    // Ajustar altura de lista de mensajes ya que el form no está
+                    if (listaMensajes) {
+                        listaMensajes.style.height = 'calc(100vh - 150px)';
+                    }
+                }
             } else {
                 sessionStorage.setItem('redirectAfterLogin', window.location.href);
                 window.location.href = '../index.html';

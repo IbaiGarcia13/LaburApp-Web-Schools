@@ -167,9 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let estrellasHTML = "";
             for (let i = 1; i <= 5; i++) {
                 if (i <= puntos) {
-                    estrellasHTML += `<span style="color: #FFD700; font-size: 18px;">&#9733;</span>`;
+                    estrellasHTML += `<span style="color: var(--yellow-2); font-size: 1.125rem;">&#9733;</span>`;
                 } else {
-                    estrellasHTML += `<span style="color: var(--gray-3); font-size: 18px;">&#9733;</span>`;
+                    estrellasHTML += `<span style="color: var(--gray-3); font-size: 1.125rem;">&#9733;</span>`;
                 }
             }
 
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="review-body">
-                    ${val.titulo_trabajo ? `<span style="display:block; font-size: 12px; color: var(--gray-4); margin-bottom: 5px;">Trabajo: <b>${val.titulo_trabajo}</b></span>` : ''}
+                    ${val.titulo_trabajo ? `<span style="display:block; font-size: 0.75rem; color: var(--gray-4); margin-bottom: 5px;">Trabajo: <b>${val.titulo_trabajo}</b></span>` : ''}
                     <p>${comentario}</p>
                 </div>
             `;

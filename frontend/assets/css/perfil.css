@@ -80,11 +80,11 @@
 
 .profile-info h1 {
     margin: 0 0 10px 0;
-    font-size: 32px;
+    font-size: 2rem;
 }
 
 .description {
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.4;
     margin-bottom: 15px;
 }
@@ -99,7 +99,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .icon-img {
@@ -168,12 +168,12 @@
 
 .lvl-val {
     display: block;
-    font-size: 28px;
+    font-size: 1.75rem;
     font-weight: bold;
 }
 
 .lvl-label {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: bold;
 }
 
@@ -184,7 +184,7 @@
 .xp-header {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 0.75rem;
     margin-bottom: 5px;
 }
 
@@ -206,7 +206,7 @@
 
 .stat-item {
     margin: 10px 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
 }
 
 
@@ -222,7 +222,7 @@
 .card-title {
     color: var(--gray-3);
     margin: 0 0 20px 0;
-    font-size: 24px;
+    font-size: 1.5rem;
     border-bottom: 1px solid var(--gray-1);
     padding-bottom: 10px;
 }
@@ -237,7 +237,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 15px;
+    font-size: 0.9375rem;
     color: var(--gray-5);
 }
 
@@ -327,7 +327,7 @@
 
 .card-body p {
     margin: 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
     color: var(--gray-5);
 }
 
@@ -349,7 +349,7 @@
 }
 
 .sub-item:hover {
-    background: #f9f9f9;
+    background: var(--gray-1);
 }
 
 .sub-item p {
@@ -412,7 +412,7 @@
 .change-pass-action a {
     color: var(--gray-5);
     text-decoration: underline;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .change-pass-action a:hover {
@@ -481,7 +481,7 @@
 
 .input-group label {
     margin-bottom: 3px;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--neutral-black);
 }
 

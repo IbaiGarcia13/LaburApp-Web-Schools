@@ -5,12 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="../manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Postulaciones</title>
-    <link rel="shortcut icon" href="../assets/img/icons/icono-app.png" type="image/x-icon">`n    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/postulaciones.css">
       <meta name="robots" content="noindex, nofollow">
@@ -84,26 +80,21 @@
     <!-- === CONTENIDO PRINCIPAL === -->
     <main id="container">
 
-        
         <h2 class="section-title">
             <img src="../assets/img/icons/icono-postulaciones-blanco.png" alt="">
             POSTULACIONES
         </h2>
 
-        
         <div class="postulaciones-layout">
 
-            
             <div class="col-trabajos">
                 <h3 class="col-header">TRABAJOS</h3>
                 
                 <div id="jobs-list"></div>
             </div>
 
-            
             <div class="col-divider"></div>
 
-            
             <div class="col-usuarios">
                 <h3 class="col-header">USUARIOS</h3>
                 
@@ -112,7 +103,6 @@
 
         </div>
 
-        
         <div class="pagination">
             <button id="prev-page" class="pag-btn">
                 <img src="../assets/img/icons/icono-flecha.png" alt="<" style="width: 20px; transform: rotate(180deg);">
@@ -128,7 +118,7 @@
     <div id="modalAceptarTrabajador" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Confirmar y Retener Pago</h3>
-            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 15px;">Para aceptar a este trabajador, el
+            <p style="color: var(--gray-5); font-size: 0.875rem; margin-bottom: 15px;">Para aceptar a este trabajador, el
                 importe del trabajo será retirado de tu cuenta y retenido por LaburApp.</p>
 
             <div class="stat-box-large"
@@ -141,13 +131,13 @@
             <div class="input-group">
                 <label style="display: block; margin-bottom: 8px; font-weight: 600;">Método de Pago:</label>
                 <select id="selectMetodoAceptar"
-                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--gray-2); font-size: 14px;"></select>
-                <div id="noMethodsAceptar" class="hidden" style="color: #d15050; font-size: 12px; margin-top: 5px;">
+                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--gray-2); font-size: 0.875rem;"></select>
+                <div id="noMethodsAceptar" class="hidden" style="color: #d15050; font-size: 0.75rem; margin-top: 5px;">
                     No tienes métodos de pago guardados.
                 </div>
             </div>
 
-            <p style="font-size: 12px; color: var(--gray-6); margin-top: 15px; font-style: italic; line-height: 1.4;">
+            <p style="font-size: 0.75rem; color: var(--gray-6); margin-top: 15px; font-style: italic; line-height: 1.4;">
                 * El dinero solo se entregará al trabajador cuando marques la tarea como completada. De lo contrario,
                 será reembolsado.
             </p>
@@ -156,7 +146,7 @@
                 <button id="btnCancelAceptar" class="modal-btn cancel"
                     style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--gray-3); background: white; cursor: pointer; font-weight: 600;">Cancelar</button>
                 <button id="btnConfirmarAceptar" class="modal-btn confirm"
-                    style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: #000; color: white; cursor: pointer; font-weight: 600;">Confirmar</button>
+                    style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: var(--neutral-black); color: white; cursor: pointer; font-weight: 600;">Confirmar</button>
             </div>
         </div>
     </div>
@@ -185,6 +175,7 @@
             <h4>Soporte</h4>
             <ul>
                 <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="#" id="asistencia-cliente">Asistencia al cliente</a></li>
             </ul>
         </div>
         <div class="footer-col">

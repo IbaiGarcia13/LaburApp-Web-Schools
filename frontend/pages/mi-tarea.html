@@ -5,12 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="../manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#ffffff">
     <title>LaburApp - Mi Tarea</title>
-    <link rel="shortcut icon" href="../assets/img/icons/icono-app.png" type="image/x-icon">`n    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/mi-tarea.css">
     <meta name="robots" content="noindex, nofollow">
@@ -159,7 +155,7 @@
             style="margin-top: 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
             <span id="displayEstado" class="estado-badge">Cargando...</span>
             <button id="btnCompletar"
-                style="display: none; align-items: center; gap: 8px; background: var(--green-1); color: var(--neutral-white); border: none; border-radius: 10px; padding: 10px 22px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 3px 10px rgba(39,174,96,0.35); transition: opacity 0.2s;"
+                style="display: none; align-items: center; gap: 8px; background: var(--green-1); color: var(--neutral-white); border: none; border-radius: 10px; padding: 10px 22px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; box-shadow: 0 3px 10px rgba(39,174,96,0.35); transition: opacity 0.2s;"
                 onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
                 MARCAR COMO COMPLETADA
             </button>
@@ -204,7 +200,6 @@
                 <label>Dirección:</label>
                 <input type="text" id="inputLoc">
             </div>
-
 
             <div class="modal-buttons">
                 <button id="btnCancelMain" class="modal-btn cancel">Cancelar</button>
@@ -308,7 +303,7 @@
     <div id="modalPago" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Realizar Pago</h3>
-            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 20px;">Confirma el pago al trabajador para
+            <p style="color: var(--gray-5); font-size: 0.875rem; margin-bottom: 20px;">Confirma el pago al trabajador para
                 finalizar la tarea.</p>
 
             <div class="stat-box-large"
@@ -321,7 +316,7 @@
                 <label>Método de Pago:</label>
                 <select id="selectMetodoPago"
                     style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gray-2);"></select>
-                <div id="noPaymentMethods" class="hidden" style="color: #d15050; font-size: 12px; margin-top: 5px;">
+                <div id="noPaymentMethods" class="hidden" style="color: #d15050; font-size: 0.75rem; margin-top: 5px;">
                     No tienes métodos de pago guardados. Ve a ajustes para añadir uno.
                 </div>
             </div>
@@ -337,7 +332,7 @@
     <div id="modalAceptarTrabajador" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Confirmar y Retener Pago</h3>
-            <p style="color: var(--gray-5); font-size: 14px; margin-bottom: 15px;">Para aceptar a este trabajador, el
+            <p style="color: var(--gray-5); font-size: 0.875rem; margin-bottom: 15px;">Para aceptar a este trabajador, el
                 importe del trabajo será retirado de tu cuenta y retenido por LaburApp.</p>
 
             <div class="stat-box-large"
@@ -351,7 +346,7 @@
                 <label>Método de Pago:</label>
                 <select id="selectMetodoAceptar"
                     style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--gray-2);"></select>
-                <div id="noMethodsAceptar" class="hidden" style="color: #d15050; font-size: 12px; margin-top: 5px;">
+                <div id="noMethodsAceptar" class="hidden" style="color: #d15050; font-size: 0.75rem; margin-top: 5px;">
                     No tienes métodos de pago guardados.
                 </div>
             </div>
@@ -365,7 +360,7 @@
                 <button id="btnCancelAceptar" class="modal-btn cancel"
                     style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--gray-3); background: white; cursor: pointer; font-weight: 600;">Cancelar</button>
                 <button id="btnConfirmarAceptar" class="modal-btn confirm"
-                    style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: #000; color: white; cursor: pointer; font-weight: 600;">Confirmar</button>
+                    style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: var(--neutral-black); color: white; cursor: pointer; font-weight: 600;">Confirmar</button>
             </div>
         </div>
     </div>
@@ -394,6 +389,7 @@
             <h4>Soporte</h4>
             <ul>
                 <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="#" id="asistencia-cliente">Asistencia al cliente</a></li>
             </ul>
         </div>
         <div class="footer-col">

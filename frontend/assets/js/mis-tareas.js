@@ -142,7 +142,7 @@ function displayTareas() {
                 <div class="job-info">
                     <div class="job-card-header">
                         <h3>${tarea.titulo}</h3>
-                        <span class="status-badge status-${(tarea.estado || 'pendiente').toLowerCase().replace(/\s+/g, '-')}">${(tarea.estado === 'Aceptado' ? 'Aceptada' : (tarea.estado || 'Pendiente')).toUpperCase()}</span>
+                        <span class="status-badge status-${(tarea.estado || 'pendiente').toLowerCase() === 'pausada' ? 'en-revision' : (tarea.estado || 'pendiente').toLowerCase().replace(/\s+/g, '-')}">${(tarea.estado === 'Pausada' ? 'En revisión' : (tarea.estado === 'Aceptado' ? 'Aceptada' : (tarea.estado || 'Pendiente'))).toUpperCase()}</span>
                     </div>
                     <p class="job-desc">${tarea.descripcion || "Sin descripción."}</p>
                     <div class="job-details">

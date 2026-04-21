@@ -124,6 +124,16 @@
     background-color: var(--red-2);
 }
 
+.status-en-disputa {
+    color: var(--neutral-white);
+    background-color: var(--purple-1);
+}
+
+.status-en-revision {
+    color: var(--neutral-black);
+    background-color: var(--gray-3);
+}
+
 
 .job-info h3 {
     font-size: 1.4rem;

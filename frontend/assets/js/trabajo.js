@@ -177,12 +177,12 @@ function initMiniMap(lat, lng, cat) {
     }).addTo(miniMap);
 
     const colorMap = {
-        "carpinteria": "#A52A2A", "construccion": "#808080", "cuidado_personal": "#FFC0CB",
-        "diseno": "#5F9EA0", "evento": "#FF0000", "gastronomia": "#FFD700",
-        "informatica": "#0000FF", "jardineria": "#008000", "limpieza": "#800080",
-        "mascotas": "#006400", "mudanza": "#8B0000", "transporte": "#FFA500", "otros": "#000000"
+        "carpinteria": "var(--cat-1)", "construccion": "var(--cat-2)", "cuidado_personal": "var(--cat-3)",
+        "diseno": "var(--cat-4)", "evento": "var(--cat-5)", "gastronomia": "var(--cat-6)",
+        "informatica": "var(--cat-7)", "jardineria": "var(--cat-8)", "limpieza": "var(--cat-9)",
+        "mascotas": "var(--cat-10)", "mudanza": "var(--cat-11)", "transporte": "var(--cat-12)", "otros": "var(--cat-13)"
     };
-    const color = colorMap[cat?.toLowerCase()] || "#000000";
+    const color = colorMap[cat?.toLowerCase()] || "var(--neutral-black)";
 
     L.circleMarker([lat, lng], {
         radius: 10,

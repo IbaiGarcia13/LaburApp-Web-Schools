@@ -140,7 +140,7 @@ function displayJobs() {
                 <div class="job-info">
                     <div class="job-card-header">
                         <h3>${job.titulo}</h3>
-                        <span class="status-badge status-${estadoNorm.toLowerCase().replace(' ', '-')}">${(job.estado === 'Aceptado' ? 'Aceptada' : estadoNorm).toUpperCase()}</span>
+                        <span class="status-badge status-${estadoNorm.toLowerCase() === 'pausada' ? 'en-revision' : estadoNorm.toLowerCase().replace(/\s+/g, '-')}">${(job.estado === 'Pausada' ? 'En revisión' : (job.estado === 'Aceptado' ? 'Aceptada' : estadoNorm)).toUpperCase()}</span>
                     </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción."}</p>
                     <div class="job-details">

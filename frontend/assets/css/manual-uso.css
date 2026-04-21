@@ -350,7 +350,7 @@ strong {
         right: 10px;
         z-index: 2100;
         background: var(--primary);
-        color: white;
+        color: var(--neutral-white);
         border: none;
         padding: 15px 30px;
         border-radius: 50px;

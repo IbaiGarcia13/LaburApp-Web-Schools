@@ -57,7 +57,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 .icon-img {
@@ -144,7 +144,7 @@
 }
 
 .info-icon {
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 
 .info-text {
@@ -176,6 +176,7 @@
 .msg-icon {
     width: 30px;
     cursor: pointer;
+    margin-bottom: -5px;
     transition: transform 0.2s;
 }
 

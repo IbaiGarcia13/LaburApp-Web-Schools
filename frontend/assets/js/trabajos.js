@@ -91,7 +91,7 @@ function displayJobs() {
                     <div class="job-card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <h3 style="display: flex; align-items: center; gap: 8px;">
                             ${job.titulo}
-                            ${(job.prioridad_suscripcion || 0) !== 0 ? '<span class="priority-badge" style="background: var(--blue-2); color: #fff; font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
+                            ${(job.prioridad_suscripcion || 0) !== 0 ? '<span class="priority-badge" style="background: var(--blue-2); color: var(--neutral-white); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
                         </h3>
                         <span class="job-date" style="font-size: 0.85rem; color: var(--gray-4); white-space: nowrap; margin-left: 10px;">${dateStr}</span>
                     </div>

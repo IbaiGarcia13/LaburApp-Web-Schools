@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <title>LaburApp - Panel de Control</title>
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <meta name="robots" content="noindex, nofollow">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="../index.html">
+                <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
+            </a>
+            <a href="../index.html">
+                <img src="../assets/img/logo/LaburApp3.png" alt="Texto LABURAPP" class="logo-text">
+            </a>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li><a href="usuarios.html">Usuarios</a></li>
+                    <li><a href="trabajos.html">Trabajos</a></li>
+                    <li><a href="mapa.html">Mapa</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="perfil.html">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
+                    </a>
+                    <p class="dropdown-name">Administrador</p>
+                    <p class="dropdown-email">laburapp.web@gmail.com</p>
+                    <div class="dropdown-footer">
+                        <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
+                        <a href="login.html">Cerrar Sesión</a>
+                    </div>
+                </div>
+
+                <div class="hamburger" id="menuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="side-menu" id="sideMenu">
+        <ul>
+            <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
+            <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
+            <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
+            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a></li>
+            <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
+            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a></li>
+            <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a></li>
+            <li><img src="../assets/img/icons/icono-ajustes.png"><a href="admin.html">Ajustes</a></li>
+        </ul>
+        <div class="side-menu-footer">
+            <img src="../assets/img/icons/icono-cerrar-sesion.png"> <a href="login.html">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <main class="admin-container">
+        <aside class="admin-sidebar">
+            <h2 id="btn-dashboard" style="cursor: pointer;"><img src="../assets/img/icons/icono-panel-control.png" alt=""> PANEL DE CONTROL</h2>
+            <nav class="admin-tabs">
+                <button class="tab-btn active" data-tab="usuarios"><img src="../assets/img/icons/icono-perfil.png" class="icon-black"> USUARIOS</button>
+                <button class="tab-btn" data-tab="trabajos"><img src="../assets/img/icons/icono-trabajos.png" class="icon-black"> TRABAJOS</button>
+                <button class="tab-btn" data-tab="disputas" id="btn-tab-disputas"><img src="../assets/img/icons/icono-disputa.png" class="icon-black"> DISPUTAS</button>
+                <button class="tab-btn" data-tab="revisiones"><img src="../assets/img/icons/icono-pausa.png" class="icon-black"> REVISIONES</button>
+                <button class="tab-btn" data-tab="chats"><img src="../assets/img/icons/icono-mensajes.png" class="icon-black"> CHATS</button>
+                <button class="tab-btn" data-tab="pagos"><img src="../assets/img/icons/icono-dinero.png" class="icon-black"> PAGOS</button>
+                <button class="tab-btn" data-tab="anuncios"><img src="../assets/img/icons/icono-notificaciones.png" class="icon-black"> ANUNCIOS</button>
+                <button class="tab-btn" data-tab="denuncias"><img src="../assets/img/icons/icono-denunciar.png" class="icon-black"> DENUNCIAS</button>
+                <button class="tab-btn" data-tab="baneados"><img src="../assets/img/icons/icono-baneo-blanco.png" class="icon-black"> BANEADOS</button>
+                <button class="tab-btn" data-tab="eliminados"><img src="../assets/img/icons/icono-eliminar-blanco.png" class="icon-black"> ELIMINADOS</button>
+            </nav>
+        </aside>
+
+        <section class="admin-content">
+            <div id="tab-resumen" class="tab-pane active">
+                <div class="pane-header">
+                    <h3> RESUMEN DE PLATAFORMA</h3>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Usuarios Totales</span>
+                        <span class="stat-value" id="stat-total-usuarios">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Suscriptores Jefe</span>
+                        <span class="stat-value" id="stat-sub-clientes">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Top Cliente</span>
+                        <span class="stat-value small-text" id="stat-top-cliente">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Trabajos Totales</span>
+                        <span class="stat-value" id="stat-total-trabajos">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Suscriptores Currante</span>
+                        <span class="stat-value" id="stat-sub-trabajadores">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Top Trabajador</span>
+                        <span class="stat-value small-text" id="stat-top-trabajador">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Top Categoría</span>
+                        <span class="stat-value small-text" id="stat-top-categoria">-</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Último Usuario</span>
+                        <span class="stat-value small-text" id="stat-ultimo-usuario">-</span>
+                    </div>
+                    <div class="stat-card premium">
+                        <span class="stat-label">Comisiones Ganadas</span>
+                        <span class="stat-value" id="stat-comisiones">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-usuarios" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-perfil.png" class="icon-white"> GESTIÓN DE USUARIOS</h3>
+                    <input type="text" id="search-usuarios" placeholder="Buscar por nombre, email o DNI...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-usuarios">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre Completo</th>
+                                <th>Email</th>
+                                <th>DNI</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-trabajos" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-trabajos.png" class="icon-white"> GESTIÓN DE TRABAJOS</h3>
+                    <div class="header-controls">
+                        <input type="text" id="search-trabajos" placeholder="Buscar trabajo, cliente o trabajador...">
+                        <select id="filter-trabajos-estado">
+                            <option value="todos">Todos los estados</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Aceptada">Aceptada</option>
+                            <option value="En curso">En curso</option>
+                            <option value="Completada">Completada</option>
+                            <option value="En disputa">En disputa</option>
+                            <option value="Pausada">En revisión</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-trabajos">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Cliente</th>
+                                <th>Trabajador</th>
+                                <th>Pago</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-pagos" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-dinero.png" class="icon-white"> HISTORIAL DE PAGOS GLOBAL</h3>
+                    <input type="text" id="search-pagos" placeholder="Buscar por usuario o detalle...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-pagos">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Importe</th>
+                                <th>Concepto / Detalle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-disputas" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-disputa.png" class="icon-white"> TRABAJOS EN DISPUTA</h3>
+                    <input type="text" id="search-disputas" placeholder="Buscar por trabajo, cliente o trabajador...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-disputas">
+                        <thead>
+                            <tr>
+                                <th>Trabajo</th>
+                                <th>Cliente</th>
+                                <th>Trabajador</th>
+                                <th>Respuestas</th>
+                                <th>Acciones</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-denuncias" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-denunciar.png" class="icon-white"> DENUNCIAS RECIBIDAS</h3>
+                    <input type="text" id="search-denuncias" placeholder="Buscar por denunciante o denunciado...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-denuncias">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Denunciante</th>
+                                <th>Denunciado</th>
+                                <th>Motivo</th>
+                                <th>Acciones</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-baneados" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-baneo-blanco.png" class="icon-white"> USUARIOS RESTRINGIDOS</h3>
+                    <input type="text" id="search-baneados" placeholder="Buscar por nombre o email...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-baneados">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Hasta</th>
+                                <th>Motivo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-revisiones" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-pausa.png" class="icon-white"> TRABAJOS EN REVISIÓN</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-revisiones">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Cliente</th>
+                                <th>Trabajador</th>
+                                <th>Acciones</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-chats" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-mensajes.png" class="icon-white"> GESTIÓN DE CHATS</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-chats">
+                        <thead>
+                            <tr>
+                                <th>ID Chat</th>
+                                <th>Usuario 1</th>
+                                <th>Usuario 2</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-anuncios" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-notificaciones.png" class="icon-white"> ENVIAR ANUNCIO</h3>
+                </div>
+                <div class="admin-form-box">
+                    <div class="input-group">
+                        <label>Título del Anuncio:</label>
+                        <input type="text" id="announcement-title" placeholder="Ej: Nueva actualización...">
+                    </div>
+                    <div class="input-group">
+                        <label>Mensaje:</label>
+                        <textarea id="announcement-message" rows="4" placeholder="Escribe el contenido del anuncio..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Enviar a:</label>
+                        <select id="announcement-target">
+                            <option value="todos">Todos los usuarios</option>
+                            <option value="cliente">Suscriptores Clientes</option>
+                            <option value="trabajador">Suscriptores Trabajadores</option>
+                            <option value="no_suscritos">Usuarios no suscritos</option>
+                        </select>
+                    </div>
+                    <button class="modal-btn confirm" id="btn-send-announcement" style="width: 100%; margin-top: 20px;">ENVIAR ANUNCIO</button>
+                </div>
+            </div>
+
+            <div id="tab-eliminados" class="tab-pane">
+                <div class="pane-header">
+                    <h3><img src="../assets/img/icons/icono-eliminar-blanco.png" class="icon-white"> USUARIOS ELIMINADOS</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-eliminados">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Fecha Eliminación</th>
+                                <th>Motivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para Baneo -->
+    <div id="modal-ban" class="modal-overlay hidden">
+        <div class="modal-content ban-modal">
+            <div class="modal-header">
+                <img src="../assets/img/icons/icono-baneo-blanco.png" class="header-icon-red">
+                <h3>Restringir Usuario</h3>
+            </div>
+            
+            <div class="user-target-info">
+                <p id="ban-user-name"></p>
+            </div>
+
+            <div class="modal-form">
+                <div class="input-group">
+                    <label for="ban-duration">Duración de la restricción</label>
+                    <select id="ban-duration">
+                        <option value="3600000">1 Hora (Temporal)</option>
+                        <option value="86400000">1 Día (Aviso)</option>
+                        <option value="604800000">1 Semana (Serio)</option>
+                        <option value="2592000000">1 Mes (Grave)</option>
+                        <option value="31536000000">1 Año (Crítico)</option>
+                        <option value="-1">Permanente (Expulsión)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="ban-reason">Motivo del baneo</label>
+                    <textarea id="ban-reason" placeholder="Describe el motivo detallado de la sanción..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="btn-cancel-ban">Cancelar</button>
+                <button class="modal-btn delete" id="btn-confirm-ban">Confirmar Restricción</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Disputa -->
+    <div id="modal-dispute" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Resolver Disputa</h3>
+            <p id="dispute-job-title"></p>
+            <p style="font-size: 0.875rem; color: var(--gray-5); margin-bottom: 20px;">
+                Elige a quién se le debe entregar el dinero retenido.
+            </p>
+            <div class="modal-buttons dispute-actions">
+                <button class="modal-btn cancel" id="btn-refund-client">Devolver al Cliente</button>
+                <button class="modal-btn cancel" id="btn-pay-worker">Pagar al Trabajador</button>
+            </div>
+            <button class="modal-btn confirm" id="btn-close-dispute" style="width: 100%; margin-top: 10px;">Cerrar</button>
+        </div>
+    </div>
+
+    <script type="module" src="../assets/js/general.js"></script>
+    <script type="module" src="../assets/js/admin.js"></script>
+</body>
+</html>

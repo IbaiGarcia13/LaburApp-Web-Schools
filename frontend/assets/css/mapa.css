@@ -30,7 +30,7 @@
 
 .section-title {
     margin-bottom: 20px;
-    color: white;
+    color: var(--neutral-white);
 }
 
 .section-title img {
@@ -93,7 +93,7 @@
 .filter-box select {
     appearance: none;
     -webkit-appearance: none;
-    background: var(--neutral-white) url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+    background: var(--neutral-white) url('data:image/svg+xml;utf8,<svg fill="var(--neutral-black)" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
 }
 
 .input-row {
@@ -120,7 +120,7 @@
     border: none;
     padding: 12px 30px;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 1rem;
     cursor: pointer;
     transition: 0.2s;
     width: 100%;
@@ -140,7 +140,7 @@
     border: none;
     padding: 25px;
     border-radius: 20px;
-    font-size: 20px;
+    font-size: 1.25rem;
     cursor: pointer;
     transition: 0.2s;
     text-align: center;
@@ -171,18 +171,18 @@
 #marker-form-box h3,
 #marker-view-box h3 {
     margin-bottom: 20px;
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 
 #marker-form-box label,
 #marker-view-box p {
     display: block;
     margin-bottom: 15px;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 #marker-form-box label {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: bold;
 }
 

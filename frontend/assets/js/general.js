@@ -1,8 +1,8 @@
 import { auth, db } from './firebase-config.js';
-import {
-    obtenerPerfilUsuario,
-    obtenerNotificaciones,
-    marcarNotificacionesComoLeidas,
+import { 
+    obtenerPerfilUsuario, 
+    obtenerNotificaciones, 
+    marcarNotificacionesComoLeidas, 
     eliminarNotificacion,
     actualizarActividadSuscripcion,
     obtenerTareasPendientesConfirmacion,
@@ -95,6 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const perfil = await obtenerPerfilUsuario(user.uid);
             if (perfil) {
+                // --- VERIFICAR BANEO ---
+                if (perfil.baneado) {
+                    const ahora = Date.now();
+                    if (perfil.baneado_hasta === -1 || ahora < perfil.baneado_hasta) {
+                        const hastaStr = perfil.baneado_hasta === -1 ? "de forma permanente" : "hasta el " + new Date(perfil.baneado_hasta).toLocaleString();
+                        window.showCustomAlert("Acceso Denegado", `Tu cuenta está restringida ${hastaStr}. Motivo: ${perfil.motivo_baneo || 'No especificado'}`, "Aceptar", () => {
+                            auth.signOut();
+                        });
+                        return;
+                    }
+                }
+
                 actualizarActividadSuscripcion(user.uid).catch(e => {
                     console.error("Error actualizando actividad suscripción:", e);
                 });
@@ -102,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 verificarSuscripcionesRecurrentes(user.uid).catch(e => {
                     console.error("Error verificando suscripciones recurrentes:", e);
                 });
+
+                gestionarVisibilidadAnuncios(perfil);
 
                 const avatarUrl = perfil.foto_perfil || guestAvatar;
 
@@ -113,6 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dropdownEmail = document.querySelector('.dropdown-email');
                 if (dropdownName) dropdownName.innerText = perfil.nombre || user.displayName || "Usuario";
                 if (dropdownEmail) dropdownEmail.innerText = user.email;
+
+                // --- INYECTAR ENLACE DE ADMIN SI ES EL USUARIO CORRECTO ---
+                const adminUID = "Phym2MgXuhMKqOLV97cUe5uzDKC2";
+                if (user.uid === adminUID) {
+                    injectAdminLinks(isPage);
+                }
 
                 const dropFooter = document.querySelector('.profile-dropdown .dropdown-footer');
                 if (dropFooter) {
@@ -309,7 +329,41 @@ document.addEventListener('DOMContentLoaded', () => {
    // --- LÓGICA DE CONSENTIMIENTO DE COOKIES (RGPD) ---
     initCookieConsent();
 
+    // --- LÓGICA DE ASISTENCIA AL CLIENTE ---
+    const asistenciaLink = document.getElementById('asistencia-cliente');
+    if (asistenciaLink) {
+        asistenciaLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const adminUID = "Phym2MgXuhMKqOLV97cUe5uzDKC2";
+            const isPage = window.location.pathname.includes('/pages/');
+            const chatUrl = isPage ? `chat.html?id=${adminUID}` : `pages/chat.html?id=${adminUID}`;
+            
+            window.verificarSesion(() => {
+                window.location.href = chatUrl;
+            }, "abrir un chat de asistencia");
+        });
+    }
+
 });
+
+function injectAdminLinks(isPage) {
+    const assetsBase = isPage ? '../assets/img/icons/' : 'assets/img/icons/';
+    const adminUrl = isPage ? 'admin.html' : 'pages/admin.html';
+
+    // 1. Inyectar en Menú Lateral (antes de Cerrar Sesión)
+    const sideMenu = document.getElementById('sideMenu');
+    if (sideMenu) {
+        const ul = sideMenu.querySelector('ul');
+        if (ul && !document.getElementById('side-admin-link')) {
+            const li = document.createElement('li');
+            li.id = 'side-admin-link';
+            li.innerHTML = `<img src="${assetsBase}icono-panel-control.png"><a href="${adminUrl}">Panel de control</a>`;
+            ul.appendChild(li);
+        }
+    }
+
+
+}
 
 function setupNotificationsLogic() {
     const sideMenu = document.getElementById('sideMenu');
@@ -536,7 +590,7 @@ window.showCustomAlert = function (title, message, btnText = "Aceptar", onClose 
 
     const msgEl = document.getElementById('global-modal-message');
     msgEl.innerText = message;
-    msgEl.style.textAlign = '';
+    modal.querySelector('.modal-content').classList.remove('has-inputs');
 
     const btnContainer = document.getElementById('global-modal-buttons');
     btnContainer.innerHTML = `<button class="modal-btn confirm" id="global-modal-ok">${btnText}</button>`;
@@ -555,7 +609,7 @@ window.showCustomConfirm = function (title, message, onConfirm, confirmText = "A
 
     const msgEl = document.getElementById('global-modal-message');
     msgEl.innerText = message;
-    msgEl.style.textAlign = centerText ? 'center' : '';
+    modal.querySelector('.modal-content').classList.remove('has-inputs');
 
     const btnContainer = document.getElementById('global-modal-buttons');
     btnContainer.innerHTML = `
@@ -580,7 +634,7 @@ window.showCustomPrompt = function (title, message, onConfirm, confirmText = "Ac
     document.getElementById('global-modal-title').innerText = title;
 
     const msgEl = document.getElementById('global-modal-message');
-    msgEl.style.textAlign = '';
+    modal.querySelector('.modal-content').classList.add('has-inputs');
 
     msgEl.innerHTML = `
         <span>${message}</span><br>
@@ -661,7 +715,7 @@ window.showChangePasswordModal = function (onConfirm) {
                     </button>
                 </div>
             </div>
-            <p id="modalPassError" style="color: var(--red-2); font-size: 13px; margin-top: 10px; display: none; text-align: left;"></p>
+            <p id="modalPassError" style="color: var(--red-2); font-size: 0.8125rem; margin-top: 10px; display: none; text-align: left;"></p>
         </div>
     `;
 
@@ -759,7 +813,7 @@ function showMandatoryCompletionModal(tarea) {
     btnContainer.innerHTML = `
         <button class="modal-btn confirm" id="modal-resp-si" style="flex: 1;">Sí</button>
         <button class="modal-btn cancel" id="modal-resp-no" style="flex: 1;">No</button>
-        <button class="modal-btn" id="modal-resp-espera" style="flex: 1; background: var(--gray-3); color: white;">Espera</button>
+        <button class="modal-btn" id="modal-resp-espera" style="flex: 1; background: var(--gray-3); color: var(--neutral-white);">Espera</button>
     `;
 
    // --- MOSTRAR MODAL ---
@@ -834,3 +888,25 @@ window.instalarPWA = async function() {
         }
     }
 };
+
+/**
+ * --- GESTIÓN DE VISIBILIDAD DE ANUNCIOS ---
+ * Oculta los anuncios si el usuario tiene una suscripción activa (Jefe o Currante).
+ */
+function gestionarVisibilidadAnuncios(perfil) {
+    if (!perfil) return;
+    const esSuscrito = (perfil.id_suscripcion_cliente === 'jefe') || (perfil.id_suscripcion_trabajador === 'currante');
+
+    if (esSuscrito) {
+        // Ocultar todos los contenedores de AdSense
+        const ads = document.querySelectorAll('.adsbygoogle, ins.adsbygoogle');
+        ads.forEach(ad => {
+            ad.style.display = 'none';
+            // También ocultamos el contenedor padre si es un div de anuncio
+            if (ad.parentElement && ad.parentElement.classList.contains('ad-container')) {
+                ad.parentElement.style.display = 'none';
+            }
+        });
+        console.log("Suscripción activa detectada: Anuncios ocultos.");
+    }
+}

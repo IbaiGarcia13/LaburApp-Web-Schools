@@ -16,9 +16,8 @@ import {
     limit
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import {
-    getAuth,
-    onAuthStateChanged,
-    deleteUser
+    deleteUser,
+    updatePassword as firebaseUpdatePassword
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
@@ -36,6 +35,12 @@ export async function actualizarPerfilUsuario(uid, datosNuevos) {
     const docRef = doc(db, "usuarios", uid);
     await updateDoc(docRef, datosNuevos);
     return true;
+}
+
+export async function cambiarPassword(nuevaPass) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No hay usuario autenticado.");
+    return await firebaseUpdatePassword(user, nuevaPass);
 }
 
 export async function actualizarSuscripcionUsuario(uid, tipo, idSuscripcion) {
@@ -148,11 +153,45 @@ export async function obtenerTodosLosUsuarios() {
 }
 // --- 2. TRABAJOS ---
 
+export async function verificarLimiteCreacionTrabajo(uid) {
+    const userRef = doc(db, "usuarios", uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) return { permitida: false, mensaje: "Usuario no encontrado" };
+
+    const data = userSnap.data();
+    const esJefe = data.id_suscripcion_cliente === "jefe";
+    const limite = esJefe ? 3 : 1;
+
+    // Usamos la fecha local para el límite diario
+    const hoy = new Date().toLocaleDateString('en-CA'); // Formato YYYY-MM-DD
+    let stats = data.stats_diarias || { fecha: hoy, trabajos_creados: 0 };
+
+    if (stats.fecha !== hoy) {
+        stats = { fecha: hoy, trabajos_creados: 0 };
+    }
+
+    if (stats.trabajos_creados >= limite) {
+        const msg = esJefe 
+            ? "Has alcanzado el límite diario de 3 tareas para el plan JEFE."
+            : "Has alcanzado el límite diario de 1 tarea. ¡Suscríbete al plan JEFE para subir hasta 3!";
+        return { permitida: false, mensaje: msg };
+    }
+
+    return { permitida: true, statsActuales: stats };
+}
+
 export async function crearTrabajo(datosTrabajo) {
     const user = auth.currentUser;
     if (!user) throw new Error("Debes iniciar sesión.");
 
     const perfil = await obtenerPerfilUsuario(user.uid);
+    
+    // --- VERIFICAR LÍMITE DIARIO ---
+    const limitCheck = await verificarLimiteCreacionTrabajo(user.uid);
+    if (!limitCheck.permitida) {
+        throw new Error(limitCheck.mensaje);
+    }
+
     const esJefe = perfil && perfil.id_suscripcion_cliente === 'jefe';
 
     const pagoCliente = Number(datosTrabajo.pagoCliente);
@@ -182,6 +221,11 @@ export async function crearTrabajo(datosTrabajo) {
         prioridad_suscripcion: esJefe ? serverTimestamp() : 0,
         es_tarea_premium: esJefe ? true : false
     });
+
+    // --- ACTUALIZAR CONTADOR DIARIO ---
+    const stats = limitCheck.statsActuales;
+    stats.trabajos_creados++;
+    await updateDoc(doc(db, "usuarios", user.uid), { stats_diarias: stats });
 
     return docRef.id;
 }
@@ -243,7 +287,7 @@ export async function obtenerTrabajos(idCategoria = "todas") {
     } else {
         q = query(
             collection(db, "trabajos"),
-            where("estado", "==", "Pendiente")
+            where("estado", "in", ["Pendiente", "Pausada", "En disputa"])
         );
     }
 
@@ -864,12 +908,24 @@ export function generarIdChat(uid1, uid2, idTrabajo = null) {
 
 export async function registrarConversacionActiva(uidActor, uidOtro, idChat, idTrabajo = null) {
     const convRef = doc(db, "usuarios", uidActor, "conversaciones", idChat);
-    await setDoc(convRef, {
+    const data = {
         id_chat: idChat,
         id_otro_usuario: uidOtro,
+        id_trabajador: idTrabajo ? (uidActor === uidOtro ? uidActor : uidOtro) : null, // Simplificado, registrar quién es quién si es posible
         id_trabajo: idTrabajo,
         tipo: idTrabajo ? 'trabajo' : 'directo',
         ultima_actualizacion: serverTimestamp()
+    };
+    await setDoc(convRef, data, { merge: true });
+
+    // También registrar en la colección raíz 'chats' para el panel admin
+    const chatRootRef = doc(db, "chats", idChat);
+    await setDoc(chatRootRef, {
+        id: idChat,
+        id_trabajo: idTrabajo,
+        ultima_actualizacion: serverTimestamp(),
+        // Guardamos los UIDs para facilitar la búsqueda en el admin
+        uids: [uidActor, uidOtro]
     }, { merge: true });
 }
 
@@ -998,15 +1054,27 @@ export async function obtenerUltimoMensaje(mensajesRef) {
     return { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
-export async function enviarDenuncia(idUsuarioReportado, motivo) {
+export async function enviarDenuncia(idDenunciado, motivo) {
     const user = auth.currentUser;
     if (!user) throw new Error("Debes iniciar sesión.");
 
+    // Obtener perfiles para guardar nombres (optimización para el panel admin)
+    const [perfilDenunciante, perfilDenunciado] = await Promise.all([
+        obtenerPerfilUsuario(user.uid),
+        obtenerPerfilUsuario(idDenunciado)
+    ]);
+
+    const nombreDenunciante = perfilDenunciante ? (perfilDenunciante.nombre_completo || perfilDenunciante.nombre) : "Desconocido";
+    const nombreDenunciado = perfilDenunciado ? (perfilDenunciado.nombre_completo || perfilDenunciado.nombre) : "Desconocido";
+
     await addDoc(collection(db, "denuncias"), {
-        id_usuario_reportado: idUsuarioReportado,
-        id_usuario_denunciante: user.uid,
+        id_denunciante: user.uid,
+        nombre_denunciante: nombreDenunciante,
+        id_denunciado: idDenunciado,
+        nombre_denunciado: nombreDenunciado,
         motivo: motivo,
-        fecha: serverTimestamp()
+        fecha: serverTimestamp(),
+        estado: "pendiente"
     });
 
     return true;
@@ -1240,7 +1308,10 @@ export async function cancelarTrabajo(idTrabajo) {
     if (!snap.exists()) return;
     const tarea = snap.data();
 
-    const updateData = { estado: "Cancelada" };
+    // BLOQUEO: Si está en disputa o en revisión, el usuario no puede cancelar manualmente.
+    if (tarea.estado === 'En disputa' || tarea.estado === 'En revisión') {
+        throw new Error(`No puedes cancelar un trabajo que está ${tarea.estado}. Contacta con soporte.`);
+    }
     if (tarea.pago_retenido === true && tarea.estado !== "En curso") {
         updateData.pago_retenido = false;
         try {
@@ -1353,7 +1424,11 @@ export async function ejecutarResolucionTarea(idTarea) {
     if (!snap.exists()) return;
     const tarea = snap.data();
 
-    if (tarea.resolucion_finalizada) return;
+    // SEGURIDAD: Si está en disputa o en revisión (Pausada), NO HACER NADA automático.
+    // Requiere intervención manual del administrador.
+    if (tarea.estado === 'En disputa' || tarea.estado === 'En revisión' || tarea.estado === 'Pausada' || tarea.resolucion_finalizada) {
+        return;
+    }
 
     const resP = tarea.confirmacion_publicador || 'pendiente';
     const resW = tarea.confirmacion_trabajador || 'pendiente';
@@ -1387,16 +1462,22 @@ export async function ejecutarResolucionTarea(idTarea) {
     }
 
     if ((resP === 'si' && resW === 'no') || (resP === 'no' && resW === 'si')) {
-        await updateDoc(trabajoRef, { estado: 'En disputa', resolucion_finalizada: true });
-        const msg = `Hay discrepancias en la confirmación de "${tarea.titulo}". Se ha abierto una investigación manual.`;
+        await updateDoc(trabajoRef, { 
+            estado: 'En disputa', 
+            resolucion_finalizada: true
+        });
+        const msg = `Hay discrepancias en la confirmación de "${tarea.titulo}". El trabajo ha pasado a estado "En disputa" y se ha abierto una investigación manual.`;
         await crearNotificacion(tarea.id_publicador, "Investigación Abierta", msg, "info");
         await crearNotificacion(tarea.id_trabajador, "Investigación Abierta", msg, "info");
        
         return;
     }
 
-   // --- 2. EXPIRACIÓN (7 DÍAS) ---
+    // --- 2. EXPIRACIÓN (7 DÍAS) ---
     if (diasTranscurridos >= 7) {
+        // SEGURIDAD EXTRA: Si se ha llegado a los 7 días pero el estado es disputa o revisión, NO hacer nada.
+        if (tarea.estado === 'En disputa' || tarea.estado === 'En revisión') return;
+
        
         if ((resP === 'si' || resP === 'no') && (resW === 'pendiente' || resW === 'espera')) {
            
@@ -1426,8 +1507,8 @@ export async function eliminarTareaResolucion(idTarea) {
         if (!snap.exists()) return;
         const data = snap.data();
 
-        if (data.estado === "En disputa") {
-            console.log("Abortando borrado: Tarea en disputa.");
+        if (data.estado === "En disputa" || data.estado === "En revisión") {
+            console.log(`Abortando borrado: Tarea ${data.estado}.`);
             return;
         }
 
@@ -1519,4 +1600,332 @@ export async function verificarSuscripcionesRecurrentes(uid) {
     if (huboCambios) {
         await updateDoc(docRef, updates);
     }
+}
+
+// --- 8. FUNCIONES DE ADMINISTRACIÓN ---
+
+export async function banearUsuario(uid, duracionMs, motivo = "Incumplimiento de normas") {
+    const userRef = doc(db, "usuarios", uid);
+    const ahora = Date.now();
+    const baneadoHasta = duracionMs === -1 ? -1 : ahora + duracionMs; // -1 para permanente
+
+    await updateDoc(userRef, {
+        baneado: true,
+        baneado_hasta: baneadoHasta,
+        motivo_baneo: motivo
+    });
+
+    // Registrar en una colección global de baneos para historial
+    await addDoc(collection(db, "admin_logs"), {
+        accion: "BANEO",
+        uid_usuario: uid,
+        duracion: duracionMs,
+        motivo: motivo,
+        fecha: serverTimestamp()
+    });
+}
+
+export async function quitarBaneo(uid) {
+    const userRef = doc(db, "usuarios", uid);
+    await updateDoc(userRef, {
+        baneado: false,
+        baneado_hasta: null,
+        motivo_baneo: null
+    });
+
+    await addDoc(collection(db, "admin_logs"), {
+        accion: "UNBAN",
+        uid_usuario: uid,
+        fecha: serverTimestamp()
+    });
+}
+
+export async function obtenerUsuariosBaneados() {
+    const q = query(collection(db, "usuarios"), where("baneado", "==", true));
+    const snap = await getDocs(q);
+    const users = [];
+    snap.forEach(d => users.push({ uid: d.id, ...d.data() }));
+    return users;
+}
+
+export async function cambiarEstadoTrabajo(idTrabajo, nuevoEstado) {
+    const docRef = doc(db, "trabajos", idTrabajo);
+    await updateDoc(docRef, {
+        estado: nuevoEstado,
+        fecha_actividad: serverTimestamp()
+    });
+}
+
+export async function marcarTrabajoLeido(idTrabajo) {
+    const docRef = doc(db, "trabajos", idTrabajo);
+    await updateDoc(docRef, { admin_leido: true });
+}
+
+export async function actualizarEstadoDenuncia(idDenuncia, nuevoEstado) {
+    const docRef = doc(db, "denuncias", idDenuncia);
+    await updateDoc(docRef, { estado: nuevoEstado });
+}
+
+export async function resolverDisputa(idTrabajo, destino) {
+    const trabajo = await obtenerTrabajoPorId(idTrabajo);
+    if (!trabajo) return;
+
+    if (destino === 'cliente') {
+        // Devolver dinero al cliente
+        const clientRef = doc(db, "usuarios", trabajo.id_publicador);
+        await updateDoc(clientRef, {
+            saldo: increment(trabajo.pago_cliente)
+        });
+        await registrarPagoHistorial(trabajo.id_publicador, "Devolución Disputa", trabajo.pago_cliente, `Devolución por trabajo en disputa: ${trabajo.titulo}`);
+        await cambiarEstadoTrabajo(idTrabajo, "Cancelada (Disputa)");
+    } else if (destino === 'trabajador') {
+        // Pagar al trabajador
+        if (trabajo.id_trabajador) {
+            const workerRef = doc(db, "usuarios", trabajo.id_trabajador);
+            await updateDoc(workerRef, {
+                saldo: increment(trabajo.pago_trabajador),
+                dinero_ganado_total: increment(trabajo.pago_trabajador)
+            });
+            await registrarPagoHistorial(trabajo.id_trabajador, "Cobro Disputa", trabajo.pago_trabajador, `Pago por trabajo en disputa: ${trabajo.titulo}`);
+            await cambiarEstadoTrabajo(idTrabajo, "Completada (Disputa)");
+        }
+    }
+}
+
+export async function obtenerTodosLosTrabajos() {
+    const q = query(collection(db, "trabajos"), orderBy("fecha_publicacion", "desc"));
+    const snap = await getDocs(q);
+    const trabajos = [];
+    snap.forEach(d => trabajos.push({ id: d.id, ...d.data() }));
+    return trabajos;
+}
+
+export async function obtenerDenuncias() {
+    const q = query(collection(db, "denuncias"), orderBy("fecha", "desc"));
+    const snap = await getDocs(q);
+    const denuncias = [];
+    snap.forEach(d => denuncias.push({ id: d.id, ...d.data() }));
+    return denuncias;
+}
+
+export async function obtenerUsuariosEliminados() {
+    const q = query(collection(db, "usuarios_eliminados"), orderBy("fecha_eliminacion", "desc"));
+    const snap = await getDocs(q);
+    const users = [];
+    snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+    return users;
+}
+
+export async function eliminarTrabajo(idTrabajo) {
+    const docRef = doc(db, "trabajos", idTrabajo);
+    await deleteDoc(docRef);
+}
+
+export async function eliminarDenuncia(idDenuncia) {
+    const docRef = doc(db, "denuncias", idDenuncia);
+    await deleteDoc(docRef);
+}
+
+export async function obtenerTodosLosChats() {
+    try {
+        const q = query(collection(db, "chats"), orderBy("ultima_actualizacion", "desc"));
+        const snap = await getDocs(q);
+        
+        if (!snap.empty) {
+            const chats = [];
+            snap.forEach(d => chats.push({ id: d.id, ...d.data() }));
+            return chats;
+        }
+
+        // Si la colección raíz está vacía (chats antiguos), buscamos en los usuarios
+        // Nota: Esto es costoso, pero solo para migración/chats viejos
+        const usuarios = await obtenerTodosLosUsuarios();
+        const idsVistos = new Set();
+        const chatsMigracion = [];
+
+        for (const u of usuarios) {
+            const qConv = query(collection(db, "usuarios", u.uid, "conversaciones"));
+            const snapConv = await getDocs(qConv);
+            snapConv.forEach(d => {
+                if (!idsVistos.has(d.id)) {
+                    idsVistos.add(d.id);
+                    chatsMigracion.push({ id: d.id, ...d.data() });
+                }
+            });
+        }
+        return chatsMigracion;
+    } catch (e) {
+        console.error("Error obteniendo chats:", e);
+        return [];
+    }
+}
+
+export async function eliminarChat(idChat) {
+    // 1. Eliminar mensajes
+    const mensajesRef = collection(db, "chats", idChat, "mensajes");
+    const snapshotMensajes = await getDocs(mensajesRef);
+    for (const docMsg of snapshotMensajes.docs) {
+        await deleteDoc(docMsg.ref);
+    }
+    // 2. Eliminar documento del chat
+    await deleteDoc(doc(db, "chats", idChat));
+
+    // Nota: Las referencias en 'usuarios/uid/conversaciones' se limpian bajo demanda 
+    // o se podrían limpiar aquí si tuviéramos los UIDs (que están en el doc del chat)
+    const chatSnap = await getDoc(doc(db, "chats", idChat));
+    if (chatSnap.exists()) {
+        const data = chatSnap.data();
+        const uids = idChat.split('_'); // Formato: uid1_uid2 o uid1_uid2_job_id
+        if (uids[0]) await deleteDoc(doc(db, "usuarios", uids[0], "conversaciones", idChat));
+        if (uids[1]) await deleteDoc(doc(db, "usuarios", uids[1], "conversaciones", idChat));
+    }
+}
+
+export async function enviarAnuncioGlobal(titulo, mensaje, filtro) {
+    const users = await obtenerTodosLosUsuarios();
+    let targets = [];
+
+    if (filtro === 'todos') {
+        targets = users;
+    } else if (filtro === 'cliente') {
+        targets = users.filter(u => u.id_suscripcion_cliente && u.id_suscripcion_cliente !== 'ninguna');
+    } else if (filtro === 'trabajador') {
+        targets = users.filter(u => u.id_suscripcion_trabajador && u.id_suscripcion_trabajador !== 'ninguna');
+    } else if (filtro === 'no_suscritos') {
+        targets = users.filter(u => (!u.id_suscripcion_cliente || u.id_suscripcion_cliente === 'ninguna') && 
+                                   (!u.id_suscripcion_trabajador || u.id_suscripcion_trabajador === 'ninguna'));
+    }
+
+    const promesas = targets.map(u => crearNotificacion(u.uid, titulo, mensaje, "info"));
+    await Promise.all(promesas);
+    return targets.length;
+}
+
+export async function obtenerHistorialPagosGlobal() {
+    const usuarios = await obtenerTodosLosUsuarios();
+    const todosLosPagos = [];
+
+    for (const u of usuarios) {
+        const q = query(collection(db, "usuarios", u.uid, "historial_pagos"), orderBy("fecha_emision", "desc"));
+        const snap = await getDocs(q);
+        snap.forEach(d => {
+            todosLosPagos.push({
+                id: d.id,
+                uid_pagador: u.uid,
+                nombre_pagador: u.nombre_completo || u.nombre || u.email,
+                ...d.data()
+            });
+        });
+    }
+    // Ordenar por fecha descendente
+    return todosLosPagos.sort((a, b) => {
+        const dateA = a.fecha_emision?.toDate ? a.fecha_emision.toDate() : 0;
+        const dateB = b.fecha_emision?.toDate ? b.fecha_emision.toDate() : 0;
+        return dateB - dateA;
+    });
+}
+
+export async function obtenerEstadisticasAdmin() {
+    const [usuarios, trabajos, todosLosPagos] = await Promise.all([
+        obtenerTodosLosUsuarios(),
+        obtenerTodosLosTrabajos(),
+        obtenerHistorialPagosGlobal()
+    ]);
+
+    const stats = {
+        totalUsuarios: usuarios.length,
+        suscriptoresCliente: usuarios.filter(u => u.id_suscripcion_cliente && u.id_suscripcion_cliente !== 'ninguna').length,
+        suscriptoresTrabajador: usuarios.filter(u => u.id_suscripcion_trabajador && u.id_suscripcion_trabajador !== 'ninguna').length,
+        totalTrabajos: trabajos.length,
+        dineroComisiones: 0,
+        topTrabajador: 'N/A',
+        topCliente: 'N/A',
+        ultimoUsuario: 'N/A',
+        topCategoria: 'N/A'
+    };
+
+    // 1. Calcular conteos para tops (Top Cliente)
+    const conteoClientes = {}; // id_publicador -> count
+    
+    trabajos.forEach(t => {
+        if (t.id_publicador) {
+            conteoClientes[t.id_publicador] = (conteoClientes[t.id_publicador] || 0) + 1;
+        }
+    });
+
+    // 2. Calcular comisiones sacadas de los pagos a trabajadores en el historial global
+    todosLosPagos.forEach(p => {
+        if (p.detalle_pago && (p.detalle_pago.includes("Cobro por trabajo") || p.detalle_pago.includes("Pago por trabajo en disputa"))) {
+            const trabajador = usuarios.find(u => u.uid === p.uid_pagador);
+            let porcentajeComision = 0.10; // 10% por defecto
+            
+            if (trabajador && trabajador.id_suscripcion_trabajador && trabajador.id_suscripcion_trabajador !== 'ninguna') {
+                porcentajeComision = 0.05; // 5% si el trabajador está suscrito
+            }
+            
+            stats.dineroComisiones += (Math.abs(p.monto) * porcentajeComision);
+        }
+    });
+
+    // 2. Top Trabajador (basado en el campo tareas_realizadas del perfil)
+    const trabajadores = usuarios.filter(u => u.tareas_realizadas > 0);
+    if (trabajadores.length > 0) {
+        const topW = trabajadores.sort((a, b) => (b.tareas_realizadas || 0) - (a.tareas_realizadas || 0))[0];
+        stats.topTrabajador = topW.nombre_completo || topW.nombre || topW.email;
+    }
+
+    // 3. Top Cliente (el que más trabajos completados ha publicado)
+    let maxJobs = 0;
+    let topClientId = null;
+    for (const uid in conteoClientes) {
+        if (conteoClientes[uid] > maxJobs) {
+            maxJobs = conteoClientes[uid];
+            topClientId = uid;
+        }
+    }
+    if (topClientId) {
+        const client = usuarios.find(u => u.uid === topClientId);
+        if (client) stats.topCliente = client.nombre_completo || client.nombre || client.email;
+    }
+
+    // 4. Último Usuario
+    if (usuarios.length > 0) {
+        const sortedUsers = [...usuarios].sort((a, b) => {
+            const dateA = a.fecha_registro?.toDate ? a.fecha_registro.toDate() : 0;
+            const dateB = b.fecha_registro?.toDate ? b.fecha_registro.toDate() : 0;
+            return dateB - dateA;
+        });
+        const lastU = sortedUsers[0];
+        stats.ultimoUsuario = lastU.nombre_completo || lastU.nombre || lastU.email;
+    }
+
+    // 5. Top Categoría (Suma total de puntos en subcolecciones de usuarios)
+    const puntosPorCategoria = {};
+    
+    const promesasPuntos = usuarios.map(async (u) => {
+        const q = query(collection(db, "usuarios", u.uid, "puntuaciones_categorias"));
+        const snap = await getDocs(q);
+        snap.forEach(docSnap => {
+            const catId = docSnap.id;
+            const pts = docSnap.data().puntos || 0;
+            puntosPorCategoria[catId] = (puntosPorCategoria[catId] || 0) + pts;
+        });
+    });
+
+    await Promise.all(promesasPuntos);
+
+    let maxPts = 0;
+    let bestCat = null;
+    for (const cat in puntosPorCategoria) {
+        if (puntosPorCategoria[cat] > maxPts) {
+            maxPts = puntosPorCategoria[cat];
+            bestCat = cat;
+        }
+    }
+    
+    if (bestCat) {
+        stats.topCategoria = bestCat.replace(/_/g, ' ').toUpperCase();
+    }
+
+    return stats;
 }

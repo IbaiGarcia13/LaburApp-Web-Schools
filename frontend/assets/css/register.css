@@ -66,7 +66,7 @@ h2 {
 a {
     color: var(--gray-6);
     text-decoration: none;
-    font-size: 15px;
+    font-size: 0.9375rem;
     transition: color 0.3s ease;
 }
 
@@ -225,7 +225,7 @@ main:has(#fase2:not(.hidden)) #download_app img.ordenador {
     display: inline-block;
     margin-top: 15px;
     color: var(--gray-5);
-    font-size: 14px;
+    font-size: 0.875rem;
     padding: 5px 10px;
     border-radius: 8px;
 }
@@ -238,7 +238,7 @@ main:has(#fase2:not(.hidden)) #download_app img.ordenador {
 
 .error {
     color: var(--red-2);
-    font-size: 14px;
+    font-size: 0.875rem;
     margin-top: 10px;
     text-align: center;
     min-height: 20px;
@@ -259,7 +259,7 @@ main:has(#fase2:not(.hidden)) #download_app img.ordenador {
 #togglePasswordRpt {
     background-color: transparent;
     border: 1px solid var(--gray-3);
-    font-size: 18px;
+    font-size: 1.125rem;
     cursor: pointer;
     padding: 0;
     width: 45px;
@@ -346,7 +346,7 @@ footer {
     background-color: var(--neutral-black);
     color: var(--neutral-white);
     padding: 50px 40px 25px;
-    font-size: 14px;
+    font-size: 0.875rem;
     text-align: left;
 }
 
@@ -612,7 +612,7 @@ footer {
     }
 
     .footer-col ul li a {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 
 }

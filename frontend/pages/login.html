@@ -6,20 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="../manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="author" content="Ibai y Asier">
-    <meta name="fecha" content="12-02-2026">
-    <meta name="TFG" content="TFG - LaburApp">
-    <meta name="keywords" content="libros, biblioteca, autores, literatura, lectura">
-    <meta name="description"
-        content="LaburApp - La plataforma para encontrar y ofrecer servicios locales de forma rápida y segura. Conecta con trabajadores de confianza en tu zona.">
-    <meta property="og:title" content="LaburApp - Servicios y Tareas">
-    <meta property="og:description"
-        content="Encuentra ayuda para tus tareas o gana dinero ofreciendo tus servicios en LaburApp.">
-    <meta property="og:image" content="https://laburapp.web.app/assets/img/logo/LaburApp2.png">
     <title>LaburApp - Inicio de Sesión</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/login.css">
@@ -38,13 +24,9 @@
         </a>
     </header>
     <main>
-        <!-- === SECCIÓN PROMOCIONAL DESCARTABLE / DESCARGAR APP === -->
-
-        <!-- === SECCIÓN FORMULARIO DE ACCESO (LOGIN) === -->
-        
+        <!-- === FORMULARIO DE ACCESO (LOGIN) === -->
         <section id="login">
             <h2>Iniciar sesión</h2>
-            <!-- === EL ID="FORMLOGIN" SE VINCULA A LOGIN.JS PARA INTERCEPTAR EL ENVÍO Y VALIDAR LOCALMENTE === -->
             <form method="post" id="formLogin">
                 <label for="username">Correo:</label>
                 <input type="text" id="username" name="username" required>
@@ -74,6 +56,7 @@
             <p style="margin-top: -40px;">¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a></p>
         </section>
 
+        <!-- === DESCARGA DE APP === -->
         <section id="download_app">
             <div class="download-text">
                 <picture>
@@ -104,6 +87,7 @@
             <h4>Soporte</h4>
             <ul>
                 <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="#" id="asistencia-cliente">Asistencia al cliente</a></li>
             </ul>
         </div>
         <div class="footer-col">

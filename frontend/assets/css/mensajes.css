@@ -314,7 +314,7 @@
 
 .input-half span {
     display: block;
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: normal;
     color: var(--gray-4);
     margin-bottom: 4px;
@@ -364,7 +364,7 @@
 }
 
 #page-info {
-    background: white;
+    background: var(--neutral-white);
     color: var(--gray-9);
     padding: 10px 30px;
     border-radius: 25px;

@@ -70,6 +70,19 @@ if (formulario) {
 
             const user = userCredential.user;
 
+            // --- VERIFICAR BANEO ---
+            const { obtenerPerfilUsuario } = await import('./database.js');
+            const perfil = await obtenerPerfilUsuario(user.uid);
+            if (perfil && perfil.baneado) {
+                const ahora = Date.now();
+                if (perfil.baneado_hasta === -1 || ahora < perfil.baneado_hasta) {
+                    const hastaStr = perfil.baneado_hasta === -1 ? "de forma permanente" : "hasta el " + new Date(perfil.baneado_hasta).toLocaleString();
+                    mensajeError.textContent = `Acceso denegado: Tu cuenta está restringida ${hastaStr}.`;
+                    await auth.signOut();
+                    return;
+                }
+            }
+
            // --- LOGIN EXITOSO, BORRAR ERROR Y REDIRIGIR ---
             mensajeError.textContent = "";
             window.location.href = "../index.html";

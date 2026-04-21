@@ -130,7 +130,7 @@ function displayUsers() {
                 <div class="user-info">
                     <h3 style="display: flex; align-items: center; gap: 8px;">
                         ${user.nombre}
-                        ${user.id_suscripcion_trabajador === 'currante' ? '<span class="priority-badge" title="Trabajador CURRANTE" style="background: var(--blue-3); color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">CURRANTE</span>' : ''}
+                        ${user.id_suscripcion_trabajador === 'currante' ? '<span class="priority-badge" title="Trabajador CURRANTE" style="background: var(--blue-3); color: var(--neutral-white); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">CURRANTE</span>' : ''}
                     </h3>
                     <p class="user-desc">${user.desc}</p>
                     <div class="user-stats">

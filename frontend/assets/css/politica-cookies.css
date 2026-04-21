@@ -95,7 +95,7 @@ th {
 .btn-config {
     display: inline-block;
     background-color: var(--primary);
-    color: white;
+    color: var(--neutral-white);
     padding: 10px 20px;
     border-radius: 5px;
     text-decoration: none;
