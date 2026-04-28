@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Valoraciones - LaburApp Schools</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/valoraciones.css">
+  <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../index.html"><img src="../assets/img/logo/LaburApp2.png" alt="Logo"></a>
+    </div>
+    <div class="header-right">
+      <nav>
+        <ul>
+          <li><a href="usuarios.html">Compañeros</a></li>
+          <li><a href="tareas.html">Tareas</a></li>
+        </ul>
+      </nav>
+      <div class="header-icons">
+        <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <h1 class="main-title">Mis Valoraciones</h1>
+    <p class="subtitle">Aquí puedes ver las notas y comentarios que has recibido en tus tareas.</p>
+
+    <!-- FILTROS -->
+    <section class="filters-container">
+      <div class="filter-group">
+        <label>Asignatura:</label>
+        <select id="filterAsignatura">
+          <option value="todas">Todas</option>
+          <option value="Matemáticas">Matemáticas</option>
+          <option value="lengua">Lengua</option>
+          <option value="historia">Historia</option>
+          <option value="ingles">Inglés</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Puntuación:</label>
+        <select id="filterPuntos">
+          <option value="todas">Todas</option>
+          <option value="9-10">Sobresaliente (9-10)</option>
+          <option value="7-8">Notable (7-8)</option>
+          <option value="5-6">Aprobado (5-6)</option>
+          <option value="0-4">Suspenso (0-4)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Desde:</label>
+        <input type="date" id="filterFechaDesde">
+      </div>
+      <div class="filter-group">
+        <label>Hasta:</label>
+        <input type="date" id="filterFechaHasta">
+      </div>
+      <button id="btnAplicarFiltros" class="btn-primary">Filtrar</button>
+    </section>
+
+    <!-- LISTADO -->
+    <section id="valoracionesList" class="valoraciones-grid">
+      <!-- Cargando... -->
+    </section>
+  </main>
+
+  <script type="module" src="../assets/js/general.js"></script>
+  <script type="module" src="../assets/js/valoraciones.js"></script>
+</body>
+<footer>
+  <div class="footer-bottom">
+    <p>&copy; 2026 LaburApp Schools &mdash; Todos los derechos reservados.</p>
+  </div>
+</footer>
+</html>
+
+
+
+
+
