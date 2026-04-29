@@ -16,7 +16,7 @@ let currentFilters = {
 
 async function loadJobs() {
     const container = document.getElementById('jobs-list');
-    if (container) container.innerHTML = "<p class='loading-text'>Cargando trabajos...</p>";
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando tareas...</p>";
 
     try {
         let rawJobs = await obtenerTrabajos(currentFilters.cat);
@@ -24,6 +24,13 @@ async function loadJobs() {
         const user = auth.currentUser;
         if (user) {
             rawJobs = rawJobs.filter(j => j.id_publicador !== user.uid);
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const claseId = urlParams.get('claseId');
+
+        if (claseId) {
+            rawJobs = rawJobs.filter(j => j.id_clase === claseId);
         }
 
         allJobs = rawJobs.sort((a, b) => {
@@ -44,7 +51,7 @@ async function loadJobs() {
     } catch (e) {
         console.error("Error cargando trabajos:", e);
         const container = document.getElementById('jobs-list');
-        if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Error al conectar con la base de datos.</p>";
+        if (container) container.innerHTML = "<p style='color:white; text-align:center;'>Error al cargar las tareas.</p>";
     }
 }
 
@@ -65,10 +72,12 @@ function displayJobs() {
     container.innerHTML = "";
 
     const isFiltered = currentFilters.cat !== "todas" || currentFilters.tMin !== 1 || currentFilters.tMax !== 100 || currentFilters.pMin !== 2 || currentFilters.pMax !== 1000;
+    const urlParams = new URLSearchParams(window.location.search);
+    const context = urlParams.get('claseId') ? " de la Clase" : ": Todas";
     const iconHtml = '<img src="../assets/img/icons/icono-trabajos-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
     const titleEl = document.querySelector('.section-title');
     if (titleEl) {
-        titleEl.innerHTML = isFiltered ? iconHtml + "TRABAJOS: Filtrados" : iconHtml + "TRABAJOS: Todos";
+        titleEl.innerHTML = isFiltered ? iconHtml + "TAREAS: Filtradas" : iconHtml + "TAREAS" + context;
     }
 
     const start = (currentPage - 1) * itemsPerPage;
@@ -76,7 +85,7 @@ function displayJobs() {
     const pageItems = filteredJobs.slice(start, end);
 
     if (pageItems.length === 0) {
-        container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron trabajos.</p>";
+        container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron tareas.</p>";
     }
 
     pageItems.forEach((job) => {

@@ -232,9 +232,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
 
+                    // --- OCULTAR ELEMENTOS SEGÚN ROL ---
+                    const rol = (perfil.rol || "").toLowerCase();
+                    if (rol === 'alumno' && subsBody) {
+                        const subCard = subsBody.closest('.info-card');
+                        if (subCard) subCard.style.display = 'none';
+                    }
+
                    // --- 5. RENDER FOTO DE PERFIL Y CV ---
                     if (displayPic) {
-                        displayPic.src = perfil.foto_perfil || "../assets/img/avatar-defecto.png";
+                        const rolParaAvatar = (perfil.rol || "alumno").toLowerCase();
+                        displayPic.src = perfil.foto_perfil || `../assets/img/avatar-defecto-${rolParaAvatar}.png`;
                     }
 
                     const displayPDF = document.getElementById('displayPDF');

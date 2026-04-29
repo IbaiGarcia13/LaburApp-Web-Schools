@@ -6,7 +6,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "site": "laburapp",
+    "site": "laburapp-schools",
     "public": "frontend",
     "ignore": [
       "firebase.json",

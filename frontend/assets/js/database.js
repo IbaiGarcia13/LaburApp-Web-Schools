@@ -13,7 +13,8 @@ import {
     deleteDoc,
     orderBy,
     increment,
-    limit
+    limit,
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import {
     deleteUser,
@@ -150,6 +151,70 @@ export async function obtenerTodosLosUsuarios() {
         users.push({ uid: doc.id, ...doc.data() });
     });
     return users;
+}
+
+// --- 1.2 CLASES ---
+
+export async function obtenerClasePorId(idClase) {
+    const docRef = doc(db, "clases", idClase);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+}
+
+export async function obtenerNovedadesClase(idClase) {
+    const q = query(
+        collection(db, "clases", idClase, "novedades"),
+        orderBy("fecha", "desc"),
+        limit(50)
+    );
+    const snapshot = await getDocs(q);
+    const novedades = [];
+    snapshot.forEach(doc => {
+        novedades.push({ id: doc.id, ...doc.data() });
+    });
+    return novedades;
+}
+
+export async function crearNovedadClase(idClase, datos) {
+    const novelRef = collection(db, "clases", idClase, "novedades");
+    await addDoc(novelRef, {
+        fecha: serverTimestamp(),
+        ...datos
+    });
+    return true;
+}
+
+export async function expulsarAlumno(idClase, uidAlumno) {
+    const claseRef = doc(db, "clases", idClase);
+    const claseSnap = await getDoc(claseRef);
+    if (!claseSnap.exists()) return;
+    
+    const alumnos = claseSnap.data().alumnos || [];
+    const nuevosAlumnos = alumnos.filter(id => id !== uidAlumno);
+    
+    await updateDoc(claseRef, { alumnos: nuevosAlumnos });
+    
+    // Quitar clase del perfil del alumno
+    const userRef = doc(db, "usuarios", uidAlumno);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+        const misClases = userSnap.data().clases || [];
+        const nuevasClases = misClases.filter(id => id !== idClase);
+        await updateDoc(userRef, { clases: nuevasClases });
+    }
+    
+    await crearNotificacion(uidAlumno, "Expulsado de clase", `Has sido expulsado de la clase "${claseSnap.data().nombre}".`, "info");
+}
+
+export async function banearAlumnoClase(idClase, uidAlumno) {
+    // Primero expulsar
+    await expulsarAlumno(idClase, uidAlumno);
+    
+    // Luego añadir a lista de baneados en la clase
+    const claseRef = doc(db, "clases", idClase);
+    await updateDoc(claseRef, {
+        baneados: arrayUnion(uidAlumno)
+    });
 }
 // --- 2. TRABAJOS ---
 
@@ -340,6 +405,30 @@ export async function postularseATrabajo(idTrabajo) {
     const trabajo = await obtenerTrabajoPorId(idTrabajo);
     if (trabajo && trabajo.id_publicador) {
         await crearNotificacion(trabajo.id_publicador, "Nueva Postulación", `Un usuario ha postulado a tu trabajo "${trabajo.titulo}".`, "nueva_postulacion", { id_trabajo: idTrabajo });
+    }
+
+    return true;
+}
+
+export async function aceptarTareaDirectamente(idTrabajo) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Debes iniciar sesión.");
+
+    const trabajoRef = doc(db, "trabajos", idTrabajo);
+    const jobSnap = await getDoc(trabajoRef);
+    if (!jobSnap.exists()) throw new Error("Tarea no encontrada.");
+    const tData = jobSnap.data();
+
+    // Si es una tarea escolar, podríamos manejarlo diferente, pero por ahora seguimos el flujo simple:
+    await updateDoc(trabajoRef, {
+        id_trabajador: user.uid,
+        estado: "Aceptada",
+        fecha_aceptacion: serverTimestamp(),
+        fecha_actividad: serverTimestamp()
+    });
+
+    if (tData.id_publicador) {
+        await crearNotificacion(tData.id_publicador, "Tarea Aceptada", `Un alumno ha aceptado tu tarea "${tData.titulo}".`, "tarea_aceptada", { id_trabajo: idTrabajo });
     }
 
     return true;

@@ -3,223 +3,83 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="var(--neutral-white)">
-    <meta name="description"
-        content="Dashboard principal de LaburApp. Gestiona tus tareas, mensajes y perfil de forma sencilla.">
-    <meta property="og:title" content="LaburApp - Inicio">
-    <title>LaburApp - Inicio</title>
+    <title>LaburApp Schools - Inicio de Sesión</title>
     <link rel="shortcut icon" href="assets/img/icons/icono-Laburapp.png" type="image/x-icon">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/principal.css">
-    <link rel="canonical" href="https://laburapp.web.app/index.html">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4927720250134961"
-        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/paleta-colores.css">
+    <link rel="canonical" href="https://laburapp-schools.web.app/index.html">
 </head>
 
 <body>
-
-    <header>
-        <div class="logo">
-            <a href="index.html">
-                <img src="assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
-            </a>
-            <a href="index.html">
-                <img src="assets/img/logo/LaburApp3.png" alt="Texto LABURAPP" class="logo-text">
-            </a>
-        </div>
-        <div class="header-right">
-            <nav>
-                <ul>
-                    <li><a href="pages/usuarios.html">Usuarios</a></li>
-                    <li><a href="pages/trabajos.html">Trabajos</a></li>
-                    <li><a href="pages/mapa.html">Mapa</a></li>
-                </ul>
-            </nav>
-
-            <div class="header-icons">
-                <img src="assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
-
-                <div class="profile-dropdown" id="profileDropdown">
-                    <a href="pages/perfil.html">
-                        <img src="assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
-                    </a>
-                    <p class="dropdown-name">Cargando...</p>
-                    <p class="dropdown-email">Cargando...</p>
-                    <div class="dropdown-footer">
-                        <img src="assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
-                        <a href="pages/login.html">Cerrar Sesión</a>
-                    </div>
-                </div>
-
-                <div class="hamburger" id="menuBtn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
+    <!-- === CABECERA DE INICIO === -->
+    <header class="header-login">
+        <a href="index.html">
+            <img class="icon" src="assets/img/logo/LaburApp2-sin-fondo.png" alt="LaburApp Icono">
+        </a>
+        <a href="index.html">
+            <img class="logo-text" src="assets/img/logo/LaburApp3-sin-fondo.png" alt="Texto LABURAPP">
+        </a>
     </header>
+    <main>
+        <!-- === FORMULARIO DE ACCESO (LOGIN) === -->
+        <section id="login">
+            <h2>Iniciar sesión</h2>
+            <form method="post" id="formLogin">
+                <label for="username">Correo:</label>
+                <input type="text" id="username" name="username" required>
 
-    <nav class="side-menu" id="sideMenu">
-        <ul>
-            <li><img src="assets/img/icons/icono-perfil.png"><a href="pages/perfil.html">Perfil</a></li>
-            <li><img src="assets/img/icons/icono-mis-tareas.png"><a href="pages/mis-tareas.html">Mis Tareas</a></li>
-            <li><img src="assets/img/icons/icono-mis-trabajos.png"><a href="pages/mis-trabajos.html">Mis Trabajos</a>
-            </li>
-            <li><img src="assets/img/icons/icono-postulaciones.png"><a href="pages/postulaciones.html">Postulaciones</a>
-            </li>
-            <li><img src="assets/img/icons/icono-mensajes.png"><a href="pages/mensajes.html">Mensajes</a></li>
-            <li><img src="assets/img/icons/icono-suscripciones.png"><a href="pages/suscripciones.html">Suscripciones</a>
-            </li>
-            <li><img src="assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a>
-            </li>
-            <li><img src="assets/img/icons/icono-ajustes.png"><a href="pages/ajustes.html">Ajustes</a></li>
-        </ul>
-        <div class="side-menu-footer">
-            <img src="assets/img/icons/icono-cerrar-sesion.png"> <a href="pages/login.html">Cerrar Sesión</a>
-        </div>
-    </nav>
+                <label for="password">Contraseña:</label>
+                <div class="password-toggle-group">
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" id="togglePassword"
+                        style="width: 45px; height: 48px; padding: 0; background: transparent; border: 1px solid var(--gray-3); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: none;">
+                        <img src="assets/img/icons/icono-ojo-si.png" alt="Mostrar" id="imgToggle"
+                            style="width: 20px; height: 20px; object-fit: contain;">
+                    </button>
+                </div>
 
-    <main class="main-container">
-        <section class="hero-card">
-            <img src="assets/img/principal-1.png" alt="LaburApp Inicio">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Recordarme</label>
+                </div>
+
+                <button type="submit">Iniciar sesión</button>
+                <p id="mensajeError" class="error"></p>
+                
+                <div style="text-align: center;">
+                    <a href="#" id="olvidar">¿Has olvidado tu contraseña?</a>
+                </div>
+            </form><br><br>
+            <p style="margin-top: -40px;">¿No tienes una cuenta? <a href="pages/register.html">Regístrate aquí</a></p>
         </section>
 
-
-        <section class="dashboard-stats" id="dashboardStats" style="display: none;">
-            <div class="stat-card">
-                <h3>Nivel</h3>
-                <p id="stat-nivel">---</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="stat-tareas-titulo">Tareas Realizadas</h3>
-                <p id="stat-tareas">---</p>
-            </div>
-            <div class="stat-card">
-                <h3>Dinero Ganado</h3>
-                <p id="stat-dinero">---</p>
-            </div>
-        </section>
-
-        <h2 class="main-title">LABURAPP - ACERCA DE NOSOTROS</h2>
-
-        <div class="about-grid">
-            <div class="info-row">
-                <div class="image-card">
-                    <picture>
-                        <source media="(max-width: 768px)" srcset="assets/img/principal-1-movil.png">
-                        <img src="assets/img/principal-2.png" alt="Que es LaburApp">
-                    </picture>
-                </div>
-                <div class="text-card">
-                    <h3>¿Qué es?</h3>
-                    <p>LaburApp es una aplicación móvil y web que conecta personas que necesitan ayuda para realizar
-                        tareas o servicios con trabajadores dispuestos a realizarlos de forma rápida y sencilla. La
-                        plataforma facilita la publicación de trabajos, la postulación de usuarios, la comunicación
-                        directa y la valoración del servicio, creando un entorno seguro y accesible para ambas partes.
-                    </p>
+        <!-- === DESCARGA DE APP === -->
+        <section id="download_app">
+            <div class="download-text">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="assets/img/app-movil-descargar.png">
+                    <img src="assets/img/app-pc-descargar.png" alt="app descargar" class="ordenador">
+                </picture>
+                <div>
+                    <h2>¡DESCARGA LABURAPP!</h2>
+                    <p>Descárgate nuestra app de LaburApp para Android o IOs gratis y empieza a disfrutar de la
+                        comodidad de llevarnos contigo a todas partes y poder ganar dinero desde cualquier lugar.</p>
                 </div>
             </div>
-
-            <div class="info-row full-width">
-                <div class="text-card">
-                    <h3>¿Como nace?</h3>
-                    <p>LaburApp nace como un proyecto académico dentro del ciclo de Desarrollo de Aplicaciones
-                        Multiplataforma (DAM), con el objetivo de ofrecer una solución digital a la búsqueda de trabajos
-                        ocasionales y servicios locales. La idea surge al detectar la dificultad de muchas personas para
-                        encontrar ayuda de confianza y, al mismo tiempo, la necesidad de otros usuarios de acceder a
-                        oportunidades laborales flexibles.</p>
-                </div>
-            </div>
-
-            <div class="info-row reverse">
-                <div class="image-card">
-                    <picture>
-                        <source media="(max-width: 768px)" srcset="assets/img/principal-2-movil.png">
-                        <img src="assets/img/principal-3.png" alt="Creadores">
-                    </picture>
-                </div>
-                <div class="text-card">
-                    <h3>¿Quiénes somos?</h3>
-                    <p>Somos Ibai García y Asier Uriarte, estudiantes de DAM y creadores de LaburApp. Como
-                        desarrolladores, hemos diseñado y construido este proyecto combinando conocimientos de
-                        programación, bases de datos y diseño de interfaces, con la intención de crear una plataforma
-                        útil, intuitiva y con impacto real en la vida de las personas.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- === SECCIÓN MANUAL DE USO === -->
-        <section class="full-width-white" id="manual-uso">
-            <div class="manual-content-wrapper">
-                <div class="manual-header">
-                    <h2>Manual de Uso</h2>
-                    <p class="manual-description">Todo lo que necesitas saber para dominar LaburApp y sacar el máximo
-                        provecho a la plataforma.</p>
-                </div>
-
-                <div class="manual-grid">
-                    <div class="manual-item">
-                        <h3>Registro y Acceso</h3>
-                        <p>Crear tu cuenta es el primer paso. Solo necesitas un correo y una contraseña segura. Recuerda
-                            verificar tus datos personales para empezar a trabajar o publicar.</p>
-                    </div>
-                    <div class="manual-item">
-                        <h3>Tu Perfil</h3>
-                        <p>Personaliza tu biografía, añade una foto de perfil y mantén al día tu dirección. Aquí verás
-                            tu nivel, experiencia y valoraciones recibidas.</p>
-                    </div>
-                    <div class="manual-item">
-                        <h3>Publicar Tareas</h3>
-                        <p>Como cliente, puedes crear tareas en el mapa. Define el título, descripción, pago y fecha
-                            límite. Selecciona la categoría adecuada para atraer a los mejores trabajadores.</p>
-                    </div>
-                    <div class="manual-item">
-                        <h3>Buscar Trabajo</h3>
-                        <p>Explora la lista de trabajos o búscalos directamente en el mapa. Postúlate a aquellos que se
-                            ajusten a tus habilidades y empieza a ganar dinero y experiencia.</p>
-                    </div>
-                    <div class="manual-item">
-                        <h3>Gestión de Tareas</h3>
-                        <p>Sigue el estado de tus tareas en tiempo real: Pendiente, Aceptada, En Curso o Completada. La
-                            comunicación directa por chat facilita todo el proceso.</p>
-                    </div>
-                    <div class="manual-item">
-                        <h3>Seguridad y Pagos</h3>
-                        <p>Tu dinero está protegido. El pago se retiene al inicio y solo se libera cuando confirmas que
-                            el trabajo se ha realizado correctamente.</p>
-                    </div>
-                </div>
-
-                <div class="manual-footer">
-                    <a href="pages/manual-uso.html" class="btn-manual">Ver Manual Completo</a>
-                </div>
+            <div class="download-button">
+                <button type="button" id="descargar" onclick="window.instalarPWA()">
+                    DESCARGAR APP
+                    <img src="assets/img/icons/icono-descargar.png" alt="descargar icon">
+                </button>
             </div>
         </section>
     </main>
 
-    <nav class="mobile-bottom-nav" style="display: none;">
-        <a href="pages/usuarios.html" class="nav-item">
-            <img src="assets/img/icons/icono-perfil.png" alt="Usuarios">
-            <span>Usuarios</span>
-        </a>
-        <a href="pages/trabajos.html" class="nav-item">
-            <img src="assets/img/icons/icono-trabajos.png" alt="Trabajos">
-            <span>Trabajos</span>
-        </a>
-        <a href="pages/mapa.html" class="nav-item">
-            <img src="assets/img/icons/icono-mapa-blanco.png" alt="Mapa" style="filter: brightness(1) invert(1);">
-            <span>Mapa</span>
-        </a>
-    </nav>
-
     <script type="module" src="assets/js/general.js"></script>
-    <script type="module" src="assets/js/principal.js"></script>
+    <script type="module" src="assets/js/login.js"></script>
 </body>
 <footer>
     <div class="footer-grid">
@@ -260,7 +120,7 @@
         </a>
     </div>
     <div class="footer-bottom">
-        <p>&copy; 2026 LaburApp &mdash; Todos los derechos reservados.</p>
+        <p>&copy; 2026 LaburApp Schools Schools &mdash; Todos los derechos reservados.</p>
     </div>
 </footer>
 

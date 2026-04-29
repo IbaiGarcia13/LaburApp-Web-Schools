@@ -451,8 +451,31 @@ footer {
 }
 
 .modal-content h3 {
-    margin-bottom: 15px;
+    margin-bottom: 0;
     font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--gray-4);
+    line-height: 1;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: var(--red-2);
 }
 
 .modal-content p {
@@ -464,11 +487,49 @@ footer {
 
 .modal-input {
     width: 100%;
-    padding: 10px;
+    padding: 10px 12px;
     margin-bottom: 20px;
     border: 1px solid var(--gray-3);
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1rem;
+    font-family: inherit;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+/* --- FORMULARIOS EN MODALES --- */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--gray-6);
+    font-size: 0.9rem;
+}
+
+.input-group input, 
+.input-group textarea, 
+.input-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-3);
+    font-family: inherit;
+    font-size: 1rem;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus, 
+.input-group textarea:focus, 
+.input-group select:focus {
+    outline: none;
+    border-color: var(--neutral-black);
 }
 
 /* --- PASSWORD MODAL SPECIFICS --- */
@@ -515,10 +576,11 @@ footer {
     height: 20px;
 }
 
-.modal-buttons {
+.modal-buttons, .modal-footer {
     display: flex;
     gap: 15px;
     justify-content: center;
+    margin-top: 25px;
 }
 
 .modal-btn {

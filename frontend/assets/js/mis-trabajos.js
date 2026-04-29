@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadMyAcceptedJobs(uid) {
     const container = document.getElementById('jobs-list');
-    if (container) container.innerHTML = "<p class='loading-text'>Cargando mis trabajos...</p>";
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando mis tareas...</p>";
 
     try {
         const rawJobs = await obtenerTrabajosAceptadosPorMi(uid);

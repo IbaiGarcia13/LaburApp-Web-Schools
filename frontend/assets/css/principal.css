@@ -54,6 +54,98 @@
     margin: 0;
 }
 
+/* --- ACTION BUTTONS (STAT CARD STYLE) --- */
+.btn-stat-card {
+    background: linear-gradient(0deg, var(--neutral-white), var(--gray-1));
+    border: 2px solid transparent;
+    padding: 15px 20px;
+    border-radius: 15px;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: var(--gray-7);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary);
+}
+
+.btn-stat-card .plus-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.plus-icon-img-rotated {
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    filter: brightness(0); /* Hace que el icono sea negro */
+    margin-right: 5px;
+}
+
+/* --- CLASS CARDS --- */
+.class-card {
+    background: linear-gradient(135deg, var(--neutral-white) 0%, var(--gray-1) 100%);
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.class-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.class-card-header {
+    padding: 20px;
+    color: white;
+    position: relative;
+    min-height: 100px;
+}
+
+.class-card-body {
+    padding: 20px;
+    background: white;
+    flex-grow: 1;
+}
+
+.class-card h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.class-card .class-code {
+    font-family: monospace;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 5px;
+    display: block;
+}
+
+.class-card p {
+    color: var(--gray-7);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

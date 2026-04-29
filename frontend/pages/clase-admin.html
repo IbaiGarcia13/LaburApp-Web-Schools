@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <title>LaburApp - Panel de Clase</title>
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <meta name="robots" content="noindex, nofollow">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="principal.html">
+                <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
+            </a>
+            <a href="principal.html">
+                <img src="../assets/img/logo/LaburApp3.png" alt="Texto LABURAPP" class="logo-text">
+            </a>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <!-- Inyectados por general.js -->
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="perfil.html">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
+                    </a>
+                    <p class="dropdown-name">Cargando...</p>
+                    <p class="dropdown-email">Cargando...</p>
+                    <div class="dropdown-footer">
+                        <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
+                        <a href="#" class="logout-action">Cerrar Sesión</a>
+                    </div>
+                </div>
+
+                <div class="hamburger" id="menuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="side-menu" id="sideMenu">
+        <ul>
+            <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
+            <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
+            <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
+            <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a></li>
+            <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
+        </ul>
+        <div class="side-menu-footer">
+            <img src="../assets/img/icons/icono-cerrar-sesion.png"> <a href="#" class="logout-action">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <main class="admin-container">
+        <aside class="admin-sidebar">
+            <h2 id="btn-dashboard" style="cursor: pointer;"><img src="../assets/img/icons/icono-panel-control.png" alt=""> PANEL DE CLASE</h2>
+            <nav class="admin-tabs">
+                <button class="tab-btn active" data-tab="resumen"><img src="../assets/img/icons/icono-panel-control.png" class="icon-black"> RESUMEN</button>
+                <button class="tab-btn" data-tab="alumnos"><img src="../assets/img/icons/icono-perfil.png" class="icon-black"> ALUMNOS</button>
+                <button class="tab-btn" data-tab="tareas"><img src="../assets/img/icons/icono-trabajos.png" class="icon-black"> TAREAS</button>
+            </nav>
+            <div style="margin-top: auto; padding: 20px;">
+                <button class="modal-btn cancel" onclick="window.history.back()" style="width: 100%;">Volver a la Clase</button>
+            </div>
+        </aside>
+
+        <section class="admin-content">
+            <!-- TAB RESUMEN -->
+            <div id="tab-resumen" class="tab-pane active">
+                <div class="pane-header">
+                    <h3 id="panel-title">RESUMEN DE CLASE</h3>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Alumnos Totales</span>
+                        <span class="stat-value" id="stat-alumnos">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Tareas Publicadas</span>
+                        <span class="stat-value" id="stat-tareas">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Entregas Totales</span>
+                        <span class="stat-value" id="stat-entregas">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB ALUMNOS -->
+            <div id="tab-alumnos" class="tab-pane">
+                <div class="pane-header">
+                    <h3>GESTIÓN DE ALUMNOS</h3>
+                    <input type="text" id="search-alumnos" placeholder="Buscar por nombre o email...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-alumnos">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Última Actividad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB TAREAS -->
+            <div id="tab-tareas" class="tab-pane">
+                <div class="pane-header">
+                    <h3>GESTIÓN DE TAREAS</h3>
+                    <input type="text" id="search-tareas" placeholder="Buscar por título...">
+                </div>
+                <div class="table-wrapper">
+                    <table id="table-tareas">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Tipo</th>
+                                <th>Límite</th>
+                                <th>Entregas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se carga vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="../assets/js/general.js"></script>
+    <script type="module" src="../assets/js/clase-admin.js"></script>
+</body>
+
+</html>

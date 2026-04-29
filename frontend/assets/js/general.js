@@ -20,7 +20,7 @@ window.verificarSesion = function (callback, mensajeAux = "realizar esta acción
         return true;
     } else {
         const isPage = window.location.pathname.includes('/pages/');
-        const loginUrl = isPage ? 'login.html' : 'pages/login.html';
+        const loginUrl = isPage ? '../index.html' : 'index.html';
 
         showCustomConfirm(
             "Acceso Restringido",
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isPage = window.location.pathname.includes('/pages/');
         const assetsBase = isPage ? '../assets/img/' : 'assets/img/';
         const guestAvatar = assetsBase + 'avatar-defecto.png';
-        const loginUrl = isPage ? 'login.html' : 'pages/login.html';
+        const loginUrl = isPage ? '../index.html' : 'index.html';
 
         if (user) {
            // --- MOSTRAR AVATAR Y OCULTAR BOTÓN DE LOGIN DE INVITADO ---
@@ -116,8 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 gestionarVisibilidadAnuncios(perfil);
-
-                const avatarUrl = perfil.foto_perfil || guestAvatar;
+                
+                const rolParaAvatar = (perfil.rol || "alumno").toLowerCase();
+                const avatarUrl = perfil.foto_perfil || (assetsBase + `avatar-defecto-${rolParaAvatar}.png`);
 
                 const dropdownAvatar = document.querySelector('.dropdown-avatar');
                 if (headerAvatar) headerAvatar.src = avatarUrl;
@@ -141,6 +142,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         dropLink.innerText = "Cerrar Sesión";
                         dropLink.href = loginUrl;
                     }
+                }
+
+                // --- AJUSTAR NAVEGACIÓN GLOBAL SEGÚN ROL ---
+                ajustarNavegacionGlobal(perfil, isPage);
+
+                // --- INYECTAR ENLACES ESPECÍFICOS DE CLASE SI CORRESPONDE ---
+                if (window.location.pathname.includes('clase.html')) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const claseId = urlParams.get('id');
+                    if (claseId) {
+                        sessionStorage.setItem('lastClassId', claseId);
+                        injectClassHeaderLinks(perfil, isPage, claseId);
+                    }
+                } else {
+                    // Si navegamos fuera de clase.html, pero a usuarios o trabajos, mantenemos el contexto si existe
+                    const lastClassId = sessionStorage.getItem('lastClassId');
+                    ajustarNavegacionGlobal(perfil, isPage, lastClassId);
                 }
 
                 setTimeout(() => checkExpiredTasks(user.uid), 0);
@@ -277,14 +295,20 @@ document.addEventListener('DOMContentLoaded', () => {
         showCustomConfirm(
             "Cerrar Sesión",
             "¿Estás seguro de que quieres cerrar sesión?",
-            () => {
-                localStorage.removeItem("loginTimestamp");
-                auth.signOut().then(() => {
-
+            async () => {
+                try {
+                    // Limpiar sello de tiempo de "recordarme" para evitar auto-login
+                    localStorage.removeItem("loginTimestamp");
+                    
+                    await auth.signOut();
                     console.log("Sesión cerrada con éxito.");
-                }).catch((error) => {
+                    
+                    const isPage = window.location.pathname.includes('/pages/');
+                    window.location.href = isPage ? '../index.html' : 'index.html';
+                } catch (error) {
                     console.error("Error al cerrar sesión:", error);
-                });
+                    window.showCustomAlert("Error", "No se pudo cerrar la sesión correctamente.");
+                }
             },
             "Cerrar Sesión",
             "Cancelar",
@@ -293,23 +317,22 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    const logoutLinks = document.querySelectorAll('a[href="login.html"], a[href="pages/login.html"]');
-    logoutLinks.forEach(link => {
-        if (link.textContent.toLowerCase().includes('cerrar sesi') || link.parentElement.innerHTML.includes('icono-cerrar-sesion')) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                procesarCerrarSesion();
-            });
-        }
-    });
+    // --- LÓGICA GLOBAL DE BOTONES DE LOGOUT ---
+    const logoutElements = document.querySelectorAll('#logoutBtn, #btnLogout, .btn-logout, .logout-action, a[href*="login.html"], .side-menu-footer');
+    
+    logoutElements.forEach(el => {
+        el.addEventListener('click', (e) => {
+            const text = el.textContent.toLowerCase();
+            const hasIcon = el.querySelector('img[src*="cerrar-sesion"]') || el.innerHTML.includes('icono-cerrar-sesion');
+            const isLogout = el.id === 'logoutBtn' || el.id === 'btnLogout' || el.classList.contains('btn-logout') || el.classList.contains('logout-action') || el.classList.contains('side-menu-footer') || text.includes('cerrar sesi');
 
-   // --- 2. CAJA COMPLETA DEL SIDE MENU FOOTER ---
-    const sideMenuFooter = document.querySelector('.side-menu-footer');
-    if (sideMenuFooter) {
-        sideMenuFooter.addEventListener('click', (e) => {
-            procesarCerrarSesion();
+            if (isLogout) {
+                e.preventDefault();
+                e.stopPropagation(); // Evitar doble disparo si hay anidación
+                procesarCerrarSesion();
+            }
         });
-    }
+    });
 
    // --- 3. CAJA COMPLETA DEL DROPDOWN FOOTER (ESPECIALMENTE PARA MÓVIL DONDE EL TEXTO ESTÁ OCULTO) ---
     const dropdownFooter = document.querySelector('.profile-dropdown .dropdown-footer');
@@ -346,23 +369,121 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+function ajustarNavegacionGlobal(perfil, isPage, lastClassId = null) {
+    const rol = (perfil.rol || "").toLowerCase();
+    const labelUsers = rol === 'docente' ? 'Alumnos' : 'Compañeros';
+    const queryParams = lastClassId ? `?claseId=${lastClassId}` : "";
+
+    // 1. Header Nav
+    const headerLinks = document.querySelectorAll('header nav ul li a');
+    headerLinks.forEach(a => {
+        const text = a.textContent.toLowerCase();
+        if (text === 'usuarios' || text === 'compañeros' || text === 'alumnos') a.textContent = labelUsers;
+        if (text === 'trabajos' || text === 'tareas') a.textContent = 'Tareas';
+        if (text === 'mapa' || text === 'postulaciones') a.parentElement.style.display = 'none';
+        
+        // Añadir claseId si existe y no lo tiene
+        if (lastClassId && !a.href.includes('claseId=')) {
+            const separator = a.href.includes('?') ? '&' : '?';
+            a.href += `${separator}claseId=${lastClassId}`;
+        }
+    });
+
+    // 2. Side Menu
+    const sideLinks = document.querySelectorAll('.side-menu ul li');
+    sideLinks.forEach(li => {
+        const a = li.querySelector('a');
+        if (!a) return;
+        const text = a.textContent.toLowerCase();
+
+        // Renombrar
+        if (text === 'usuarios') a.textContent = labelUsers;
+        if (text === 'trabajos') a.textContent = 'Tareas';
+        
+        // Ocultar eliminados
+        if (text.includes('mapa') || text.includes('postulaciones')) {
+            li.style.display = 'none';
+        }
+
+        // Suscripciones solo para no alumnos (o según lógica previa)
+        if (rol === 'alumno' && text.includes('suscrip')) {
+            li.style.display = 'none';
+        }
+
+        // Lógica Mis Tareas / Mis Trabajos
+        if (rol === 'alumno') {
+            if (text.includes('mis tareas')) {
+                a.href = isPage ? 'mis-trabajos.html' : 'pages/mis-trabajos.html';
+            }
+            if (text.includes('mis trabajos')) {
+                li.style.display = 'none';
+            }
+        } else if (rol === 'docente') {
+            if (text.includes('mis trabajos')) {
+                li.style.display = 'none';
+            }
+            if (text.includes('mis tareas')) {
+                a.href = isPage ? 'mis-tareas.html' : 'pages/mis-tareas.html';
+            }
+        }
+    });
+
+    // 3. Mobile Bottom Nav
+    const mobileLinks = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    mobileLinks.forEach(a => {
+        const span = a.querySelector('span');
+        if (!span) return;
+        const text = span.textContent.toLowerCase();
+
+        if (text === 'usuarios' || text === 'compañeros' || text === 'alumnos') span.textContent = labelUsers;
+        if (text === 'trabajos' || text === 'tareas') span.textContent = 'Tareas';
+        if (text.includes('mapa') || text.includes('postulaciones')) {
+            a.style.display = 'none';
+        }
+        
+        if (lastClassId && !a.href.includes('claseId=')) {
+            const separator = a.href.includes('?') ? '&' : '?';
+            a.href += `${separator}claseId=${lastClassId}`;
+        }
+    });
+
+    // 4. Dropdown Perfil
+    const dropdownLinks = document.querySelectorAll('.profile-dropdown a');
+    dropdownLinks.forEach(a => {
+        const text = a.textContent.toLowerCase();
+        if (rol === 'alumno' && text.includes('suscrip')) {
+            a.style.display = 'none';
+        }
+    });
+}
+
+function injectClassHeaderLinks(perfil, isPage, claseId) {
+    const navUl = document.querySelector('header nav ul');
+    if (!navUl) return;
+
+    navUl.innerHTML = ''; // Limpiar enlaces anteriores
+
+    const rol = (perfil.rol || "").toLowerCase();
+    const labelUsers = rol === 'docente' ? 'Alumnos' : 'Compañeros';
+    const queryParams = `?claseId=${claseId}`;
+
+    // Enlace de Compañeros/Alumnos
+    const liUsers = document.createElement('li');
+    liUsers.innerHTML = `<a href="usuarios.html${queryParams}">${labelUsers}</a>`;
+    navUl.appendChild(liUsers);
+
+    // Enlace de Tareas
+    const liTasks = document.createElement('li');
+    liTasks.innerHTML = `<a href="tareas.html${queryParams}">Tareas</a>`;
+    navUl.appendChild(liTasks);
+}
+
 function injectAdminLinks(isPage) {
     const assetsBase = isPage ? '../assets/img/icons/' : 'assets/img/icons/';
     const adminUrl = isPage ? 'admin.html' : 'pages/admin.html';
 
-    // 1. Inyectar en Menú Lateral (antes de Cerrar Sesión)
-    const sideMenu = document.getElementById('sideMenu');
-    if (sideMenu) {
-        const ul = sideMenu.querySelector('ul');
-        if (ul && !document.getElementById('side-admin-link')) {
-            const li = document.createElement('li');
-            li.id = 'side-admin-link';
-            li.innerHTML = `<img src="${assetsBase}icono-panel-control.png"><a href="${adminUrl}">Panel de control</a>`;
-            ul.appendChild(li);
-        }
-    }
-
-
+    // 1. Inyectar en Menú Lateral (solo si es admin real, no docente)
+    // El docente tiene su propio panel en la clase.
 }
 
 function setupNotificationsLogic() {
@@ -694,7 +815,7 @@ window.showChangePasswordModal = function (onConfirm) {
     const msgEl = document.getElementById('global-modal-message');
     msgEl.innerHTML = `
         <div class="password-modal-container">
-            <p style="margin-bottom: 20px; text-align: left; color: var(--gray-5);">Gestiona tu seguridad con una nueva clave.</p>
+            <p class="class-description" style="text-align: left; color: var(--gray-5);">Gestiona tu seguridad con una nueva clave.</p>
             
             <div class="modal-input-group">
                 <label>Nueva Contraseña:</label>

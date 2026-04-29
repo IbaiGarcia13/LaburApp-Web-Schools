@@ -1,1175 +1,623 @@
-﻿import { auth, db } from './firebase-config.js';
+import { auth, db, storage } from './firebase-config.js';
+import {
+    obtenerClasePorId,
+    obtenerPerfilUsuario,
+    crearNovedadClase,
+    expulsarAlumno,
+    banearAlumnoClase
+} from './database.js';
+import {
+    collection,
+    addDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp,
+    getDocs,
+    updateDoc,
+    where
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-import { obtenerPerfilUsuario, obtenerClasePorId, actualizarPerfilUsuario } from './database.js';
+let currentClassId = new URLSearchParams(window.location.search).get('id');
+let userRole = null;
+let currentPerfil = null;
+let selectedColor = '';
 
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+const colorMap = {
+    'cat-2': '#e46363ff', 'cat-3': '#71b77fff', 'cat-4': '#659ee8ff', 'cat-5': '#ffd54f', 'cat-6': '#bc5ad2ff', 'cat-7': '#b07c4cff',
+    'cat-8': '#ff9152ff', 'cat-9': '#5def81ff', 'cat-10': '#6fb9e7ff', 'cat-11': '#edec84ff', 'cat-12': '#f07dc8ff', 'cat-13': '#91919198'
+};
 
-import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!currentClassId) {
+        window.location.href = 'principal.html';
+        return;
+    }
 
-
-
-document.addEventListener('DOMContentLoaded', () => {
-
-
-
-  const urlParams = new URLSearchParams(window.location.search);
-
-  const claseId = urlParams.get('id');
-
-
-
-  if (!claseId) {
-
-    window.location.href = "principal.html";
-
-    return;
-
-  }
-
-
-
-  const claseHeaderNav = document.getElementById('claseHeaderNav');
-
-  const claseMobileNav = document.getElementById('claseMobileNav');
-
-  const classHeroCard = document.getElementById('classHeroCard');
-
-  const docenteActions = document.getElementById('docenteActions');
-
-  
-
-  // Novedades
-
-  const feedList = document.getElementById('feedList');
-
-  const feedInputText = document.getElementById('feedInputText');
-
-  const btnEnviarMensajeFeed = document.getElementById('btnEnviarMensajeFeed');
-
-
-
-  // Modales Tarea
-
-  const btnNuevaTarea = document.getElementById('btnNuevaTarea');
-
-  const modalCrearTarea = document.getElementById('modalCrearTarea');
-
-  const btnCancelarTarea = document.getElementById('btnCancelarTarea');
-
-  const formCrearTareaClase = document.getElementById('formCrearTareaClase');
-
-
-
-  let currentUserProfile = null;
-
-  let currentClaseData = null; // Guardar datos de la clase para acceso global
-
-
-
-  onAuthStateChanged(auth, async (user) => {
-
-    if (user) {
-
-      try {
-
-        currentUserProfile = await obtenerPerfilUsuario(user.uid);
-
-        const clase = await obtenerClasePorId(claseId);
-
-        currentClaseData = clase; // Guardar referencia
-
-
-
-        if (!clase || !currentUserProfile) {
-
-          window.location.href = "principal.html";
-
-          return;
-
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = '../index.html';
+            return;
         }
 
+        currentPerfil = await obtenerPerfilUsuario(user.uid);
+        const clase = await obtenerClasePorId(currentClassId);
 
+        if (!clase) {
+            window.showCustomAlert("Error", "La clase no existe.", "Volver", () => {
+                window.location.href = 'principal.html';
+            });
+            return;
+        }
 
         const esDocente = clase.id_docente === user.uid;
-
         const esAlumno = clase.alumnos && clase.alumnos.includes(user.uid);
+        const esBaneado = clase.baneados && clase.baneados.includes(user.uid);
 
-
+        if (esBaneado) {
+            window.showCustomAlert("Acceso Denegado", "Has sido baneado de esta clase.", "Volver", () => {
+                window.location.href = 'principal.html';
+            });
+            return;
+        }
 
         if (!esDocente && !esAlumno) {
-
-          // No pertenece a la clase
-
-          window.location.href = "principal.html";
-
-          return;
-
-        }
-
-
-
-        // --- HEADER DINÁMICO ---
-
-        const nombreUsuarios = esDocente ? "Alumnos" : "Compañeros";
-
-        const htmlNav = `
-
-          <li><a href="usuarios.html?clase=${claseId}">${nombreUsuarios}</a></li>
-
-          <li><a href="tareas.html?clase=${claseId}">Tareas</a></li>
-
-        `;
-
-        if(claseHeaderNav) claseHeaderNav.innerHTML = htmlNav;
-
-        
-
-        if(claseMobileNav) {
-
-          claseMobileNav.innerHTML = `
-
-            <a href="usuarios.html?clase=${claseId}" class="nav-item">
-
-              <img src="../assets/img/icons/icono-perfil.png" alt="${nombreUsuarios}">
-
-              <span>${nombreUsuarios}</span>
-
-            </a>
-
-            <a href="tareas.html?clase=${claseId}" class="nav-item">
-
-              <img src="../assets/img/icons/icono-trabajos.png" alt="Tareas">
-
-              <span>Tareas</span>
-
-            </a>
-
-          `;
-
-        }
-
-
-
-        // --- DATOS DEL HERO ---
-
-        const docenteInfo = await obtenerPerfilUsuario(clase.id_docente);
-
-        document.getElementById('classHeroTitle').textContent = clase.nombre;
-
-        document.getElementById('classHeroDocente').textContent = "Profesor: " + (docenteInfo ? docenteInfo.nombre_completo : "Desconocido");
-
-        document.getElementById('classHeroDesc').textContent = clase.Descripción || "";
-
-        document.getElementById('classHeroCode').textContent = "Código: " + clase.Código;
-
-
-
-        const colorCat = clase.color || `cat-${claseId.charCodeAt(0) % 12 + 1}`;
-
-        classHeroCard.style.background = `var(--${colorCat})`;
-
-
-
-        // --- Código DE CLASE: MODAL (ESTILO CLASSROOM) ---
-
-        const btnToggleCode = document.getElementById('btnToggleCode');
-
-        const modalCódigoClase = document.getElementById('modalCódigoClase');
-
-        const btnCloseCodeModal = document.getElementById('btnCloseCodeModal');
-
-        const modalCodeTitle = document.getElementById('modalCodeTitle');
-
-        const modalCodeValue = document.getElementById('modalCodeValue');
-
-
-
-        if (currentUserProfile.rol === 'docente') {
-
-        const btnEdit = document.getElementById('btnEditarClase');
-
-        if (btnEdit) {
-
-          btnEdit.style.display = 'block';
-
-          btnEdit.classList.remove('hidden');
-
-        }
-
-        if (btnToggleCode) btnToggleCode.style.display = 'block';
-
-        const btnCrear = document.getElementById('btnCrearTarea');
-
-        if (btnCrear) btnCrear.style.display = 'inline-flex';
-
-      } else {
-
-        // Alumno
-
-        const btnColorAlu = document.getElementById('btnColorAlumno');
-
-        if (btnColorAlu) {
-
-          btnColorAlu.style.display = 'block';
-
-          btnColorAlu.classList.remove('hidden');
-
-        }
-
-        
-
-        // Aplicar preferencia de color si existe
-
-        const prefs = currentUserProfile.preferencias_clases || {};
-
-        if (prefs[claseId]) {
-
-          if (classHeroCard) {
-
-            classHeroCard.style.background = `var(--${prefs[claseId]})`;
-
-            const innerCircle = document.getElementById('alumnoColorPreview');
-
-            if (innerCircle) innerCircle.style.background = `var(--${prefs[claseId]})`;
-
-          }
-
-        }
-
-      }
-
-
-
-        if (btnToggleCode && modalCódigoClase) {
-
-          btnToggleCode.addEventListener('click', () => {
-
-            modalCodeTitle.textContent = clase.nombre;
-
-            modalCodeValue.textContent = clase.Código;
-
-            modalCódigoClase.classList.remove('hidden');
-
-          });
-
-
-
-          if(btnCloseCodeModal) {
-
-            btnCloseCodeModal.addEventListener('click', () => {
-
-              modalCódigoClase.classList.add('hidden');
-
+            window.showCustomAlert("Acceso Denegado", "No tienes permiso para ver esta clase.", "Volver", () => {
+                window.location.href = 'principal.html';
             });
-
-          }
-
-
-
-          modalCódigoClase.addEventListener('click', (e) => {
-
-            if (e.target === modalCódigoClase) modalCódigoClase.classList.add('hidden');
-
-          });
-
+            return;
         }
 
-
-
-        // --- MOSTRAR CONTROLES POR ROL ---
-
-        const btnColorAlumno = document.getElementById('btnColorAlumno');
-
-        const btnEditarClaseInline = document.getElementById('btnEditarClase');
-
-        const alumnoColorPreview = document.getElementById('alumnoColorPreview');
-
-
+        userRole = esDocente ? 'docente' : 'alumno';
+        renderClassUI(clase);
+        setupFeedListener();
+        setupEventListeners(clase);
 
         if (esDocente) {
-
-          if (btnEditarClaseInline) {
-
-            btnEditarClaseInline.style.display = 'block';
-
-            btnEditarClaseInline.classList.remove('hidden');
-
-          }
-
-          if (docenteActions) docenteActions.style.display = 'flex';
-
-          
-
-          const btnPanelControl = document.getElementById('btnPanelControl');
-
-          if (btnPanelControl) {
-
-            btnPanelControl.href = `panel-control.html?id=${claseId}`;
-
-          }
-
-        } else {
-
-          if (btnColorAlumno) {
-
-            btnColorAlumno.style.display = 'block';
-
-            btnColorAlumno.classList.remove('hidden');
-
-          }
-
+            document.getElementById('btnEditarClase').style.display = 'flex';
+            document.getElementById('btnVerCodigo').style.display = 'flex';
+            document.getElementById('btnNuevaTarea').style.display = 'flex';
+            document.getElementById('btnGestionarAlumnos').style.display = 'flex';
+        } else if (esAlumno) {
+            // Mostrar selector de color solo para alumnos
+            const picker = document.getElementById('colorPickerContainer');
+            if (picker) picker.style.display = 'flex';
+            setupColorPicker();
         }
-
-
-
-        // --- GESTIÓN DE COLOR (PREFERENCIA PERSONAL) ---
-
-        let colorActual = clase.color || `cat-${claseId.charCodeAt(0) % 12 + 1}`;
-
-        
-
-        // Si el alumno tiene un color guardado para esta clase, usarlo
-
-        if (currentUserProfile.preferencias_clases && currentUserProfile.preferencias_clases[claseId]) {
-
-          colorActual = currentUserProfile.preferencias_clases[claseId];
-
-        }
-
-        
-
-        classHeroCard.style.background = `var(--${colorActual})`;
-
-        if (alumnoColorPreview) alumnoColorPreview.style.background = `var(--${colorActual})`;
-
-
-
-        // Lógica modal color alumno
-
-        if (btnColorAlumno) {
-
-          const modalColorAlumno = document.getElementById('modalColorAlumno');
-
-          const btnCancelarColorAlumno = document.getElementById('btnCancelarColorAlumno');
-
-          const swatches = document.querySelectorAll('#alumnoColorPicker .color-swatch');
-
-
-
-          btnColorAlumno.addEventListener('click', () => modalColorAlumno.classList.remove('hidden'));
-
-          btnCancelarColorAlumno.addEventListener('click', () => modalColorAlumno.classList.add('hidden'));
-
-
-
-          swatches.forEach(swatch => {
-
-            swatch.addEventListener('click', async () => {
-
-              const nuevoColor = swatch.dataset.color;
-
-              colorActual = nuevoColor;
-
-              classHeroCard.style.background = `var(--${nuevoColor})`;
-
-              if (alumnoColorPreview) alumnoColorPreview.style.background = `var(--${nuevoColor})`;
-
-              
-
-              // Guardar en perfil
-
-              const nuevasPreferencia = currentUserProfile.preferencias_clases || {};
-
-              nuevasPreferencia[claseId] = nuevoColor;
-
-              
-
-              try {
-
-                await actualizarPerfilUsuario(user.uid, { preferencias_clases: nuevasPreferencia });
-
-                modalColorAlumno.classList.add('hidden');
-
-              } catch (error) {
-
-                console.error("Error al guardar color:", error);
-
-              }
-
-            });
-
-          });
-
-        }
-
-
-
-        // --- ACTUALIZAR AVATAR INPUT ---
-
-        const feedInputAvatar = document.getElementById('feedInputAvatar');
-
-        if (feedInputAvatar) {
-
-          feedInputAvatar.src = currentUserProfile.foto_perfil || 
-
-            (currentUserProfile.rol === 'docente' ? '../assets/img/avatar-defecto-docente.png' : '../assets/img/avatar-defecto-alumno.png');
-
-        }
-
-
-
-        // --- INICIAR FEED DE NOVEDADES ---
-
-        cargarFeed(claseId);
-
-
-
-      } catch (error) {
-
-        console.error("Error cargando clase:", error);
-
-      }
-
-    } else {
-
-      window.location.href = "../index.html";
-
-    }
-
-  });
-
-
-
-  // --- ENVIAR MENSAJE AL FEED (con archivos) ---
-
-  let feedFilesSelected = [];
-
-
-
-  const feedFileInput = document.getElementById('feedFileInput');
-
-  const feedFilesPreview = document.getElementById('feedFilesPreview');
-
-
-
-  if (feedFileInput) {
-
-    feedFileInput.addEventListener('change', () => {
-
-      feedFilesSelected = Array.from(feedFileInput.files);
-
-      renderFeedFilesPreview();
-
     });
-
-  }
-
-
-
-  function renderFeedFilesPreview() {
-
-    if (!feedFilesPreview) return;
-
-    if (feedFilesSelected.length === 0) {
-
-      feedFilesPreview.style.display = 'none';
-
-      feedFilesPreview.innerHTML = '';
-
-      return;
-
-    }
-
-    feedFilesPreview.style.display = 'flex';
-
-    feedFilesPreview.innerHTML = feedFilesSelected.map((f, i) => `
-
-      <div class="feed-file-chip">
-
-        �� ${f.name}
-
-        <button type="button" data-idx="${i}">×</button>
-
-      </div>
-
-    `).join('');
-
-    feedFilesPreview.querySelectorAll('button').forEach(btn => {
-
-      btn.onclick = () => {
-
-        feedFilesSelected.splice(Number(btn.dataset.idx), 1);
-
-        renderFeedFilesPreview();
-
-      };
-
-    });
-
-  }
-
-
-
-  if (btnEnviarMensajeFeed) {
-
-    btnEnviarMensajeFeed.addEventListener('click', async () => {
-
-      const texto = feedInputText.value.trim();
-
-      if (!texto && feedFilesSelected.length === 0) return;
-
-
-
-      // Convertir archivos a base64
-
-      const archivosData = await Promise.all(feedFilesSelected.map(file => {
-
-        return new Promise((resolve) => {
-
-          const reader = new FileReader();
-
-          reader.onload = (e) => resolve({
-
-            nombre: file.name,
-
-            tipo: file.type,
-
-            data: e.target.result // base64 data URL
-
-          });
-
-          reader.readAsDataURL(file);
-
-        });
-
-      }));
-
-
-
-      try {
-
-        await addDoc(collection(db, "mensajes_clase"), {
-
-          id_clase: claseId,
-
-          id_autor: auth.currentUser.uid,
-
-          nombre_autor: currentUserProfile.nombre_completo || "Usuario",
-
-          rol_autor: currentUserProfile.rol || "alumno",
-
-          foto_autor: currentUserProfile.foto_perfil || "",
-
-          texto: texto,
-
-          archivos: archivosData,
-
-          fecha: serverTimestamp(),
-
-          tipo: "mensaje"
-
-        });
-
-        feedInputText.value = "";
-
-        feedFilesSelected = [];
-
-        renderFeedFilesPreview();
-
-        if (feedFileInput) feedFileInput.value = '';
-
-      } catch (e) {
-
-        console.error("Error enviando mensaje:", e);
-
-        alert("No se pudo enviar el mensaje.");
-
-      }
-
-    });
-
-  }
-
-
-
-  // --- CARGAR FEED EN TIEMPO REAL ---
-
-  function cargarFeed(idClase) {
-
-    const q = query(
-
-      collection(db, "mensajes_clase"), 
-
-      where("id_clase", "==", idClase)
-
-    );
-
-
-
-    onSnapshot(q, (snapshot) => {
-
-      if (snapshot.empty) {
-
-        feedList.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--gray-5);">Aún no hay novedades en esta clase. ¡Escribe el primer mensaje!</div>`;
-
-        return;
-
-      }
-
-
-
-      feedList.innerHTML = "";
-
-      
-
-      const mensajes = [];
-
-      snapshot.forEach((docSnap) => {
-
-        mensajes.push({ id: docSnap.id, ...docSnap.data() });
-
-      });
-
-
-
-      // Ordenar por fecha descendente (más recientes primero)
-
-      mensajes.sort((a, b) => {
-
-        const fA = a.fecha ? a.fecha.toMillis() : 0;
-
-        const fB = b.fecha ? b.fecha.toMillis() : 0;
-
-        return fB - fA;
-
-      });
-
-
-
-      mensajes.forEach((data) => {
-
-        const div = document.createElement('div');
-
-        div.className = "feed-msg" + (data.tipo === 'novedad' ? " novedad-automatica" : "");
-
-        
-
-        // Formateo simple de fecha
-
-        let fechaStr = "";
-
-        if(data.fecha) {
-
-          const date = data.fecha.toDate();
-
-          fechaStr = date.toLocaleDateString() + " " + date.getHours() + ":" + String(date.getMinutes()).padStart(2, '0');
-
-        }
-
-
-
-        const msgAvatar = data.foto_autor || 
-
-          (data.rol_autor === 'docente' ? '../assets/img/avatar-defecto-docente.png' : '../assets/img/avatar-defecto-alumno.png');
-
-
-
-        // Renderizar archivos adjuntos
-
-        let archivosHtml = '';
-
-        if (data.archivos && data.archivos.length > 0) {
-
-          const items = data.archivos.map(f => {
-
-            // Soporte tanto formato nuevo {nombre,tipo,data} como nombre solo (legacy)
-
-            const nombre = typeof f === 'string' ? f : f.nombre;
-
-            const tipo = typeof f === 'string' ? '' : (f.tipo || '');
-
-            const dataUrl = typeof f === 'string' ? null : f.data;
-
-
-
-            if (dataUrl && tipo.startsWith('image/')) {
-
-              return `<div class="msg-file-item">
-
-                <img src="${dataUrl}" class="msg-file-img" alt="${nombre}" onclick="window.open('${dataUrl}')" title="${nombre}">
-
-              </div>`;
-
-            } else if (dataUrl && tipo === 'application/pdf') {
-
-              return `<div class="msg-file-item msg-file-pdf">
-
-                <embed src="${dataUrl}" type="application/pdf" class="msg-file-embed">
-
-                <a href="${dataUrl}" download="${nombre}" class="msg-file-download">&#8681; ${nombre}</a>
-
-              </div>`;
-
-            } else if (dataUrl) {
-
-              return `<a href="${dataUrl}" download="${nombre}" class="msg-file-chip">
-
-                &#128196; ${nombre}
-
-              </a>`;
-
-            } else {
-
-              return `<span class="msg-file-chip">&#128196; ${nombre}</span>`;
-
-            }
-
-          }).join('');
-
-          archivosHtml = `<div class="msg-files">${items}</div>`;
-
-        }
-
-
-
-        div.innerHTML = `
-
-          <img src="${msgAvatar}" class="msg-avatar" alt="Avatar">
-
-          <div class="msg-content">
-
-            <div class="msg-header">
-
-              <span class="msg-author">${data.nombre_autor}</span>
-
-              <span class="msg-time">${fechaStr}</span>
-
-            </div>
-
-            <div class="msg-text">${data.texto}</div>
-
-            ${archivosHtml}
-
-          </div>
-
-        `;
-
-        feedList.appendChild(div);
-
-      });
-
-    });
-
-  }
-
-
-
-  // --- LÓGICA MODAL CREAR TAREA ---
-
-  if (btnNuevaTarea && modalCrearTarea) {
-
-    btnNuevaTarea.addEventListener('click', () => {
-
-      modalCrearTarea.classList.remove('hidden');
-
-      initFileSlots();
-
-    });
-
-
-
-    btnCancelarTarea.addEventListener('click', () => {
-
-      modalCrearTarea.classList.add('hidden');
-
-    });
-
-
-
-    function initFileSlots() {
-
-      const slots = document.querySelectorAll('.file-slot');
-
-      slots.forEach(slot => {
-
-        // Reset slot
-
-        slot.classList.remove('slot-locked');
-
-        slot.innerHTML = `<input type="file" hidden accept="image/*,.pdf,.doc,.docx,.zip,.ppt,.pptx,.xls,.xlsx"><span class="slot-plus">+</span>`;
-
-        slot.style.pointerEvents = '';
-
-
-
-        const fileInput = slot.querySelector('input[type="file"]');
-
-        slot.addEventListener('click', () => {
-
-          if (!slot.classList.contains('slot-locked')) fileInput.click();
-
-        }, { once: false });
-
-
-
-        fileInput.addEventListener('change', () => {
-
-          const file = fileInput.files[0];
-
-          if (!file) return;
-
-
-
-          slot.classList.add('slot-locked');
-
-          slot.style.pointerEvents = 'none';
-
-
-
-          const isImage = file.type.startsWith('image/');
-
-          if (isImage) {
-
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-
-              slot.innerHTML = `<img src="${e.target.result}" class="slot-preview-img" alt="${file.name}">`;
-
-            };
-
-            reader.readAsDataURL(file);
-
-          } else {
-
-            const ext = file.name.split('.').pop().toUpperCase();
-
-            slot.innerHTML = `<div class="slot-preview-name">${ext}<br><small style="font-size:0.5rem">${file.name.substring(0,12)}...</small></div>`;
-
-          }
-
-        });
-
-      });
-
-    }
-
-
-
-    formCrearTareaClase.addEventListener('submit', async (e) => {
-
-      e.preventDefault();
-
-      
-
-      const Título = document.getElementById('tareaTítulo').value;
-
-      const desc = document.getElementById('tareaDesc').value;
-
-      const fechaIn = document.getElementById('tareaFechaInicio').value;
-
-      const fechaLim = document.getElementById('tareaFechaLimite').value;
-
-      const partic = document.getElementById('tareaParticipantes').value;
-
-      const puntos = parseInt(document.getElementById('tareaPuntos').value) || 1;
-
-
-
-      // Aquí se integraría con la colección "trabajos"
-
-      try {
-
-        // Crear tarea en BD
-
-        const docRef = await addDoc(collection(db, "trabajos"), {
-
-          id_clase: claseId,
-
-          id_Categoría: currentClaseData.id_Categoría || "otros", // La tarea hereda la asignatura de la clase
-
-          Título: Título,
-
-          Descripción: desc,
-
-          fecha_inicio: fechaIn,
-
-          fecha_limite: fechaLim,
-
-          participantes_tipo: partic,
-
-          tipo_obligatoriedad: tipoOblig,
-
-          puntos_asignatura: puntos,
-
-          creador_id: auth.currentUser.uid,
-
-          estado: "abierta",
-
-          fecha_creacion: serverTimestamp()
-
-        });
-
-
-
-        // Lanzar novedad automática al feed
-
-        await addDoc(collection(db, "mensajes_clase"), {
-
-          id_clase: claseId,
-
-          id_autor: auth.currentUser.uid,
-
-          nombre_autor: currentUserProfile.nombre_completo || "Docente",
-
-          rol_autor: "docente",
-
-          foto_autor: currentUserProfile.foto_perfil || "",
-
-          texto: `Se ha publicado una nueva tarea: "${Título}". Límite: ${fechaLim}`,
-
-          fecha: serverTimestamp(),
-
-          tipo: "novedad"
-
-        });
-
-
-
-        modalCrearTarea.classList.add('hidden');
-
-        formCrearTareaClase.reset();
-
-        alert("Tarea creada Éxitosamente.");
-
-
-
-      } catch (error) {
-
-        console.error("Error al crear la tarea:", error);
-
-        alert("Error al crear la tarea.");
-
-      }
-
-    });
-
-  }
-
-
-
-  // --- LÓGICA MODAL EDITAR CLASE (DOCENTE) ---
-
-  const btnEditarClase = document.getElementById('btnEditarClase');
-
-  const modalEditarClase = document.getElementById('modalEditarClase');
-
-  const btnCancelarEditarClase = document.getElementById('btnCancelarEditarClase');
-
-  const formEditarClase = document.getElementById('formEditarClase');
-
-
-
-  if (btnEditarClase && modalEditarClase) {
-
-    btnEditarClase.addEventListener('click', async () => {
-
-      const clase = await obtenerClasePorId(claseId);
-
-      document.getElementById('editNombreClase').value = clase.nombre || "";
-
-      document.getElementById('editDescClase').value = clase.Descripción || "";
-
-      
-
-      const colorCat = clase.color || `cat-${claseId.charCodeAt(0) % 12 + 1}`;
-
-      document.getElementById('editColorClase').value = colorCat;
-
-
-
-      // Configurar swatches
-
-      document.querySelectorAll('#editColorPicker .color-swatch').forEach(swatch => {
-
-        swatch.classList.toggle('selected', swatch.dataset.color === colorCat);
-
-        swatch.onclick = () => {
-
-          document.querySelectorAll('#editColorPicker .color-swatch').forEach(s => s.classList.remove('selected'));
-
-          swatch.classList.add('selected');
-
-          document.getElementById('editColorClase').value = swatch.dataset.color;
-
-        };
-
-      });
-
-
-
-      modalEditarClase.classList.remove('hidden');
-
-    });
-
-
-
-    if (btnCancelarEditarClase) {
-
-      btnCancelarEditarClase.addEventListener('click', () => {
-
-        modalEditarClase.classList.add('hidden');
-
-      });
-
-    }
-
-
-
-    if (formEditarClase) {
-
-      formEditarClase.addEventListener('submit', async (e) => {
-
-        e.preventDefault();
-
-        const nuevoNombre = document.getElementById('editNombreClase').value.trim();
-
-        const nuevaDesc = document.getElementById('editDescClase').value.trim();
-
-        const nuevoColor = document.getElementById('editColorClase').value;
-
-
-
-        if (!nuevoNombre) return;
-
-
-
-        try {
-
-          const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-
-          const claseRef = doc(db, "clases", claseId);
-
-          await updateDoc(claseRef, {
-
-            nombre: nuevoNombre,
-
-            Descripción: nuevaDesc,
-
-            color: nuevoColor
-
-          });
-
-          
-
-          modalEditarClase.classList.add('hidden');
-
-          alert("Clase actualizada correctamente");
-
-          window.location.reload();
-
-        } catch (error) {
-
-          console.error("Error al actualizar la clase:", error);
-
-          alert("Hubo un error al actualizar la clase.");
-
-        }
-
-      });
-
-    }
-
-  }
-
-
-
-  // --- LÓGICA MODAL COLOR ALUMNO ---
-
-  const btnColorAlumno = document.getElementById('btnColorAlumno');
-
-  const modalColorAlumno = document.getElementById('modalColorAlumno');
-
-  const alumnoColorPicker = document.getElementById('alumnoColorPicker');
-
-  const btnCancelarColorAlumno = document.getElementById('btnCancelarColorAlumno');
-
-
-
-  if (btnColorAlumno && modalColorAlumno) {
-
-    btnColorAlumno.onclick = () => {
-
-      modalColorAlumno.classList.remove('hidden');
-
-    };
-
-
-
-    btnCancelarColorAlumno.onclick = () => modalColorAlumno.classList.add('hidden');
-
-
-
-    alumnoColorPicker.querySelectorAll('.color-swatch').forEach(swatch => {
-
-      swatch.onclick = async () => {
-
-        const newColor = swatch.dataset.color;
-
-        try {
-
-          const { doc, updateDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-
-          const user = auth.currentUser;
-
-          const prefRef = doc(db, "usuarios", user.uid);
-
-          
-
-          // Guardamos la preferencia en el objeto preferencias_clases del perfil
-
-          await setDoc(prefRef, {
-
-            preferencias_clases: {
-
-              [claseId]: newColor
-
-            }
-
-          }, { merge: true });
-
-
-
-          // Actualizar UI instantáneamente
-
-          const hero = document.getElementById('classHero');
-
-          if (hero) hero.style.background = `var(--${newColor})`;
-
-          const innerCircle = document.getElementById('currentAlumnoColor');
-
-          if (innerCircle) innerCircle.style.background = `var(--${newColor})`;
-
-
-
-          modalColorAlumno.classList.add('hidden');
-
-        } catch (err) {
-
-          console.error("Error guardando preferencia de color:", err);
-
-        }
-
-      };
-
-    });
-
-  }
-
-
-
 });
 
+function getAvatar(perfil) {
+    if (perfil && perfil.foto_perfil) return perfil.foto_perfil;
+    const rol = perfil?.rol || 'alumno';
+    return `../assets/img/avatar-defecto-${rol}.png`;
+}
 
+async function renderClassUI(clase) {
+    document.getElementById('className').innerText = clase.nombre;
+    document.getElementById('classDesc').innerText = clase.Descripción || "";
+    document.getElementById('classSubject').innerText = clase.Asignatura || "General";
 
+    // Obtener nombre del docente
+    const docente = await obtenerPerfilUsuario(clase.id_docente);
+    if (docente) {
+        document.getElementById('classTeacherName').innerText = `${docente.nombre} ${docente.apellidos || ''}`;
+    }
 
+    // Aplicar color (Prioridad: Preferencia Usuario > Color Clase > Default)
+    let colorKey = clase.color || 'cat-4'; // Default azul
+    if (currentPerfil && currentPerfil.preferencias_clases && currentPerfil.preferencias_clases[currentClassId]) {
+        colorKey = currentPerfil.preferencias_clases[currentClassId].color || colorKey;
+    }
+
+    const hero = document.getElementById('classHero');
+    if (hero && colorMap[colorKey]) {
+        hero.style.backgroundColor = colorMap[colorKey];
+        // Actualizar el circulo del picker
+        const inner = document.getElementById('currentColorInner');
+        if (inner) inner.style.backgroundColor = colorMap[colorKey];
+    }
+
+    if (currentPerfil) {
+        document.getElementById('userPostAvatar').src = getAvatar(currentPerfil);
+    }
+}
+
+function setupFeedListener() {
+    const q = query(
+        collection(db, "clases", currentClassId, "novedades"),
+        orderBy("fecha", "desc")
+    );
+
+    onSnapshot(q, (snapshot) => {
+        const feedList = document.getElementById('classFeedList');
+        feedList.innerHTML = '';
+
+        if (snapshot.empty) {
+            feedList.innerHTML = '<div class="empty-msg">Anuncia algo a tu clase para empezar.</div>';
+            return;
+        }
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const date = data.fecha?.toDate ? data.fecha.toDate().toLocaleString() : 'Reciente';
+
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+
+            let contentHtml = '';
+            if (data.tipo === 'tarea') {
+                contentHtml = `
+                    <div class="feed-task-info">
+                        <strong>Nueva Tarea: ${data.titulo}</strong>
+                        <p>${data.mensaje}</p>
+                        <a href="trabajo.html?id=${data.id_referencia}" class="btn-ver-tarea">Ver Tarea</a>
+                    </div>
+                `;
+            } else if (data.tipo === 'unirse') {
+                contentHtml = `<p style="color: var(--gray-4); font-style: italic;">${data.mensaje}</p>`;
+            } else {
+                // Mensaje normal
+                if (data.mensaje) {
+                    contentHtml += `<p class="feed-text">${data.mensaje}</p>`;
+                }
+                if (data.archivoUrl) {
+                    const isImg = data.archivoNombre && data.archivoNombre.match(/\.(jpg|jpeg|png|gif)$/i);
+                    if (isImg) {
+                        contentHtml += `<div class="feed-attachment"><img src="${data.archivoUrl}" alt="Adjunto" class="feed-img-preview" onclick="window.open('${data.archivoUrl}', '_blank')"></div>`;
+                    } else {
+                        contentHtml += `
+                            <div class="feed-attachment">
+                                <a href="${data.archivoUrl}" download="${data.archivoNombre}" class="feed-file-link">
+                                    <img src="../assets/img/icons/icono-categoria.png">
+                                    <span>${data.archivoNombre}</span>
+                                </a>
+                            </div>`;
+                    }
+                }
+            }
+
+            item.innerHTML = `
+                <div class="feed-item-header">
+                    <img src="../assets/img/avatar-defecto.png" class="post-avatar" id="avatar-${docSnap.id}">
+                    <div class="author-info">
+                        <h4>${data.autor_nombre}</h4>
+                        <span>${date}</span>
+                    </div>
+                </div>
+                <div class="feed-item-content">
+                    ${contentHtml}
+                </div>
+            `;
+            feedList.appendChild(item);
+
+            if (data.autor_id) {
+                obtenerPerfilUsuario(data.autor_id).then(p => {
+                    const img = document.getElementById(`avatar-${docSnap.id}`);
+                    if (img) img.src = getAvatar(p);
+                });
+            }
+        });
+    });
+}
+
+function setupEventListeners(clase) {
+    // Publicar mensaje
+    const btnSend = document.getElementById('btnSendFeed');
+    const inputMsg = document.getElementById('inputFeedMessage');
+    const btnAttach = document.getElementById('btnAttachFeed');
+    const fileInput = document.getElementById('feedFileInput');
+    const filePreview = document.getElementById('feedFilePreview');
+    const btnRemoveFile = document.getElementById('btnRemoveFeedFile');
+
+    let selectedFeedFile = null;
+
+    btnAttach.onclick = () => fileInput.click();
+
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            selectedFeedFile = file;
+            const nameSpan = filePreview.querySelector('.file-name');
+            const thumbContainer = document.getElementById('feedThumbContainer');
+            const thumbImg = document.getElementById('feedThumb');
+
+            nameSpan.textContent = file.name;
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    thumbImg.src = e.target.result;
+                    thumbContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                thumbContainer.classList.add('hidden');
+            }
+
+            filePreview.classList.remove('hidden');
+        }
+    };
+
+    btnRemoveFile.onclick = () => {
+        selectedFeedFile = null;
+        fileInput.value = '';
+        filePreview.classList.add('hidden');
+        const thumbContainer = document.getElementById('feedThumbContainer');
+        if (thumbContainer) thumbContainer.classList.add('hidden');
+    };
+
+    // Mandar con Enter
+    inputMsg.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            btnSend.click();
+        }
+    });
+
+    btnSend.onclick = async () => {
+        const msg = inputMsg.value.trim();
+        if (!msg && !selectedFeedFile) return;
+
+        try {
+            btnSend.disabled = true;
+            btnSend.style.opacity = '0.5';
+
+            let archivoData = {};
+            if (selectedFeedFile) {
+                console.log("Procesando archivo como Base64...");
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(selectedFeedFile);
+                });
+                archivoData = {
+                    archivoUrl: base64,
+                    archivoNombre: selectedFeedFile.name
+                };
+            }
+
+            await crearNovedadClase(currentClassId, {
+                tipo: 'mensaje',
+                autor_id: auth.currentUser.uid,
+                autor_nombre: currentPerfil?.nombre || "Usuario",
+                mensaje: msg,
+                ...archivoData
+            });
+
+            inputMsg.value = '';
+            selectedFeedFile = null;
+            fileInput.value = '';
+            filePreview.classList.add('hidden');
+            const thumbContainer = document.getElementById('feedThumbContainer');
+            if (thumbContainer) thumbContainer.classList.add('hidden');
+
+            window.showCustomAlert("Éxito", "Publicado correctamente.");
+        } catch (err) {
+            console.error("Error al publicar en el muro:", err);
+            window.showCustomAlert("Error", "No se pudo publicar: " + err.message);
+        } finally {
+            btnSend.disabled = false;
+            btnSend.style.opacity = '1';
+        }
+    };
+
+    // Modales genéricos
+    document.querySelectorAll('.close-modal, .modal-btn.cancel').forEach(btn => {
+        btn.onclick = (e) => {
+            if (e.target.tagName === 'A') return; // No cerrar si es un link (p.ej. en el footer del dropdown)
+            btn.closest('.modal-overlay').classList.add('hidden');
+        };
+    });
+
+    // Ver Código
+    const btnVerCodigo = document.getElementById('btnVerCodigo');
+    const modalVerCodigo = document.getElementById('modalVerCodigo');
+    if (btnVerCodigo) {
+        btnVerCodigo.onclick = () => {
+            document.getElementById('bigClassCode').innerText = clase.Código;
+            modalVerCodigo.classList.remove('hidden');
+        };
+    }
+
+    // Editar Clase
+    const btnEditar = document.getElementById('btnEditarClase');
+    const modalEditar = document.getElementById('modalEditarClase');
+    if (btnEditar) {
+        btnEditar.onclick = () => {
+            document.getElementById('editNombreClase').value = clase.nombre;
+            document.getElementById('editAsignaturaClase').value = clase.Asignatura || "General";
+            document.getElementById('editDescClase').value = clase.Descripción || "";
+            selectedColor = clase.color || 'cat-2';
+            renderColorPicker();
+            modalEditar.classList.remove('hidden');
+        };
+    }
+
+    const btnSaveEdit = document.getElementById('btnSaveEdit');
+    if (btnSaveEdit) {
+        btnSaveEdit.onclick = async () => {
+            const nuevoNombre = document.getElementById('editNombreClase').value.trim();
+            const nuevaAsig = document.getElementById('editAsignaturaClase').value.trim();
+            const nuevaDesc = document.getElementById('editDescClase').value.trim();
+
+            if (!nuevoNombre) return;
+
+            try {
+                await updateDoc(doc(db, "clases", currentClassId), {
+                    nombre: nuevoNombre,
+                    Asignatura: nuevaAsig,
+                    Descripción: nuevaDesc,
+                    color: selectedColor
+                });
+                modalEditar.classList.add('hidden');
+                window.location.reload();
+            } catch (err) {
+                console.error(err);
+                window.showCustomAlert("Error", "No se pudo actualizar la clase.");
+            }
+        };
+    }
+
+    // Crear Tarea
+    const btnNuevaTarea = document.getElementById('btnNuevaTarea');
+    const modalTarea = document.getElementById('modalCrearTarea');
+    if (btnNuevaTarea) {
+        btnNuevaTarea.onclick = () => modalTarea.classList.remove('hidden');
+    }
+
+    const formTarea = document.getElementById('formNuevaTarea');
+    if (formTarea) {
+        formTarea.onsubmit = async (e) => {
+            e.preventDefault();
+            await crearTarea();
+        };
+    }
+
+    // Lógica de File Slots
+    const fileSlots = document.querySelectorAll('.file-slot');
+    fileSlots.forEach(slot => {
+        const input = slot.querySelector('input');
+        const nameSpan = slot.querySelector('.file-name');
+
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                slot.classList.add('has-file');
+                nameSpan.textContent = file.name;
+                nameSpan.classList.remove('hidden');
+            } else {
+                slot.classList.remove('has-file');
+                nameSpan.classList.add('hidden');
+            }
+        });
+    });
+
+    const selectPart = document.getElementById('selectParticipantes');
+    selectPart.onchange = async (e) => {
+        const extra = document.getElementById('participantesExtra');
+        extra.innerHTML = '';
+        if (e.target.value === 'numero') {
+            extra.innerHTML = '<input type="number" id="numPart" placeholder="Nº de alumnos" min="1" required>';
+        } else if (e.target.value === 'especificos') {
+            extra.innerHTML = '<p>Cargando alumnos...</p>';
+            const updatedClase = await obtenerClasePorId(currentClassId);
+            if (updatedClase && updatedClase.alumnos) {
+                extra.innerHTML = '<div id="listEspec" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--gray-2); padding: 10px; border-radius: 8px;"></div>';
+                const list = document.getElementById('listEspec');
+                for (const uid of updatedClase.alumnos) {
+                    const p = await obtenerPerfilUsuario(uid);
+                    const div = document.createElement('div');
+                    div.innerHTML = `<input type="checkbox" name="especAlumno" value="${uid}"> ${p.nombre} ${p.apellidos || ''}`;
+                    list.appendChild(div);
+                }
+            }
+        }
+    };
+
+    // Botón Panel de Control (Docente) -> Ir a clase-admin.html
+    const btnGestionar = document.getElementById('btnGestionarAlumnos');
+    if (btnGestionar) {
+        btnGestionar.onclick = () => {
+            window.location.href = `clase-admin.html?id=${currentClassId}`;
+        };
+    }
+}
+
+function renderColorPicker() {
+    const picker = document.getElementById('colorPicker');
+    picker.innerHTML = '';
+    Object.keys(colorMap).forEach(cat => {
+        const opt = document.createElement('div');
+        opt.className = `color-option ${selectedColor === cat ? 'selected' : ''}`;
+        opt.style.backgroundColor = colorMap[cat];
+        opt.onclick = () => {
+            selectedColor = cat;
+            renderColorPicker();
+        };
+        picker.appendChild(opt);
+    });
+}
+
+async function renderAlumnosList() {
+    const list = document.getElementById('alumnosList');
+    list.innerHTML = 'Cargando alumnos...';
+
+    const clase = await obtenerClasePorId(currentClassId);
+    if (!clase || !clase.alumnos || clase.alumnos.length === 0) {
+        list.innerHTML = 'No hay alumnos en esta clase.';
+        return;
+    }
+
+    list.innerHTML = '';
+    for (const uid of clase.alumnos) {
+        const p = await obtenerPerfilUsuario(uid);
+        const item = document.createElement('div');
+        item.className = 'admin-list-item';
+        item.innerHTML = `
+            <div class="user-info-box">
+                <img src="${p.foto_perfil || '../assets/img/avatar-defecto.png'}" class="post-avatar">
+                <div>
+                    <strong>${p.nombre} ${p.apellidos || ''}</strong>
+                    <p style="font-size: 0.8rem; color: var(--gray-4);">${p.email || ''}</p>
+                </div>
+            </div>
+            <div class="user-actions">
+                <button class="btn-warning" onclick="expulsarAlumnoWrapper('${uid}')">Expulsar</button>
+                <button class="btn-danger" onclick="banearAlumnoWrapper('${uid}')">Banear</button>
+            </div>
+        `;
+        list.appendChild(item);
+    }
+}
+
+window.expulsarAlumnoWrapper = async (uid) => {
+    window.showCustomConfirm("Expulsar Alumno", "¿Seguro que quieres expulsar a este alumno?", async () => {
+        await expulsarAlumno(currentClassId, uid);
+        await renderAlumnosList();
+    });
+};
+
+window.banearAlumnoWrapper = async (uid) => {
+    window.showCustomConfirm("Banear Alumno", "¿Seguro que quieres banear a este alumno? NO podrá volver a unirse.", async () => {
+        await banearAlumnoClase(currentClassId, uid);
+        await renderAlumnosList();
+    });
+};
+
+async function crearTarea() {
+    const titulo = document.getElementById('tareaTitulo').value.trim();
+    const desc = document.getElementById('tareaDesc').value.trim();
+    const tipoTarea = document.getElementById('tareaTipo').value;
+    const fSalida = document.getElementById('fechaSalida').value;
+    const fEntrega = document.getElementById('fechaEntrega').value;
+    const partTipo = document.getElementById('selectParticipantes').value;
+
+    // Recoger archivos de los slots (máx 4)
+    const archivos = [];
+    for (let i = 0; i < 4; i++) {
+        const f = document.getElementById(`file-${i}`).files[0];
+        if (f) archivos.push(f);
+    }
+
+    if (!titulo || !desc || !fSalida || !fEntrega) {
+        window.showCustomAlert("Error", "Todos los campos obligatorios deben estar rellenos.");
+        return;
+    }
+
+    try {
+        window.showCustomAlert("Publicando", "Procesando archivos y creando tarea...");
+
+        const fileUrls = [];
+        for (const file of archivos) {
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            fileUrls.push({ nombre: file.name, url: base64 });
+        }
+
+        const alumnosEspec = [];
+        if (partTipo === 'especificos') {
+            const checks = document.querySelectorAll('input[name="especAlumno"]:checked');
+            checks.forEach(c => alumnosEspec.push(c.value));
+        }
+
+        const tareaRef = await addDoc(collection(db, "trabajos"), {
+            titulo: titulo,
+            descripcion: desc,
+            tipo_tarea: tipoTarea, // Obligatoria u Opcional
+            fecha_publicacion: serverTimestamp(),
+            fecha_limite: new Date(fEntrega),
+            fecha_salida: new Date(fSalida),
+            estado: "Pendiente",
+            id_publicador: auth.currentUser.uid,
+            id_clase: currentClassId,
+            adjuntos: fileUrls,
+            participantes_tipo: partTipo,
+            num_participantes: partTipo === 'numero' ? document.getElementById('numPart').value : null,
+            alumnos_especificos: alumnosEspec,
+            tipo: 'escolar'
+        });
+
+        await crearNovedadClase(currentClassId, {
+            tipo: 'tarea',
+            autor_id: auth.currentUser.uid,
+            autor_nombre: currentPerfil.nombre || "Profesor",
+            titulo: titulo,
+            mensaje: `Se ha publicado una nueva tarea: **${titulo}** (${tipoTarea})`,
+            id_referencia: tareaRef.id
+        });
+
+        document.getElementById('modalCrearTarea').classList.add('hidden');
+        window.showCustomAlert("Éxito", "Tarea publicada correctamente.");
+        document.getElementById('formNuevaTarea').reset();
+
+        // Resetear slots
+        document.querySelectorAll('.file-slot').forEach(s => {
+            s.classList.remove('has-file');
+            s.querySelector('.file-name').classList.add('hidden');
+        });
+
+    } catch (err) {
+        console.error("Error al crear tarea:", err);
+        window.showCustomAlert("Error", "No se pudo crear la tarea.");
+    }
+}
+function setupColorPicker() {
+    const picker = document.getElementById('colorPickerContainer');
+    if (!picker) return;
+
+    picker.onclick = (e) => {
+        e.stopPropagation();
+        // Eliminar si ya existe
+        const existing = document.querySelector('.color-options-popup');
+        if (existing) {
+            existing.remove();
+            return;
+        }
+
+        const popup = document.createElement('div');
+        popup.className = 'color-options-popup';
+
+        Object.entries(colorMap).forEach(([key, value]) => {
+            const opt = document.createElement('div');
+            opt.className = 'color-option';
+            opt.style.backgroundColor = value;
+            opt.onclick = async () => {
+                const hero = document.getElementById('classHero');
+                const inner = document.getElementById('currentColorInner');
+                if (hero) hero.style.backgroundColor = value;
+                if (inner) inner.style.backgroundColor = value;
+
+                // Guardar preferencia
+                try {
+                    const user = auth.currentUser;
+                    const prefPath = `preferencias_clases.${currentClassId}.color`;
+                    await updateDoc(doc(db, "usuarios", user.uid), {
+                        [prefPath]: key
+                    });
+                    // Actualizar perfil local
+                    if (!currentPerfil.preferencias_clases) currentPerfil.preferencias_clases = {};
+                    if (!currentPerfil.preferencias_clases[currentClassId]) currentPerfil.preferencias_clases[currentClassId] = {};
+                    currentPerfil.preferencias_clases[currentClassId].color = key;
+                } catch (err) {
+                    console.error("Error al guardar preferencia de color:", err);
+                }
+                popup.remove();
+            };
+            popup.appendChild(opt);
+        });
+
+        picker.appendChild(popup);
+    };
+
+    document.addEventListener('click', () => {
+        const popup = document.querySelector('.color-options-popup');
+        if (popup) popup.remove();
+    });
+}

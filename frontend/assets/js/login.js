@@ -13,10 +13,10 @@ function toggleVisibility() {
     const img = togglePassword.querySelector('img');
     if (contraseñaInput.type === "password") {
         contraseñaInput.type = "text";
-        if (img) img.src = "../assets/img/icons/icono-ojo-no.png";
+        if (img) img.src = "assets/img/icons/icono-ojo-no.png";
     } else {
         contraseñaInput.type = "password";
-        if (img) img.src = "../assets/img/icons/icono-ojo-si.png";
+        if (img) img.src = "assets/img/icons/icono-ojo-si.png";
     }
 }
 
@@ -37,7 +37,7 @@ onAuthStateChanged(auth, (user) => {
                 return;
             }
         }
-        window.location.href = "../index.html";
+        window.location.href = "pages/principal.html";
     }
 });
 
@@ -85,7 +85,7 @@ if (formulario) {
 
            // --- LOGIN EXITOSO, BORRAR ERROR Y REDIRIGIR ---
             mensajeError.textContent = "";
-            window.location.href = "../index.html";
+            window.location.href = "pages/principal.html";
         } catch (error) {
             console.error("Error signing in", error);
             const errorCode = error.code;

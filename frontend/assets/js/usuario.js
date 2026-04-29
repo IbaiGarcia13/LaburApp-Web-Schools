@@ -72,7 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const pic = document.querySelector('.profile-pic');
-        if (pic) pic.src = user.foto_perfil || "../assets/img/avatar-defecto.png";
+        if (pic) {
+            const rolParaAvatar = (user.rol || "alumno").toLowerCase();
+            pic.src = user.foto_perfil || `../assets/img/avatar-defecto-${rolParaAvatar}.png`;
+        }
 
         const nLvl = user.nivel || 1;
         const xpActual = user.experiencia_nivel_actual || 0;

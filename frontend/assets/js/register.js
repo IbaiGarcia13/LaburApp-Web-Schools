@@ -12,7 +12,7 @@ const passwordRptInput = document.getElementById("passwordRpt");
 const nombreInput = document.getElementById("nombre");
 const apellidosInput = document.getElementById("apellidos");
 const fechaNacInput = document.getElementById("fechaNac");
-const dniInput = document.getElementById("dni");
+const rolSelect = document.getElementById("rol");
 const termsCheckbox = document.getElementById("terms");
 
 const btnSiguiente = document.getElementById("btnSiguiente");
@@ -75,10 +75,7 @@ if (btnAtras) {
     });
 }
 
-function isDniValid(dni) {
-    const dniRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
-    return dniRegex.test(dni);
-}
+
 
 if (formRegister) {
     formRegister.addEventListener("submit", async (e) => {
@@ -98,10 +95,10 @@ if (formRegister) {
         const nombre = nombreInput.value.trim();
         const apellidos = apellidosInput.value.trim();
         const dNac = fechaNacInput ? fechaNacInput.value.trim() : "";
-        const dni = dniInput.value.trim().toUpperCase();
+        const rol = rolSelect ? rolSelect.value : "";
 
-        if (!nombre || !apellidos || !dni || !dNac) {
-            errorMsg.textContent = "Todos los campos de datos personales (incluyendo Fecha Nac.) son obligatorios.";
+        if (!nombre || !apellidos || !rol || !dNac) {
+            errorMsg.textContent = "Todos los campos (incluyendo el Rol) son obligatorios.";
             if (btnReg) {
                 btnReg.disabled = false;
                 btnReg.textContent = "Registrarse";
@@ -111,16 +108,15 @@ if (formRegister) {
 
         if (nombre.length > 30) {
             errorMsg.textContent = "El nombre no puede tener más de 30 caracteres.";
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
             return;
         }
 
         if (apellidos.length > 70) {
             errorMsg.textContent = "Los apellidos no pueden tener más de 70 caracteres.";
-            return;
-        }
-
-        if (!isDniValid(dni)) {
-            errorMsg.textContent = "El formato del DNI no es válido (ej: 12345678A).";
             if (btnReg) {
                 btnReg.disabled = false;
                 btnReg.textContent = "Registrarse";
@@ -147,8 +143,17 @@ if (formRegister) {
         }
 
         console.log("Validando datos personales...");
-        if (age < 16) {
-            errorMsg.textContent = "Debes tener al menos 16 años para registrarte.";
+        if (age < 6) {
+            errorMsg.textContent = "Debes tener al menos 6 años para registrarte.";
+            if (btnReg) {
+                btnReg.disabled = false;
+                btnReg.textContent = "Registrarse";
+            }
+            return;
+        }
+
+        if (rol === "docente" && age < 18) {
+            errorMsg.textContent = "Debes ser mayor de 18 años para registrarte como docente.";
             if (btnReg) {
                 btnReg.disabled = false;
                 btnReg.textContent = "Registrarse";
@@ -163,14 +168,6 @@ if (formRegister) {
         }
 
         try {
-            console.log("Verificando DNI único...");
-            const q = query(collection(db, "usuarios"), where("dni", "==", dni));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                errorMsg.textContent = "Ya existe un usuario registrado con este DNI.";
-                return;
-            }
-
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
@@ -178,16 +175,16 @@ if (formRegister) {
                 nombre: nombre,
                 nombre_completo: nombre + " " + apellidos,
                 apellidos: apellidos,
-                dni: dni,
+                rol: rol,
                 email: email,
                 fecha_nacimiento: formattedDate, 
                 fecha_ingreso: serverTimestamp(), 
                 nivel: 1,
                 experiencia_total: 0,
                 experiencia_nivel_actual: 0,
-                valoracion_media: 2.5,
-                num_valoraciones: 1,
-                dinero_ganado_total: 0,
+                puntos: 0,
+                xp: 0,
+                nota_media: 0,
                 id_suscripcion_trabajador: "ninguna",
                 id_suscripcion_cliente: "ninguna"
             });

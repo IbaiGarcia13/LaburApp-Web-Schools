@@ -1,10 +1,11 @@
-import { auth } from './firebase-config.js';
-import { obtenerTodosLosUsuarios } from './database.js';
+import { auth, db } from './firebase-config.js';
+import { obtenerTodosLosUsuarios, obtenerClasePorId } from './database.js';
 
 let usuariosData = [];
 let filteredUsers = [];
 let currentPage = 1;
 const itemsPerPage = 5;
+let currentRoleLabel = "USUARIOS";
 
 const mobileFilterBtn = document.getElementById('mobile-filter-btn');
 const sidebar = document.getElementById('sidebar');
@@ -44,50 +45,74 @@ if (mobileFilterBtn && sidebar) {
 document.addEventListener('DOMContentLoaded', async () => {
 
     const container = document.getElementById('users-list');
-    if (container) container.innerHTML = "<p class='loading-text'>Cargando usuarios...</p>";
+    if (container) container.innerHTML = "<p class='loading-text'>Cargando...</p>";
 
     try {
         usuariosData = await obtenerTodosLosUsuarios();
 
         auth.onAuthStateChanged((user) => {
             const currentUid = user ? user.uid : null;
+            const urlParams = new URLSearchParams(window.location.search);
+            const claseId = urlParams.get('claseId');
 
-           // --- MAPEAR DATOS PARA QUE COINCIDAN CON LA LÓGICA DE FILTRADO SI ES NECESARIO ---
-            usuariosData = usuariosData.map(u => ({
-                ...u,
-                nombre: u.nombre_completo || (u.nombre + " " + u.apellidos),
-                desc: u.bio || "Sin biografía.",
-                loc: u.direccion_principal || "No especificada",
-                lvl: u.nivel || 1,
-                val: u.valoracion_media !== undefined ? u.valoracion_media : 2.5,
-                esp: u.especialidad_principal || u.id_categoria_trabajador || u.especialidad || "Ninguna"
-            }));
-
-            filteredUsers = usuariosData.filter(u => u.uid !== currentUid);
-
-           // --- ORDENAR: PRIMERO LOS CURRANTE, LUEGO TODOS POR ACTIVIDAD RECIENTE (ULTIMO_LOGIN) ---
-            filteredUsers.sort((a, b) => {
-                const subA = a.id_suscripcion_trabajador === 'currante';
-                const subB = b.id_suscripcion_trabajador === 'currante';
-
-                if (subA && !subB) return -1;
-                if (!subA && subB) return 1;
-
-               // --- PARA TODOS (SUB Y NO SUB), ORDENAMOS POR ULTIMO_LOGIN (ACTIVIDAD REAL) ---
-                const timeA = a.ultimo_login?.toMillis ? a.ultimo_login.toMillis() : (a.ultimo_login || 0);
-                const timeB = b.ultimo_login?.toMillis ? b.ultimo_login.toMillis() : (b.ultimo_login || 0);
-
-                if (timeB !== timeA) return timeB - timeA;
-
-                return (b.nivel || 1) - (a.nivel || 1);
-            });
-
-            displayUsers();
+            // --- FILTRAR POR CLASE SI EXISTE EL PARÁMETRO ---
+            if (claseId) {
+                obtenerClasePorId(claseId).then(clase => {
+                    if (clase) {
+                        const classUids = [clase.id_docente, ...(clase.alumnos || [])];
+                        usuariosData = usuariosData.filter(u => classUids.includes(u.uid));
+                        finalizarCarga(currentUid);
+                    } else {
+                        finalizarCarga(currentUid);
+                    }
+                }).catch(e => {
+                    console.error("Error filtrando por clase:", e);
+                    finalizarCarga(currentUid);
+                });
+            } else {
+                finalizarCarga(currentUid);
+            }
         });
     } catch (e) {
         console.error("Error cargando usuarios:", e);
     }
 });
+
+function finalizarCarga(currentUid) {
+    // --- MAPEAR DATOS ---
+    usuariosData = usuariosData.map(u => ({
+        ...u,
+        nombre: u.nombre_completo || (u.nombre + " " + (u.apellidos || "")),
+        desc: u.bio || "Sin biografía.",
+        loc: u.direccion_principal || "No especificada",
+        lvl: u.nivel || 1,
+        val: u.valoracion_media !== undefined ? u.valoracion_media : 2.5,
+        esp: u.especialidad_principal || u.id_categoria_trabajador || u.especialidad || "General"
+    }));
+
+    filteredUsers = usuariosData.filter(u => u.uid !== currentUid);
+
+    // Ajustar título según rol
+    const perfilActual = usuariosData.find(u => u.uid === currentUid);
+    currentRoleLabel = (perfilActual && perfilActual.rol === 'docente') ? 'ALUMNOS' : 'COMPAÑEROS';
+    
+    // Si estamos en una clase, el título debe ser específico
+    const urlParams = new URLSearchParams(window.location.search);
+    const context = urlParams.get('claseId') ? " de la Clase" : ": Todos";
+
+    const iconHtml = '<img src="../assets/img/icons/icono-perfil.png" style="width: 35px; vertical-align: middle; margin-right: 10px; filter: invert(1);" alt=""> ';
+    const titleEl = document.querySelector('.section-title');
+    if (titleEl) titleEl.innerHTML = iconHtml + currentRoleLabel + context;
+
+    // --- ORDENAR ---
+    filteredUsers.sort((a, b) => {
+        const timeA = a.ultimo_login?.toMillis ? a.ultimo_login.toMillis() : (a.ultimo_login || 0);
+        const timeB = b.ultimo_login?.toMillis ? b.ultimo_login.toMillis() : (b.ultimo_login || 0);
+        return timeB - timeA;
+    });
+
+    displayUsers(perfilActual);
+}
 
 function getStandardName(catId) {
     const names = {
@@ -110,8 +135,9 @@ function getStandardName(catId) {
     return res.charAt(0).toUpperCase() + res.slice(1);
 }
 
-function displayUsers() {
+function displayUsers(perfilActual) {
     const container = document.getElementById('users-list');
+    if (!container) return;
     container.innerHTML = "";
 
     const start = (currentPage - 1) * itemsPerPage;
@@ -119,18 +145,24 @@ function displayUsers() {
     const pageItems = filteredUsers.slice(start, end);
 
     if (pageItems.length === 0) {
-        container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron usuarios.</p>";
+        container.innerHTML = "<p style='color:var(--gray-4);font-style: italic; text-align:center; margin-top: 20px;'>No se encontraron resultados.</p>";
     }
 
+    const isDocente = perfilActual && perfilActual.rol === 'docente';
+
     pageItems.forEach((user) => {
-        const avatar = user.foto_perfil || "../assets/img/avatar-defecto.png";
+        const avatar = user.foto_perfil || (user.rol === 'docente' ? "../assets/img/avatar-defecto-docente.png" : "../assets/img/avatar-defecto-alumno.png");
+        
+        // Solo mostrar insignia de suscripción si no somos alumnos (opcional, según criterio)
+        const showBadge = !isDocente && user.id_suscripcion_trabajador === 'currante';
+
         const card = `
             <article class="user-card" onclick="window.location.href='usuario.html?id=${user.uid}'">
                 <img src="${avatar}" class="user-img">
                 <div class="user-info">
                     <h3 style="display: flex; align-items: center; gap: 8px;">
                         ${user.nombre}
-                        ${user.id_suscripcion_trabajador === 'currante' ? '<span class="priority-badge" title="Trabajador CURRANTE" style="background: var(--blue-3); color: var(--neutral-white); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">CURRANTE</span>' : ''}
+                        ${showBadge ? '<span class="priority-badge" style="background: var(--blue-3); color: var(--neutral-white); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">CURRANTE</span>' : ''}
                     </h3>
                     <p class="user-desc">${user.desc}</p>
                     <div class="user-stats">
@@ -158,7 +190,7 @@ document.getElementById('update-btn').onclick = () => {
 
     const isFiltered = cat !== "todas" || lvl !== 1 || minV !== 0.0 || maxV !== 5.0;
     const iconHtml = '<img src="../assets/img/icons/icono-ajustes.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
-    document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + "USUARIOS: Filtrados" : iconHtml + "USUARIOS: Todos";
+    document.querySelector('.section-title').innerHTML = isFiltered ? iconHtml + `${currentRoleLabel}: Filtrados` : iconHtml + `${currentRoleLabel}: Todos`;
 
     filteredUsers = usuariosData.filter(u => {
         const matchCat = (cat === "todas" || u.esp === cat || u.esp.includes(cat) || cat.includes(u.esp));

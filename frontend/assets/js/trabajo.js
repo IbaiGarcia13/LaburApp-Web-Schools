@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerTrabajoPorId, postularseATrabajo, usuarioTieneMetodoPago } from './database.js';
+import { obtenerTrabajoPorId, aceptarTareaDirectamente } from './database.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -55,45 +55,30 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
 
-            const postRef = doc(db, "trabajos", trabajo.id, "postulaciones", user.uid);
-            const postSnap = await getDoc(postRef);
-
-            if (postSnap.exists()) {
+            if (trabajo.id_trabajador === user.uid) {
                 if (btnPostular) {
-                    btnPostular.innerText = "YA POSTULADO";
+                    btnPostular.innerText = "TAREA ACEPTADA";
                     btnPostular.disabled = true;
                     btnPostular.style.opacity = "0.6";
                     btnPostular.style.display = 'block';
                 }
             } else {
                 if (btnPostular) {
+                    btnPostular.innerText = "ACEPTAR TAREA";
                     btnPostular.style.display = 'block';
                     btnPostular.onclick = async () => {
-                       // --- VERIFICAR MÉTODO DE PAGO ---
-                        const tienePago = await usuarioTieneMetodoPago(user.uid);
-                        if (!tienePago) {
-                            showCustomConfirm(
-                                "Acción Requerida",
-                                "Para poder postularte a un trabajo, primero debes añadir un método de pago en los ajustes.",
-                                () => { window.location.href = "ajustes.html"; },
-                                "Ir a Ajustes",
-                                "Cancelar"
-                            );
-                            return;
-                        }
-
                         showCustomConfirm(
-                            "Postularse",
-                            "¿Quieres postularte a este trabajo?",
+                            "Aceptar Tarea",
+                            "¿Quieres aceptar esta tarea y empezar a realizarla?",
                             async () => {
                                 try {
-                                    await postularseATrabajo(trabajo.id);
-                                    showCustomAlert("¡Éxito!", "Te has postulado correctamente.");
-                                    btnPostular.innerText = "YA POSTULADO";
+                                    await aceptarTareaDirectamente(trabajo.id);
+                                    showCustomAlert("¡Éxito!", "Has aceptado la tarea correctamente.");
+                                    btnPostular.innerText = "TAREA ACEPTADA";
                                     btnPostular.disabled = true;
                                     btnPostular.style.opacity = "0.6";
                                 } catch (err) {
-                                    showCustomAlert("Error", "No se pudo realizar la postulación.");
+                                    showCustomAlert("Error", "No se pudo aceptar la tarea.");
                                 }
                             }
                         );
@@ -159,37 +144,7 @@ function renderTrabajo(trabajo) {
         infoTexts[2].innerText = fechaStr;
     }
 
-    if (trabajo.latitud && trabajo.longitud) {
-        initMiniMap(trabajo.latitud, trabajo.longitud, trabajo.id_categoria);
-    }
+    // Mapa eliminado
 }
 
-function initMiniMap(lat, lng, cat) {
-    const miniMap = L.map('mini-map', {
-        zoomControl: true,
-        dragging: !L.Browser.mobile,
-        touchZoom: true,
-        scrollWheelZoom: false
-    }).setView([lat, lng], 15);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(miniMap);
-
-    const colorMap = {
-        "carpinteria": "var(--cat-1)", "construccion": "var(--cat-2)", "cuidado_personal": "var(--cat-3)",
-        "diseno": "var(--cat-4)", "evento": "var(--cat-5)", "gastronomia": "var(--cat-6)",
-        "informatica": "var(--cat-7)", "jardineria": "var(--cat-8)", "limpieza": "var(--cat-9)",
-        "mascotas": "var(--cat-10)", "mudanza": "var(--cat-11)", "transporte": "var(--cat-12)", "otros": "var(--cat-13)"
-    };
-    const color = colorMap[cat?.toLowerCase()] || "var(--neutral-black)";
-
-    L.circleMarker([lat, lng], {
-        radius: 10,
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.8
-    }).addTo(miniMap).bindPopup("Ubicación del trabajo").openPopup();
-
-    setTimeout(() => miniMap.invalidateSize(), 500);
-}
+// initMiniMap eliminado

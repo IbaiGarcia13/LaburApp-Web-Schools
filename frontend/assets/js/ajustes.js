@@ -130,6 +130,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         renderHistorialPagos(historial, false);
                     }
 
+                    // --- OCULTAR ELEMENTOS SEGÚN ROL ---
+                    const rol = (perfil.rol || "").toLowerCase();
+                    if (rol === 'alumno') {
+                        // Ocultar tarjetas de suscripciones y pagos
+                        const allCards = document.querySelectorAll('.settings-card, .info-card');
+                        allCards.forEach(card => {
+                            const title = card.querySelector('.card-title')?.textContent || "";
+                            if (title.includes('Suscripciones') || title.includes('Método de Pago') || title.includes('Historial de Pagos')) {
+                                card.style.display = 'none';
+                            }
+                        });
+                    }
+
                 }
             } catch (error) {
                 console.error("Error obteniendo perfil/pagos en Ajustes:", error);
@@ -210,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('inputSetFechaNac').value = dateStr;
             }
 
-            document.getElementById('inputSetDni').value = displayDni.innerText;
             const telSano = displayTelefono.innerText === 'No especificado' ? '' : displayTelefono.innerText;
             document.getElementById('inputSetTelefono').value = telSano;
         };
@@ -249,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     apellidos: ape,
                     nombre_completo: nom + " " + ape,
                     fecha_nacimiento: formattedFnac,
-                    dni: dni,
                     direccion_principal: dir,
                     telefono: tel
                 });
@@ -257,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayNombre.innerText = nom;
                 displayApellidos.innerText = ape;
                 displayFechaNac.innerText = formattedFnac;
-                displayDni.innerText = dni;
                 displayDireccion.innerText = dir || 'No especificada';
                 displayTelefono.innerText = tel || 'No especificado';
 

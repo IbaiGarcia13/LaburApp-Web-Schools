@@ -242,37 +242,7 @@ function renderTrabajo(trabajo) {
         }
     }
 
-    if (trabajo.latitud && trabajo.longitud) {
-        initMiniMap(trabajo.latitud, trabajo.longitud, trabajo.id_categoria);
-    }
+    // Mapa eliminado
 }
 
-function initMiniMap(lat, lng, cat) {
-    const miniMap = L.map('mini-map', {
-        zoomControl: true,
-        dragging: !L.Browser.mobile,
-        touchZoom: true,
-        scrollWheelZoom: false
-    }).setView([lat, lng], 15);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(miniMap);
-
-    const colorMap = {
-        "carpinteria": "#A52A2A", "construccion": "#808080", "cuidado_personal": "#FFC0CB",
-        "diseno": "#5F9EA0", "evento": "#FF0000", "gastronomia": "var(--yellow-2)",
-        "informatica": "#0000FF", "jardineria": "#008000", "limpieza": "#800080",
-        "mascotas": "#006400", "mudanza": "#8B0000", "transporte": "#FFA500", "otros": "var(--neutral-black)"
-    };
-    const color = colorMap[cat?.toLowerCase()] || "var(--neutral-black)";
-
-    L.circleMarker([lat, lng], {
-        radius: 10,
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.8
-    }).addTo(miniMap).bindPopup("Ubicación del trabajo").openPopup();
-
-    setTimeout(() => miniMap.invalidateSize(), 500);
-}
+// initMiniMap eliminado
