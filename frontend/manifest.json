@@ -1,7 +1,7 @@
 {
   "name": "LaburApp",
   "short_name": "LaburApp",
-  "description": "LaburApp - Conectando personas para tareas y servicios.",
+  "description": "LaburApp Schools - Conectando estudiantes para tareas y servicios.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
