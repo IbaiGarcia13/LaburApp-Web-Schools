@@ -10,8 +10,8 @@ let currentFilters = {
     cat: "todas",
     tMin: 1,
     tMax: 100,
-    pMin: 2,
-    pMax: 1000
+    ptsMin: 1,
+    ptsMax: 100
 };
 
 async function loadJobs() {
@@ -58,8 +58,8 @@ async function loadJobs() {
 function applyClientFilters() {
     filteredJobs = allJobs.filter(j => {
         const matchTime = (j.tiempo_estimado_horas || 0) >= currentFilters.tMin && (j.tiempo_estimado_horas || 0) <= currentFilters.tMax;
-        const matchPay = (j.pago_cliente || 0) >= currentFilters.pMin && (j.pago_cliente || 0) <= currentFilters.pMax;
-        return matchTime && matchPay;
+        const matchPts = (j.puntos || 1) >= currentFilters.ptsMin && (j.puntos || 1) <= currentFilters.ptsMax;
+        return matchTime && matchPts;
     });
 
     currentPage = 1;
@@ -71,7 +71,7 @@ function displayJobs() {
     if (!container) return;
     container.innerHTML = "";
 
-    const isFiltered = currentFilters.cat !== "todas" || currentFilters.tMin !== 1 || currentFilters.tMax !== 100 || currentFilters.pMin !== 2 || currentFilters.pMax !== 1000;
+    const isFiltered = currentFilters.cat !== "todas" || currentFilters.tMin !== 1 || currentFilters.tMax !== 100 || currentFilters.ptsMin !== 1 || currentFilters.ptsMax !== 100;
     const urlParams = new URLSearchParams(window.location.search);
     const context = urlParams.get('claseId') ? " de la Clase" : ": Todas";
     const iconHtml = '<img src="../assets/img/icons/icono-trabajos-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
@@ -91,26 +91,27 @@ function displayJobs() {
     pageItems.forEach((job) => {
         const dateObj = job.fecha_publicacion?.toDate ? job.fecha_publicacion.toDate() : (job.fecha_publicacion ? new Date(job.fecha_publicacion) : null);
         const dateStr = dateObj ? dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Reciente";
-        const hasPrio = (job.prioridad_suscripcion || 0) !== 0;
+        
+        const puntos = job.puntos || 1;
+        const xp = puntos * 100;
 
         const card = `
-            <article class="job-card" onclick="window.location.href='trabajo.html?id=${job.id}'">
+            <article class="job-card" onclick="window.location.href='tarea.html?id=${job.id}'">
                 <img src="${job.foto_trabajo || '../assets/img/trabajo-defecto.png'}" class="job-img" onerror="this.src='../assets/img/trabajo-defecto.png'">
                 <div class="job-info">
                     <div class="job-card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <h3 style="display: flex; align-items: center; gap: 8px;">
                             ${job.titulo}
-                            ${(job.prioridad_suscripcion || 0) !== 0 ? '<span class="priority-badge" style="background: var(--blue-2); color: var(--neutral-white); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">JEFE</span>' : ''}
+                            ${(job.prioridad_suscripcion || 0) !== 0 ? '<span class="priority-badge" style="background: var(--blue-2); color: var(--neutral-white); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; display: flex; align-items: center; gap: 4px;"><img src="../assets/img/icons/icono-estrella.png" style="width: 10px; filter: brightness(0) invert(1);">DOCENTE</span>' : ''}
                         </h3>
                         <span class="job-date" style="font-size: 0.85rem; color: var(--gray-4); white-space: nowrap; margin-left: 10px;">${dateStr}</span>
                     </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción"}</p>
                     <div class="job-details">
-                        <span><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${job.direccion || "Ubicación no especificada"}</span>
-                        <span><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${job.tiempo_estimado_horas}h</span>
-                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${getStandardName(job.id_categoria)}</span>
-                        <span><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${job.xp_otorgada || Math.round(job.pago_cliente * 10)} XP</strong></span>
-                        <span><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""> <strong> ${Number(job.pago_cliente).toFixed(2)} €</strong></span>
+                        <span><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo: ${job.tiempo_estimado_horas}h</span>
+                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Asignatura: ${job.id_categoria || 'Otra'}</span>
+                        <span><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> <strong>${xp} XP</strong></span>
+                        <span><img src="../assets/img/icons/icono-estrella-color.png" class="icon-img-small" style="width:18px; height: 18px" alt=""> <strong> ${puntos} Pts</strong></span>
                     </div>
                 </div>
             </article>`;
@@ -127,33 +128,14 @@ function displayJobs() {
     if (btnNext) btnNext.style.opacity = currentPage === totalPages ? '0.3' : '1';
 }
 
-function getStandardName(catId) {
-    const names = {
-        'carpinteria': 'Carpintería',
-        'construccion': 'Construcción/Reforma',
-        'cuidado_personal': 'Cuidado personal',
-        'diseno': 'Diseño',
-        'evento': 'Evento',
-        'gastronomia': 'Gastronomía',
-        'informatica': 'Informática',
-        'jardineria': 'Jardinería',
-        'limpieza': 'Limpieza',
-        'mascotas': 'Mascotas',
-        'mudanza': 'Mudanza/Traslado',
-        'transporte': 'Transporte',
-        'otros': 'Otros'
-    };
-    return names[catId] || catId || 'Otros';
-}
-
 const btnUpdate = document.getElementById('update-btn');
 if (btnUpdate) {
     btnUpdate.onclick = async () => {
         const newCat = document.getElementById('filter-category').value;
-        const newTMin = parseInt(document.getElementById('time-min').value);
-        const newTMax = parseInt(document.getElementById('time-max').value);
-        const newPMin = parseFloat(document.getElementById('pay-min').value);
-        const newPMax = parseFloat(document.getElementById('pay-max').value);
+        const newTMin = parseInt(document.getElementById('time-min').value) || 1;
+        const newTMax = parseInt(document.getElementById('time-max').value) || 100;
+        const newPtsMin = parseInt(document.getElementById('pts-min').value) || 1;
+        const newPtsMax = parseInt(document.getElementById('pts-max').value) || 100;
 
         const categoryChanged = newCat !== currentFilters.cat;
 
@@ -161,15 +143,13 @@ if (btnUpdate) {
             cat: newCat,
             tMin: newTMin,
             tMax: newTMax,
-            pMin: newPMin,
-            pMax: newPMax
+            ptsMin: newPtsMin,
+            ptsMax: newPtsMax
         };
 
         if (categoryChanged) {
-           
             await loadJobs();
         } else {
-           
             applyClientFilters();
         }
 

@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajosPublicadosPorMi, gestionarBorradoTarea, cancelarTrabajo } from './database.js';
+import { obtenerTrabajosPublicadosPorMi, gestionarBorradoTarea, cancelarTrabajo, obtenerPerfilUsuario } from './database.js';
 
 let allTareas = [];
 let filteredTareas = [];
@@ -55,6 +55,15 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = '../index.html';
             return;
         }
+
+        // --- VERIFICACIÓN DE ROL (Escolar) ---
+        const perfil = await obtenerPerfilUsuario(user.uid);
+        if (perfil && perfil.rol === 'alumno') {
+            console.warn("Acceso denegado: Los alumnos no tienen 'Mis Tareas'.");
+            window.location.href = 'principal.html';
+            return;
+        }
+
         await loadMyPostedTasks(user.uid);
     });
     setupEventListeners();

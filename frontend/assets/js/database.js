@@ -563,8 +563,9 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
     if (trabajoSnap.exists()) {
         const data = trabajoSnap.data();
         idCategoria = data.id_categoria || data.categoria || "otros";
-        xpRecompensa = data.xp_otorgada || Math.round((data.pago_cliente || 0) * 10);
-        tituloTrabajo = data.titulo || "Trabajo";
+        const puntosTarea = data.puntos || 1;
+        xpRecompensa = puntosTarea * 100; // XP = puntos de categoría x 100
+        tituloTrabajo = data.titulo || "Tarea";
     }
 
     await updateDoc(trabajoRef, {
@@ -577,36 +578,25 @@ export async function completarTrabajo(idTrabajo, uidTrabajador) {
     const trabajadorRef = doc(db, "usuarios", uidTrabajador);
     const trabajadorSnap = await getDoc(trabajadorRef);
 
-    let pagoFinalTrabajador = (trabajoSnap.exists() ? trabajoSnap.data().pago_trabajador : 0) || (xpRecompensa / 10 * 0.9);
-
-   // --- APLICAR VENTAJAS DE SUSCRIPCIÓN CURRANTE ---
     if (trabajadorSnap.exists()) {
         const tData = trabajadorSnap.data();
         if (tData.id_suscripcion_trabajador === "currante") {
             xpRecompensa *= 2;
-           
-            if (trabajoSnap.exists()) {
-                pagoFinalTrabajador = trabajoSnap.data().pago_cliente * 0.95;
-            }
         }
     }
 
     await aplicarXPTrabajador(uidTrabajador, xpRecompensa, idCategoria);
 
+    // Otorgar puntos de asignatura (puntos específicos de la tarea)
+    const puntosTarea = (trabajoSnap.exists() ? trabajoSnap.data().puntos : 1) || 1;
     if (idCategoria && idCategoria !== "ninguna") {
-        await sumarPuntosCategoria(uidTrabajador, idCategoria, 1);
+        await sumarPuntosCategoria(uidTrabajador, idCategoria, puntosTarea);
     }
 
     await updateDoc(trabajadorRef, {
-        tareas_realizadas: increment(1),
-        saldo: increment(pagoFinalTrabajador),
-        dinero_ganado_total: increment(pagoFinalTrabajador)
+        tareas_realizadas: increment(1)
     });
 
-    await crearNotificacion(uidTrabajador, "Trabajo Completado", `Has finalizado "${tituloTrabajo}".`, "aceptado");
-    await crearNotificacion(uidTrabajador, "Pago Recibido", `Has recibido ${Number(pagoFinalTrabajador).toFixed(2)}€ por "${tituloTrabajo}".`, "pago");
-
-    await registrarPagoHistorial(uidTrabajador, "Saldo LaburApp", Math.abs(pagoFinalTrabajador), `Cobro por trabajo: ${tituloTrabajo}`);
 
     return true;
 }
@@ -732,7 +722,7 @@ export async function recalcularEspecialidadPrincipal(uid) {
 export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, comentario) {
     const user = auth.currentUser;
     if (!user) throw new Error("Debes iniciar sesión.");
-    if (puntuacion < 1 || puntuacion > 5) throw new Error("Puntuación inválida.");
+    if (puntuacion < 0 || puntuacion > 10) throw new Error("Puntuación inválida (debe ser 0-10).");
 
     let tituloTrabajo = "Trabajo";
     try {
@@ -759,8 +749,8 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
 
     if (userSnap.exists()) {
         const userData = userSnap.data();
-        let oldMedia = userData.valoracion_media !== undefined ? userData.valoracion_media : 2.5;
-        let oldCount = userData.num_valoraciones !== undefined ? userData.num_valoraciones : 1;
+        let oldMedia = userData.valoracion_media !== undefined ? userData.valoracion_media : 5.0; // Neutro en escala 0-10
+        let oldCount = userData.num_valoraciones !== undefined ? userData.num_valoraciones : 0; // Iniciar en 0 si es nuevo
 
         const newCount = oldCount + 1;
         const newMedia = (oldMedia * oldCount + puntuacion) / newCount;
@@ -781,15 +771,9 @@ export async function dejarValoracion(uidReceptor, idTrabajo, puntuacion, coment
             if (tData.id_trabajador === uidReceptor && !tData.xp_ajustado_por_valoracion) {
                 const xpBase = tData.xp_otorgada || 0;
 
-                const multiMap = {
-                    1: -0.2,
-                    2: -0.1,
-                    3: 0,
-                    4: 0.1,
-                    5: 0.2
-                };
-
-                const deltaMod = multiMap[puntuacion] || 0;
+                // Multiplicador proporcional (5 es el neutro en escala 0-10, como 3 era en escala 1-5)
+                // 10 -> +25%, 5 -> 0%, 0 -> -25%
+                const deltaMod = (puntuacion - 5) * 0.05; 
                 const xpDelta = Math.round(xpBase * deltaMod);
 
                 if (xpDelta !== 0) {

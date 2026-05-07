@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="../manifest.json">
-  <title>LaburApp - Trabajos</title>
+  <title>LaburApp - Tareas</title>
   <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">  <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
   <link rel="stylesheet" href="../assets/css/styles.css">
-  <link rel="stylesheet" href="../assets/css/trabajos.css">
+  <link rel="stylesheet" href="../assets/css/tareas.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4927720250134961"
     crossorigin="anonymous"></script>
 </head>
@@ -77,7 +77,11 @@
     </div>
   </nav>
 
-  <!-- === CONTENEDOR PRINCIPAL === -->
+    <a href="javascript:void(0)" onclick="sessionStorage.setItem('forceScrollTop', 'true'); history.back();"
+        class="btn-back-global">
+        <img src="../assets/img/icons/icono-flecha.png" alt="Volver">
+    </a>
+
   <main id="container">
     <!-- Breadcrumb para volver a la clase si estamos filtrando -->
     <div id="breadcrumb-clase" style="display: none; padding: 10px 20px; font-size: 0.9rem; color: var(--gray-6); width: 100%; max-width: 1060px; margin: 0 auto;"></div>
@@ -85,7 +89,7 @@
     <section id="content">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <h2 class="section-title" style="margin-bottom: 0;"><img
-            src="../assets/img/icons/icono-trabajos-blanco.png" alt=""> TRABAJOS: Todos</h2>
+            src="../assets/img/icons/icono-trabajos-blanco.png" alt=""> TAREAS: Todas</h2>
         <button id="mobile-filter-btn" class="filter-toggle-btn"
           style="display: none; background: none; border: none; cursor: pointer; padding: 5px;">
           <img src="../assets/img/icons/icono-filtros.png" alt="Filtros"
@@ -112,22 +116,26 @@
         <h2 class="text-center" style="margin-bottom: 25px; text-align: center;">FILTRAR</h2>
         <form id="filter-form">
           <div class="filter-group">
-            <label>Categoría:</label>
+            <label>Asignatura:</label>
             <select id="filter-category">
               <option value="todas">Todas</option>
-              <option value="carpinteria">Carpintería</option>
-              <option value="construccion">Construcción/Reforma</option>
-              <option value="cuidado_personal">Cuidado personal</option>
-              <option value="diseno">Diseño</option>
-              <option value="evento">Evento</option>
-              <option value="gastronomia">Gastronomía</option>
-              <option value="informatica">Informática</option>
-              <option value="jardineria">Jardinería</option>
-              <option value="limpieza">Limpieza</option>
-              <option value="mascotas">Mascotas</option>
-              <option value="mudanza">Mudanza/Traslado</option>
-              <option value="transporte">Transporte</option>
-              <option value="otros">Otros</option>
+              <option value="Matematicas">Matemáticas</option>
+              <option value="Filosofia">Filosofía</option>
+              <option value="Lengua Castellana">Lengua Castellana</option>
+              <option value="Inglés">Inglés</option>
+              <option value="Ciencias">Ciencias</option>
+              <option value="Biología">Biología</option>
+              <option value="Fisica">Física</option>
+              <option value="Quimica">Química</option>
+              <option value="Educacion Fisica">Educación Física</option>
+              <option value="Musica">Música</option>
+              <option value="Plastica">Plástica</option>
+              <option value="Tecnologia">Tecnología</option>
+              <option value="Informatica">Informática</option>
+              <option value="Historia">Historia</option>
+              <option value="Geografía">Geografía</option>
+              <option value="Economia">Economía</option>
+              <option value="otra">Otra</option>
             </select>
           </div>
 
@@ -146,15 +154,15 @@
           </div>
 
           <div class="filter-group">
-            <label class="group-label">Pago (€):</label>
+            <label class="group-label">Puntos (Asignatura):</label>
             <div class="input-row">
               <div class="input-half">
-                <span>Desde</span>
-                <input type="number" id="pay-min" value="2">
+                <span>Mín</span>
+                <input type="number" id="pts-min" value="1">
               </div>
               <div class="input-half">
-                <span>Hasta</span>
-                <input type="number" id="pay-max" value="1000">
+                <span>Máx</span>
+                <input type="number" id="pts-max" value="100">
               </div>
             </div>
           </div>
@@ -224,6 +232,7 @@
 </footer>
 
 </html>
+
 
 
 

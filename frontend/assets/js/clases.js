@@ -22,7 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
       modalCrearClase.classList.remove('hidden');
       inputNombreClase.value = "";
       inputDescClase.value = "";
+      document.getElementById('inputAsignaturaClase').value = "";
+      const customInput = document.getElementById('inputAsignaturaPersonalizada');
+      if (customInput) customInput.classList.add('hidden');
     });
+
+    const selectAsignatura = document.getElementById('inputAsignaturaClase');
+    if (selectAsignatura) {
+      selectAsignatura.addEventListener('change', (e) => {
+        const customInput = document.getElementById('inputAsignaturaPersonalizada');
+        if (customInput) {
+          if (e.target.value === 'Otra') customInput.classList.remove('hidden');
+          else customInput.classList.add('hidden');
+        }
+      });
+    }
 
     btnCancelarCrear.addEventListener('click', () => {
       modalCrearClase.classList.add('hidden');
@@ -30,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnConfirmarCrear.addEventListener('click', () => {
       const nombreClase = inputNombreClase.value.trim();
-      const AsignaturaClase = document.getElementById('inputAsignaturaClase').value;
+      let AsignaturaClase = document.getElementById('inputAsignaturaClase').value;
+      const AsignaturaPersonalizada = document.getElementById('inputAsignaturaPersonalizada').value.trim();
       const DescripciónClase = inputDescClase.value.trim();
       
       if (!nombreClase) {
@@ -40,6 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!AsignaturaClase) {
         window.showCustomAlert("Error", "Debes seleccionar una asignatura.");
         return;
+      }
+
+      if (AsignaturaClase === 'Otra') {
+        if (!AsignaturaPersonalizada) {
+          window.showCustomAlert("Error", "Escribe el nombre de la asignatura personalizada.");
+          return;
+        }
+        AsignaturaClase = AsignaturaPersonalizada;
       }
 
       modalCrearClase.classList.add('hidden');
@@ -76,8 +99,8 @@ async function crearClase(nombre, asignatura, Descripción) {
   // Generar Código de 5 caracteres
   const Código = Math.random().toString(36).substring(2, 7).toUpperCase();
 
-  // Color aleatorio del 2 al 12 para evitar el color primario (cat-1 suele ser azul)
-  const randomCat = Math.floor(Math.random() * 11) + 2;
+  // Color aleatorio del 2 al 13 para evitar el color primario (cat-1 suele ser azul)
+  const randomCat = Math.floor(Math.random() * 12) + 2;
   const colorInicial = `cat-${randomCat}`;
 
   try {

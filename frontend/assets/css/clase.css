@@ -43,7 +43,7 @@
 
 .hero-desc {
     font-size: 1rem;
-    opacity: 0.85;
+    opacity: 0.7;
     max-width: 80%;
     line-height: 1.4;
 }
@@ -269,7 +269,7 @@
 }
 
 .post-input-wrapper button.btn-attach-feed {
-    background: var(--gray-3);
+    background: var(--gray-2);
     border: none;
     width: 45px;
     height: 45px;
@@ -281,8 +281,8 @@
     transition: background 0.2s;
 }
 
-.post-input-wrapper button.btn-attach-feed:hover {
-    background: var(--gray-4);
+.post-input-wrapper button.btn-send-icon:hover ,.post-input-wrapper button.btn-attach-feed:hover {
+    background: var(--gray-3);
 }
 
 .post-input-wrapper button.btn-attach-feed img {
@@ -328,7 +328,7 @@
 }
 
 .post-input-wrapper button.btn-send-icon {
-    background: var(--gray-4);
+    background: var(--gray-2);
     color: var(--neutral-white);
     border: none;
     width: 45px;
@@ -345,10 +345,6 @@
 .post-input-wrapper button.btn-send-icon img {
     width: 20px;
     filter: brightness(0) invert(1);
-}
-
-.post-input-wrapper button.btn-send-icon:hover {
-    transform: scale(1.1);
 }
 
 /* Modal Ver Código */
@@ -543,7 +539,7 @@
 }
 
 .modal-content.medium-modal {
-    max-width: 420px;
+    max-width: 350px;
 }
 
 .modal-columns {

@@ -27,8 +27,8 @@
         <div class="header-right">
             <nav>
                 <ul>
-                    <li><a href="usuarios.html">Usuarios</a></li>
-                    <li><a href="trabajos.html">Trabajos</a></li>
+                    <li><a href="usuarios.html">Compañeros</a></li>
+                    <li><a href="tareas.html">Tareas</a></li>
                     <!-- Mapa eliminado -->
                 </ul>
             </nav>
@@ -63,8 +63,6 @@
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
-            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
             <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
             </li>
@@ -99,14 +97,13 @@
                 </p>
                 <div class="profile-info-footer">
                     <div class="contact-links">
-                        <div class="link-row">
-                            <img src="../assets/img/icons/icono-pdf.png" alt="PDF" class="icon-img">
-                            <a href="../assets/docs/tu-curriculum-ejemplo.pdf" target="_blank" class="underline"
-                                id="displayPDF">Currículum</a>
+                        <div class="link-row" id="contactRow" style="display: none;">
+                            <img src="../assets/img/icons/icono-correo.png" alt="Email" class="icon-img">
+                            <span id="displayContact">Cargando...</span>
                         </div>
-                        <div class="link-row">
-                            <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
-                            <span class="italic truncate-text" id="displayAddress">Ubicación no establecida</span>
+                        <div class="link-row" id="pdfRow" style="display: none;">
+                            <img src="../assets/img/icons/icono-pdf.png" alt="PDF" class="icon-img">
+                            <a href="#" target="_blank" class="underline" id="displayPDF">Currículum</a>
                         </div>
                     </div>
 
@@ -139,9 +136,6 @@
                 <div class="stat-item"><img src="../assets/img/icons/icono-categoria-color.png" class="icon-img"
                         alt="Cerebro">
                     Especialidad: <strong> Cargando...</strong></div>
-                <div class="stat-item"><img src="../assets/img/icons/icono-dinero-color.png" class="icon-img"
-                        alt="Dinero">
-                    Dinero conseguido: <strong>--- €</strong></div>
             </div>
         </section>
 
@@ -175,7 +169,7 @@
             </div>
         </section>
 
-        <section class="info-card">
+        <section class="info-card" id="subsSection">
             <h2 class="card-title">Suscripciones</h2>
             <div class="card-body" id="subsContainer">
                 <div class="sub-item" id="workerSubRow">
@@ -188,9 +182,9 @@
         </section>
 
         <div class="user-view-action">
-            <button id="btnViewMyUser" class="btn-perfil-usuario">
-                <img src="../assets/img/icons/icono-perfil.png" alt="" style="width: 20px; filter: invert(1);">
-                TU USUARIO
+            <button id="btnViewRatings" class="btn-perfil-usuario" onclick="window.location.href='valoraciones.html'">
+                <img src="../assets/img/icons/icono-estrella-color.png" alt="" style="width: 20px; filter: brightness(0) invert(1);">
+                VALORACIONES
             </button>
         </div>
     </main>
@@ -216,14 +210,10 @@
             </div>
 
             <div class="input-group">
-                <label>Dirección (Opcional):</label>
-                <input type="text" id="inputAddress" placeholder="Ciudad, CP...">
+                <label>Contacto (Email):</label>
+                <input type="email" id="inputContact" placeholder="Tu email de contacto...">
             </div>
 
-            <div class="input-group">
-                <label>Currículum PDF (Opcional):</label>
-                <input type="file" id="inputPDF" accept=".pdf">
-            </div>
 
             <div class="modal-buttons">
                 <button id="modal-btn cancel" class="modal-btn cancel">Cancelar</button>
@@ -235,11 +225,11 @@
     <nav class="mobile-bottom-nav" style="display: none;">
         <a href="usuarios.html" class="nav-item">
             <img src="../assets/img/icons/icono-perfil.png" alt="Usuarios">
-            <span>Usuarios</span>
+            <span>Compañeros</span>
         </a>
-        <a href="trabajos.html" class="nav-item">
-            <img src="../assets/img/icons/icono-trabajos.png" alt="Trabajos">
-            <span>Trabajos</span>
+        <a href="tareas.html" class="nav-item">
+            <img src="../assets/img/icons/icono-trabajos.png" alt="Tareas">
+            <span>Tareas</span>
         </a>
         <!-- Mapa eliminado -->
     </nav>
@@ -291,4 +281,5 @@
 </footer>
 
 </html>
+
 

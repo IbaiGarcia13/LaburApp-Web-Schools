@@ -1,5 +1,5 @@
 import { auth, db, storage } from './firebase-config.js';
-import { collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, query, getDocs, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cancelarSuscripcionUsuario, cambiarPassword } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -11,8 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayName = document.getElementById('displayName');
     const displayDescription = document.getElementById('displayDescription');
-    const displayAddress = document.getElementById('displayAddress');
     const displayPic = document.getElementById('displayPic');
+    const displayContact = document.getElementById('displayContact');
+    const contactRow = document.getElementById('contactRow');
 
     const lvlVal = document.querySelector('.lvl-val');
     const lvlBars = document.querySelectorAll('.xp-header span');// --- [0 XP, ACTUAL XP, MAX XP] ---
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cuentaBody = null;
     infoCards.forEach(card => {
         if (card.querySelector('.card-title') && card.querySelector('.card-title').textContent.includes('Suscripciones')) {
-            subsBody = card.querySelector('.card-body');
+            subsBody = card; // Guardamos la sección completa
         }
         if (card.querySelector('.card-title') && card.querySelector('.card-title').textContent.includes('Cuenta')) {
             cuentaBody = card.querySelector('.card-body');
@@ -42,19 +43,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputPhotoDirect = document.getElementById('inputPhotoDirect');
 
     const catInfo = {
-        'carpinteria': { nombre: 'Carpintería', color: 'cat-dot-carpinteria' },
-        'construccion': { nombre: 'Construcción/Reforma', color: 'cat-dot-construccion' },
-        'cuidado_personal': { nombre: 'Cuidado personal', color: 'cat-dot-cuidado_personal' },
-        'diseno': { nombre: 'Diseño', color: 'cat-dot-diseno' },
-        'evento': { nombre: 'Evento', color: 'cat-dot-evento' },
-        'gastronomia': { nombre: 'Gastronomía', color: 'cat-dot-gastronomia' },
-        'informatica': { nombre: 'Informática', color: 'cat-dot-informatica' },
-        'jardineria': { nombre: 'Jardinería', color: 'cat-dot-jardineria' },
-        'limpieza': { nombre: 'Limpieza', color: 'cat-dot-limpieza' },
-        'mascotas': { nombre: 'Mascotas', color: 'cat-dot-mascotas' },
-        'mudanza': { nombre: 'Mudanza/Traslado', color: 'cat-dot-mudanza' },
-        'transporte': { nombre: 'Transporte', color: 'cat-dot-transporte' },
-        'otros': { nombre: 'Otros', color: 'cat-dot-otros' }
+        'matematicas': { nombre: 'Matemáticas', color: 'cat-dot-carpinteria' },
+        'filosofia': { nombre: 'Filosofía', color: 'cat-dot-construccion' },
+        'lengua castellana': { nombre: 'Lengua Castellana', color: 'cat-dot-cuidado_personal' },
+        'inglés': { nombre: 'Inglés', color: 'cat-dot-diseno' },
+        'lengua extranjera 1': { nombre: 'Lengua Extranjera 1', color: 'cat-dot-evento' },
+        'lengua extranjera 2': { nombre: 'Lengua Extranjera 2', color: 'cat-dot-gastronomia' },
+        'segunda lengua oficial': { nombre: 'Segunda Lengua Oficial', color: 'cat-dot-informatica' },
+        'latin': { nombre: 'Latín', color: 'cat-dot-jardineria' },
+        'ciencias': { nombre: 'Ciencias', color: 'cat-dot-limpieza' },
+        'biología': { nombre: 'Biología', color: 'cat-dot-mascotas' },
+        'fisica': { nombre: 'Física', color: 'cat-dot-mudanza' },
+        'quimica': { nombre: 'Química', color: 'cat-dot-transporte' },
+        'educacion fisica': { nombre: 'Educación Física', color: 'cat-dot-otros' },
+        'musica': { nombre: 'Música', color: 'cat-dot-otros' },
+        'plastica': { nombre: 'Plástica', color: 'cat-dot-otros' },
+        'tecnologia': { nombre: 'Tecnología', color: 'cat-dot-otros' },
+        'religion': { nombre: 'Religión', color: 'cat-dot-otros' },
+        'informatica': { nombre: 'Informática', color: 'cat-dot-otros' },
+        'historia': { nombre: 'Historia', color: 'cat-dot-otros' },
+        'geografía': { nombre: 'Geografía', color: 'cat-dot-otros' },
+        'economia': { nombre: 'Economía', color: 'cat-dot-otros' },
+        'ciencias sociales': { nombre: 'Ciencias Sociales', color: 'cat-dot-otros' },
+        'dibujo tecnico': { nombre: 'Dibujo Técnico', color: 'cat-dot-otros' }
     };
 
    // --- CARGAR LOS DATOS DESDE FIREBASE AL ABRIR LA APP O INICIAR SESIÓN ---
@@ -96,9 +107,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         displayDescription.textContent = "¡Hola! Soy nuevo en LaburApp. Todavía no he escrito mi biografía.";
                     }
 
-                    if (perfil.direccion_principal) {
-                        displayAddress.textContent = perfil.direccion_principal;
+                    if (displayContact) {
+                        if (perfil.email_contacto) {
+                            displayContact.textContent = perfil.email_contacto;
+                            if (contactRow) contactRow.style.display = "flex";
+                        } else {
+                            if (contactRow) contactRow.style.display = "none";
+                        }
                     }
+
+                    // if (perfil.direccion_principal) {
+                    //     displayAddress.textContent = perfil.direccion_principal;
+                    // }
 
                    // --- 1. LÓGICA DE NIVEL Y BARRA DE XP ---
                     const nLvl = perfil.nivel || 1;
@@ -118,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                    // --- 2. VALORACIÓN, ESPECIALIDAD Y DINERO ---
-                    if (statItems.length >= 3) {
-                        const valMedia = perfil.valoracion_media !== undefined ? perfil.valoracion_media : 2.5;
+                    if (statItems.length >= 2) {
+                        const valMedia = perfil.valoracion_media !== undefined ? perfil.valoracion_media : 0;
                         statItems[0].textContent = valMedia.toFixed(1);
 
                         let maxPts = -1;
@@ -132,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 bestCat = c.id_categoria;
                                 oldestDate = c.fecha_creacion;
                             } else if (c.puntos === maxPts && c.puntos > 0) {
-                               
                                 if (c.fecha_creacion < oldestDate) {
                                     bestCat = c.id_categoria;
                                     oldestDate = c.fecha_creacion;
@@ -141,13 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         if (bestCat && maxPts > 0) {
-                            const n = catInfo[bestCat] ? catInfo[bestCat].nombre : bestCat;
+                            const n = catInfo[bestCat.toLowerCase()] ? catInfo[bestCat.toLowerCase()].nombre : bestCat;
                             statItems[1].textContent = `${n} (${maxPts} pts)`;
                         } else {
                             statItems[1].textContent = "Ninguna (0 pts)";
                         }
-
-                        statItems[2].textContent = (perfil.dinero_ganado_total || 0).toLocaleString() + " €";
                     }
 
                    // --- 3. RENDIMIENTO DE TABLA DE CATEGORIAS ---
@@ -234,9 +251,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // --- OCULTAR ELEMENTOS SEGÚN ROL ---
                     const rol = (perfil.rol || "").toLowerCase();
-                    if (rol === 'alumno' && subsBody) {
-                        const subCard = subsBody.closest('.info-card');
-                        if (subCard) subCard.style.display = 'none';
+                    const statsCard = document.querySelector('.stats-card');
+                    const categoriesTitle = document.querySelector('.categories-container .card-title');
+
+                    if (rol === "docente") {
+                        if (statsCard) statsCard.style.display = 'none';
+                        if (categoriesTitle) categoriesTitle.textContent = "Asignaturas";
+
+                        // Ocultar botón de valoraciones para docentes
+                        const btnViewRatings = document.getElementById('btnViewRatings');
+                        if (btnViewRatings) {
+                            const container = btnViewRatings.closest('.user-view-action');
+                            if (container) container.style.display = 'none';
+                            else btnViewRatings.style.display = 'none';
+                        }
+                        
+                        // Cargar asignaturas reales del docente desde sus clases
+                        if (catGrid) {
+                            catGrid.innerHTML = "<p>Cargando asignaturas...</p>";
+                            try {
+                                const qClases = query(collection(db, "clases"), where("id_docente", "==", user.uid));
+                                const snapClases = await getDocs(qClases);
+                                const subjects = new Set();
+                                snapClases.forEach(docSnap => {
+                                    const data = docSnap.data();
+                                    if (data.Asignatura) subjects.add(data.Asignatura);
+                                });
+
+                                if (subjects.size > 0) {
+                                    catGrid.innerHTML = "";
+                                    subjects.forEach(sub => {
+                                        const info = catInfo[sub.toLowerCase()] || { nombre: sub, color: 'cat-dot-otros' };
+                                        const div = document.createElement('div');
+                                        div.className = 'cat-item';
+                                        div.innerHTML = `<span class="dot ${info.color}"></span> <strong>${info.nombre}</strong>`;
+                                        catGrid.appendChild(div);
+                                    });
+                                } else {
+                                    catGrid.innerHTML = "<p style='color: var(--gray-6); font-style: italic; grid-column: 1 / -1;'>Aún no impartes ninguna asignatura.</p>";
+                                }
+                            } catch (err) {
+                                console.error("Error cargando asignaturas del docente:", err);
+                                catGrid.innerHTML = "<p>Error al cargar las asignaturas.</p>";
+                            }
+                        }
+                    } else {
+                        if (statsCard) statsCard.style.display = 'block';
+                        if (categoriesTitle) categoriesTitle.textContent = "Categorías";
+                    }
+
+                    if (rol === "alumno") {
+                        if (subsBody) subsBody.style.display = 'none';
                     }
 
                    // --- 5. RENDER FOTO DE PERFIL Y CV ---
@@ -245,19 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         displayPic.src = perfil.foto_perfil || `../assets/img/avatar-defecto-${rolParaAvatar}.png`;
                     }
 
-                    const displayPDF = document.getElementById('displayPDF');
-                    if (displayPDF) {
-                        if (perfil.curriculum_url) {
-                            displayPDF.href = perfil.curriculum_url;
-                            displayPDF.style.display = "inline";
-                        } else {
-                            displayPDF.removeAttribute('href');
-                            displayPDF.style.display = "none";
-                           
-                            const pdfRow = displayPDF.closest('.link-row');
-                            if (pdfRow) pdfRow.style.display = "none";
-                        }
-                    }
                 }
             } catch (error) {
                 console.error("Error cargando perfil:", error);
@@ -335,6 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('inputName').value = perfil.nombre || "";
             document.getElementById('inputLastname').value = perfil.apellidos || "";
+            document.getElementById('inputContact').value = perfil.email_contacto || "";
 
             const currDesc = displayDescription.textContent.trim();
             if (currDesc.includes("Todavía no he escrito mi biografía")) {
@@ -342,10 +395,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 document.getElementById('inputDescription').value = currDesc;
             }
-
-            const addressMatch = displayAddress.textContent;
-            const dirSana = (addressMatch.includes("Uribarri") || addressMatch.includes("Bilbao 48007")) ? "" : addressMatch;
-            document.getElementById('inputAddress').value = dirSana;
         };
     }
 
@@ -363,8 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = document.getElementById('inputName').value.trim();
             const newLastname = document.getElementById('inputLastname').value.trim();
             const newDescription = document.getElementById('inputDescription').value.trim();
-            const newAddress = document.getElementById('inputAddress').value.trim();
-            const pdfFile = document.getElementById('inputPDF').files[0];
+            const newContact = document.getElementById('inputContact').value.trim();
 
             try {
                 const updateData = {
@@ -372,29 +420,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     apellidos: newLastname,
                     nombre_completo: `${newName} ${newLastname}`.trim(),
                     bio: newDescription,
-                    direccion_principal: newAddress
+                    email_contacto: newContact
                 };
-
-                if (pdfFile) {
-                    const pdfRef = ref(storage, `curricula/${user.uid}/cv.pdf`);
-                    await uploadBytes(pdfRef, pdfFile, { contentType: 'application/pdf' });
-                    const pdfUrl = await getDownloadURL(pdfRef);
-                    updateData.curriculum_url = pdfUrl;
-
-                    const displayPDF = document.getElementById('displayPDF');
-                    if (displayPDF) {
-                        displayPDF.href = pdfUrl;
-                        displayPDF.style.display = "inline";
-                        const pdfRow = displayPDF.closest('.link-row');
-                        if (pdfRow) pdfRow.style.display = "flex";
-                    }
-                }
 
                 await actualizarPerfilUsuario(user.uid, updateData);
 
                 displayName.textContent = updateData.nombre_completo;
                 displayDescription.textContent = newDescription || "¡Hola! Soy nuevo en LaburApp. Todavía no he escrito mi biografía.";
-                displayAddress.textContent = newAddress || "Ubicación no establecida";
+                
+                if (displayContact) {
+                    if (newContact) {
+                        displayContact.textContent = newContact;
+                        if (contactRow) contactRow.style.display = "flex";
+                    } else {
+                        if (contactRow) contactRow.style.display = "none";
+                    }
+                }
 
                 showCustomAlert("Éxito", "Perfil guardado correctamente en la Base de Datos.");
                 modal.style.display = "none";

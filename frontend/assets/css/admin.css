@@ -81,6 +81,11 @@
     filter: brightness(0);
 }
 
+.back-icon-black {
+    filter: brightness(0);
+    transform: rotate(180deg);
+}
+
 .icon-white {
     filter: brightness(0) invert(1);
 }

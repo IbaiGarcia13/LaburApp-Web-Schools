@@ -5,11 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="../manifest.json">
-    <title>LaburApp - Trabajo</title>
+    <title>LaburApp - Tarea</title>
     <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/trabajo.css">
-    <!-- Leaflet eliminado -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4927720250134961"
         crossorigin="anonymous"></script>
 </head>
@@ -28,9 +27,8 @@
         <div class="header-right">
             <nav>
                 <ul>
-                    <li><a href="usuarios.html">Usuarios</a></li>
-                    <li><a href="trabajos.html">Trabajos</a></li>
-                    <!-- Mapa eliminado -->
+                    <li><a href="usuarios.html">Compañeros</a></li>
+                    <li><a href="tareas.html">Tareas</a></li>
                 </ul>
             </nav>
 
@@ -62,14 +60,8 @@
         <ul>
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
-            <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
-            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
-            </li>
-            <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a>
-            </li>
+            <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a></li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
         <div class="side-menu-footer">
@@ -85,7 +77,7 @@
     <main class="main-content">
         <section class="job-header-section">
             <div class="job-image-wrapper">
-                <img src="../assets/img/trabajo-defecto.png" alt="Cortar el césped" class="job-img">
+                <img src="../assets/img/trabajo-defecto.png" alt="Tarea" class="job-img">
             </div>
 
             <div class="job-info-main">
@@ -97,10 +89,7 @@
                 </p>
                 <div class="job-info-footer">
                     <div class="contact-links">
-                        <div class="link-row">
-                            <img src="../assets/img/icons/icono-ubicacion-color.png" alt="Ubicación" class="icon-img">
-                            <span class="italic truncate-text">Cargando...</span>
-                        </div>
+                        <!-- Ubicación eliminada -->
                     </div>
                     <div class="message-container">
                         <a href="chat.html" id="btn-chat">
@@ -112,7 +101,7 @@
 
             <div class="job-stats-container">
                 <div class="stat-box-large">
-                    <span class="stat-label">Pago:</span> <span class="stat-value">--- €</span>
+                    <span class="stat-label">Puntos:</span> <span class="stat-value">--- Pts</span>
                 </div>
                 <div class="stat-box-large" style="opacity: 0.85;">
                     <span class="stat-label">Experiencia:</span> <span class="stat-value">--- XP</span>
@@ -126,7 +115,7 @@
                 <div class="info-item">
                     <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-categoria.png"
                             class="icon-img-small" alt="Cerebro"></span>
-                    <strong>Categoría:</strong> <span class="info-text"> Cargando...</span>
+                    <strong>Asignatura:</strong> <span class="info-text"> Cargando...</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon" style="color: #d15050;"><img src="../assets/img/icons/icono-relog.png"
@@ -142,27 +131,24 @@
         </section>
 
         <div class="job-actions">
-            <button id="btn-postular" class="btn-postular">POSTULARSE</button>
+            <button id="btn-postular" class="btn-postular">ACEPTAR TAREA</button>
         </div>
-
-        <!-- Mini-mapa eliminado -->
 
     </main>
 
     <nav class="mobile-bottom-nav" style="display: none;">
         <a href="usuarios.html" class="nav-item">
             <img src="../assets/img/icons/icono-perfil.png" alt="Usuarios">
-            <span>Usuarios</span>
+            <span>Compañeros</span>
         </a>
-        <a href="trabajos.html" class="nav-item">
-            <img src="../assets/img/icons/icono-trabajos.png" alt="Trabajos">
-            <span>Trabajos</span>
+        <a href="tareas.html" class="nav-item">
+            <img src="../assets/img/icons/icono-trabajos.png" alt="Tareas">
+            <span>Tareas</span>
         </a>
-        <!-- Mapa eliminado -->
     </nav>
 
     <script type="module" src="../assets/js/general.js"></script>
-    <script type="module" src="../assets/js/trabajo.js"></script>
+    <script type="module" src="../assets/js/tarea.js"></script>
 </body>
 <footer>
     <div class="footer-grid">

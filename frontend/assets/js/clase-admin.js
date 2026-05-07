@@ -29,6 +29,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             cargarResumen(clase);
             cargarAlumnos(clase.alumnos || []);
             cargarTareas();
+
+            // Botón superior para volver a la clase
+            const btnDashboard = document.getElementById('btn-dashboard');
+            if (btnDashboard) {
+                btnDashboard.onclick = () => {
+                    window.location.href = `clase.html?id=${currentClassId}`;
+                };
+            }
         }
     });
 });

@@ -1,84 +1,180 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mis Valoraciones - LaburApp Schools</title>
-  <link rel="stylesheet" href="../assets/css/styles.css">
-  <link rel="stylesheet" href="../assets/css/valoraciones.css">
-  <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="../manifest.json">
+    <title>LaburApp - Valoraciones</title>
+    <link rel="shortcut icon" href="../assets/img/icons/icono-Laburapp.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../assets/img/icons/icono-app.png">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/valoraciones.css">
 </head>
+
 <body>
-  <header>
-    <div class="logo">
-      <a href="../index.html"><img src="../assets/img/logo/LaburApp2.png" alt="Logo"></a>
-    </div>
-    <div class="header-right">
-      <nav>
+
+    <!-- === NAVEGACIÓN SUPERIOR === -->
+    <header>
+        <div class="logo">
+            <a href="principal.html">
+                <img src="../assets/img/logo/LaburApp2.png" alt="Icono LaburApp">
+            </a>
+            <a href="principal.html">
+                <img src="../assets/img/logo/LaburApp3.png" alt="Texto LABURAPP" class="logo-text">
+            </a>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul>
+                    <li><a href="usuarios.html">Compañeros</a></li>
+                    <li><a href="tareas.html">Tareas</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="perfil.html">
+                        <img src="../assets/img/avatar-defecto.png" alt="Avatar" class="dropdown-avatar">
+                    </a>
+                    <p class="dropdown-name">Cargando...</p>
+                    <p class="dropdown-email">Cargando...</p>
+                    <div class="dropdown-footer">
+                        <img src="../assets/img/icons/icono-cerrar-sesion.png" alt="Logout" style="width: 20px;">
+                        <a href="login.html">Cerrar Sesión</a>
+                    </div>
+                </div>
+
+                <div class="hamburger" id="menuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- === MENÚ LATERAL === -->
+    <nav class="side-menu" id="sideMenu">
         <ul>
-          <li><a href="usuarios.html">Compa�eros</a></li>
-          <li><a href="tareas.html">Tareas</a></li>
+            <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
+            <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
+            <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-tareas.html">Mis Trabajos</a></li>
+            <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
+            <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
         </ul>
-      </nav>
-      <div class="header-icons">
-        <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
-      </div>
-    </div>
-  </header>
+        <div class="side-menu-footer">
+            <img src="../assets/img/icons/icono-cerrar-sesion.png"> <a href="login.html">Cerrar Sesión</a>
+        </div>
+    </nav>
 
-  <main class="main-container">
-    <h1 class="main-title">Mis Valoraciones</h1>
-    <p class="subtitle">Aqu� puedes ver las notas y comentarios que has recibido en tus tareas.</p>
+    <a href="javascript:void(0)" onclick="history.back();" class="btn-back-global">
+        <img src="../assets/img/icons/icono-flecha.png" alt="Volver">
+    </a>
 
-    <!-- FILTROS -->
-    <section class="filters-container">
-      <div class="filter-group">
-        <label>Asignatura:</label>
-        <select id="filterAsignatura">
-          <option value="todas">Todas</option>
-          <option value="Matem�ticas">Matem�ticas</option>
-          <option value="lengua">Lengua</option>
-          <option value="historia">Historia</option>
-          <option value="ingles">Ingl�s</option>
-          <option value="otros">Otros</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Puntuaci�n:</label>
-        <select id="filterPuntos">
-          <option value="todas">Todas</option>
-          <option value="9-10">Sobresaliente (9-10)</option>
-          <option value="7-8">Notable (7-8)</option>
-          <option value="5-6">Aprobado (5-6)</option>
-          <option value="0-4">Suspenso (0-4)</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Desde:</label>
-        <input type="date" id="filterFechaDesde">
-      </div>
-      <div class="filter-group">
-        <label>Hasta:</label>
-        <input type="date" id="filterFechaHasta">
-      </div>
-      <button id="btnAplicarFiltros" class="btn-primary">Filtrar</button>
-    </section>
+    <!-- === CONTENEDOR PRINCIPAL === -->
+    <main id="container">
+        <section id="content">
+            <div class="header-section">
+                <h2 class="section-title"><img src="../assets/img/icons/icono-estrella-color.png" alt=""> MIS VALORACIONES</h2>
+                <div class="stats-summary" id="statsSummary" style="display: none;">
+                    <div class="stat-bubble">
+                        <span class="label">Nota Media</span>
+                        <span id="avgScore" class="value">--</span>
+                    </div>
+                    <div class="stat-bubble">
+                        <span class="label">Total Tareas</span>
+                        <span id="totalTasks" class="value">--</span>
+                    </div>
+                </div>
+            </div>
 
-    <!-- LISTADO -->
-    <section id="valoracionesList" class="valoraciones-grid">
-      <!-- Cargando... -->
-    </section>
-  </main>
+            <div id="valoracionesList" class="valoraciones-grid">
+                <!-- Cards de valoraciones inyectadas por JS -->
+                <div class="loading-box">
+                    <p>Cargando tus valoraciones...</p>
+                </div>
+            </div>
+        </section>
 
-  <script type="module" src="../assets/js/general.js"></script>
-  <script type="module" src="../assets/js/valoraciones.js"></script>
+        <!-- === BARRA LATERAL FILTROS === -->
+        <aside id="sidebar">
+            <div class="filter-box">
+                <h2 class="text-center" style="margin-bottom: 25px; text-align: center;">FILTRAR</h2>
+                <form id="filter-form">
+                    <div class="filter-group">
+                        <label>Asignatura:</label>
+                        <select id="filterAsignatura">
+                            <option value="todas">Todas</option>
+                            <option value="Matematicas">Matemáticas</option>
+                            <option value="Filosofia">Filosofía</option>
+                            <option value="Lengua Castellana">Lengua Castellana</option>
+                            <option value="Inglés">Inglés</option>
+                            <option value="Lengua Extranjera 1">Lengua Extranjera 1</option>
+                            <option value="Lengua Extranjera 2">Lengua Extranjera 2</option>
+                            <option value="Segunda Lengua Oficial">Segunda Lengua Oficial</option>
+                            <option value="Latin">Latín</option>
+                            <option value="Ciencias">Ciencias</option>
+                            <option value="Biología">Biología</option>
+                            <option value="Fisica">Fisica</option>
+                            <option value="Quimica">Química</option>
+                            <option value="Educacion Fisica">Educación Física</option>
+                            <option value="Musica">Música</option>
+                            <option value="Plastica">Plástica</option>
+                            <option value="Tecnologia">Tecnología</option>
+                            <option value="Religion">Religión</option>
+                            <option value="Informatica">Informática</option>
+                            <option value="Historia">Historia</option>
+                            <option value="Geografía">Geografía</option>
+                            <option value="Economia">Economía</option>
+                            <option value="Ciencias Sociales">Ciencias Sociales</option>
+                            <option value="Dibujo Tecnico">Dibujo Técnico</option>
+                            <option value="Otra">Otra</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Puntuación:</label>
+                        <select id="filterPuntos">
+                            <option value="todas">Todas</option>
+                            <option value="9-10">Sobresaliente (9-10)</option>
+                            <option value="7-8">Notable (7-8)</option>
+                            <option value="5-6">Aprobado (5-6)</option>
+                            <option value="0-4">Suspenso (0-4)</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Desde:</label>
+                        <input type="date" id="filterFechaDesde">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Hasta:</label>
+                        <input type="date" id="filterFechaHasta">
+                    </div>
+
+                    <button type="button" id="btnAplicarFiltros">APLICAR FILTROS</button>
+                </form>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 LaburApp - Schools &mdash; Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="../assets/js/general.js"></script>
+    <script type="module" src="../assets/js/valoraciones.js"></script>
 </body>
-<footer>
-  <div class="footer-bottom">
-    <p>&copy; 2026 LaburApp Schools Schools &mdash; Todos los derechos reservados.</p>
-  </div>
-</footer>
+
 </html>
+
+
 
 
 

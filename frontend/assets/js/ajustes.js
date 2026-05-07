@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayNombre = document.getElementById('displayNombre');
     const displayApellidos = document.getElementById('displayApellidos');
-    const displayDireccion = document.getElementById('displayDireccion');
     const displayFechaNac = document.getElementById('displayFechaNac');
-    const displayDni = document.getElementById('displayDni');
     const displayTelefono = document.getElementById('displayTelefono');
+    const displayCurso = document.getElementById('displayCurso');
+    const cursoRow = document.getElementById('cursoRow');
 
     const settingsCards = document.querySelectorAll('.settings-card, .info-card');
     let subsBody = null;
@@ -45,10 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (perfil) {
                     if (displayNombre) displayNombre.textContent = perfil.nombre || "";
                     if (displayApellidos) displayApellidos.textContent = perfil.apellidos || "";
-                    if (displayDireccion) displayDireccion.textContent = perfil.direccion_principal || "No especificada";
                     if (displayFechaNac) displayFechaNac.textContent = perfil.fecha_nacimiento || "";
-                    if (displayDni) displayDni.textContent = perfil.dni || "";
                     if (displayTelefono) displayTelefono.textContent = perfil.telefono || "No especificado";
+                    
+                    if (displayCurso) displayCurso.textContent = perfil.curso || "No especificado";
+                    if (cursoRow) {
+                        // Solo mostrar curso a alumnos
+                        cursoRow.style.display = (perfil.rol === 'docente') ? 'none' : 'block';
+                    }
 
                     const emailDisplays = document.querySelectorAll('p strong');
                     emailDisplays.forEach(el => {
@@ -204,18 +208,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 true
             );
         });
-    }
-
-   // --- ABRIR MODAL EDITAR ---
-    if (btnEditProfile) {
-        btnEditProfile.onclick = () => {
+      if (btnEditProfile) {
+        btnEditProfile.onclick = async () => {
+            const user = auth.currentUser;
+            const perfil = await obtenerPerfilUsuario(user.uid);
+            
             editModal.classList.remove('hidden');
-            document.getElementById('inputSetNombre').value = displayNombre.innerText;
-            document.getElementById('inputSetApellidos').value = displayApellidos.innerText;
-            const dirSana = displayDireccion.innerText === 'No especificada' ? '' : displayDireccion.innerText;
-            document.getElementById('inputSetDireccion').value = dirSana;
-
-            const dateStr = displayFechaNac.innerText;
+            document.getElementById('inputSetNombre').value = perfil.nombre || "";
+            document.getElementById('inputSetApellidos').value = perfil.apellidos || "";
+            
+            const dateStr = perfil.fecha_nacimiento || ""; // dd-mm-yyyy
             if (dateStr && dateStr.includes("-") && dateStr.split("-")[0].length === 2) {
                 const parts = dateStr.split("-");
                 document.getElementById('inputSetFechaNac').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
@@ -223,14 +225,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('inputSetFechaNac').value = dateStr;
             }
 
-            const telSano = displayTelefono.innerText === 'No especificado' ? '' : displayTelefono.innerText;
-            document.getElementById('inputSetTelefono').value = telSano;
+            document.getElementById('inputSetTelefono').value = perfil.telefono || "";
+            
+            const inputSetCurso = document.getElementById('inputSetCurso');
+            const groupSetCurso = document.getElementById('groupSetCurso');
+            if (inputSetCurso) inputSetCurso.value = perfil.curso || "";
+            if (groupSetCurso) {
+                groupSetCurso.style.display = (perfil.rol === 'docente') ? 'none' : 'block';
+            }
         };
     }
 
     if (btnCancelEditSettings) btnCancelEditSettings.onclick = () => editModal.classList.add('hidden');
 
-   // --- GUARDAR EN FIREBASE ---
     if (btnSaveSettings) {
         btnSaveSettings.onclick = async () => {
             const user = auth.currentUser;
@@ -238,13 +245,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const nom = document.getElementById('inputSetNombre').value.trim();
             const ape = document.getElementById('inputSetApellidos').value.trim();
-            const rawFnac = document.getElementById('inputSetFechaNac').value.trim();// --- YYYY-MM-DD ---
-            const dni = document.getElementById('inputSetDni').value.trim();
-            const dir = document.getElementById('inputSetDireccion').value.trim();
+            const rawFnac = document.getElementById('inputSetFechaNac').value.trim();
             const tel = document.getElementById('inputSetTelefono').value.trim();
+            const cur = document.getElementById('inputSetCurso') ? document.getElementById('inputSetCurso').value.trim() : "";
 
-            if (!nom || !ape || !rawFnac || !dni) {
-                showCustomAlert("Error", "Los campos Nombre, Apellidos, Fecha Nac. y DNI son obligatorios.");
+            if (!nom || !ape || !rawFnac) {
+                showCustomAlert("Error", "Los campos Nombre, Apellidos y Fecha de Nacimiento son obligatorios.");
                 return;
             }
 
@@ -255,28 +261,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-               
-                await actualizarPerfilUsuario(user.uid, {
+                const updateData = {
                     nombre: nom,
                     apellidos: ape,
                     nombre_completo: nom + " " + ape,
                     fecha_nacimiento: formattedFnac,
-                    direccion_principal: dir,
                     telefono: tel
-                });
+                };
+                
+                // Solo guardar curso si es alumno (o si existe el input)
+                if (document.getElementById('groupSetCurso').style.display !== 'none') {
+                    updateData.curso = cur;
+                }
 
-                displayNombre.innerText = nom;
-                displayApellidos.innerText = ape;
-                displayFechaNac.innerText = formattedFnac;
-                displayDireccion.innerText = dir || 'No especificada';
-                displayTelefono.innerText = tel || 'No especificado';
+                await actualizarPerfilUsuario(user.uid, updateData);
+
+                if (displayNombre) displayNombre.innerText = nom;
+                if (displayApellidos) displayApellidos.innerText = ape;
+                if (displayFechaNac) displayFechaNac.innerText = formattedFnac;
+                if (displayTelefono) displayTelefono.innerText = tel || 'No especificado';
+                if (displayCurso) displayCurso.innerText = cur || 'No especificado';
 
                 editModal.classList.add('hidden');
-                showCustomAlert("Éxito", "Datos actualizados correctamente en base de datos.");
+                showCustomAlert("Éxito", "Datos actualizados correctamente.");
 
             } catch (e) {
                 console.error("Error guardando ajustes: ", e);
-                showCustomAlert("Error", "Fallo al guardar en la nube.");
+                showCustomAlert("Error", "Fallo al guardar los cambios.");
             }
         };
     }
@@ -437,16 +448,13 @@ document.addEventListener('DOMContentLoaded', () => {
         paymentsList.innerHTML = "";
 
         if (metodos.length === 0) {
-            paymentsList.innerHTML = "<p style='color: var(--gray-6); font-style: italic;'>No tienes métodos de pago registrados.</p>";
+            paymentsList.innerHTML = "<p style='color: var(--gray-6); font-style: italic;'>No tienes métodos de pago guardados.</p>";
             return;
         }
 
         metodos.forEach(m => {
             const li = document.createElement('li');
-            const favorStar = m.favorito
-                ? `<img src="../assets/img/icons/icono-estrella.png" class="icon-star-favorite" title="Favorito">`
-                : ``;
-
+            const favorStar = m.es_principal ? '<span class="star-icon">★</span>' : '';
             li.innerHTML = `
                 ${favorStar}
                 <span><strong>${m.tipo}:</strong> ${m.detalle}</span>

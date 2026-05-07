@@ -27,9 +27,8 @@
         <div class="header-right">
             <nav>
                 <ul>
-                    <li><a href="usuarios.html">Usuarios</a></li>
-                    <li><a href="trabajos.html">Trabajos</a></li>
-                    <!-- Mapa eliminado -->
+                    <li><a href="usuarios.html">Compañeros</a></li>
+                    <li><a href="tareas.html">Tareas</a></li>
                 </ul>
             </nav>
 
@@ -63,8 +62,6 @@
             <li><img src="../assets/img/icons/icono-perfil.png"><a href="perfil.html">Perfil</a></li>
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
-            <li><img src="../assets/img/icons/icono-postulaciones.png"><a href="postulaciones.html">Postulaciones</a>
-            </li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
             <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
             </li>
@@ -90,11 +87,10 @@
             <div class="card-body">
                 <div class="info-grid">
                     <p class="info"><strong>Nombre:</strong> <span id="displayNombre"> Cargando...</span></p>
-                    <p class="info"><strong>Dirección:</strong> <span id="displayDireccion"> Cargando...</span></p>
                     <p class="info"><strong>Apellidos:</strong> <span id="displayApellidos"> Cargando...</span></p>
-                    <p class="info"><strong>Fecha de Nacimiento:</strong> <span id="displayFechaNac"> Cargando...</span>
-                    </p>
-                    <p class="info"><strong>Teléfono:</strong> <span id="displayTelefono"> Cargando...</span></p>
+                    <p class="info"><strong>Fecha de Nacimiento:</strong> <span id="displayFechaNac"> Cargando...</span></p>
+                    <p class="info"><strong>Contacto:</strong> <span id="displayTelefono"> Cargando...</span></p>
+                    <p class="info" id="cursoRow"><strong>Curso:</strong> <span id="displayCurso"> Cargando...</span></p>
                 </div>
             </div>
         </section>
@@ -125,7 +121,7 @@
             </div>
         </section>
 
-        <section class="info-card">
+        <section class="info-card" id="subsSection">
             <h2 class="card-title">Suscripciones</h2>
             <div class="card-body" id="subsContainer">
                 <div class="sub-item" id="workerSubRow">
@@ -137,7 +133,7 @@
             </div>
         </section>
 
-        <section class="settings-card">
+        <section class="settings-card" id="paymentsSection">
             <div class="card-header">
                 <h2 class="card-title">Método de Pago</h2>
             </div>
@@ -158,7 +154,7 @@
             </div>
         </section>
 
-        <section class="settings-card">
+        <section class="settings-card" id="historySection">
             <div class="card-header">
                 <h2 class="card-title">Historial de Pagos</h2>
             </div>
@@ -232,16 +228,16 @@
                 <input type="text" id="inputSetApellidos" class="modal-input" style="margin-bottom: 10px;" required>
             </div>
             <div class="input-group">
-                <label>Dirección:</label>
-                <input type="text" id="inputSetDireccion" class="modal-input" style="margin-bottom: 10px;">
+                <label>Contacto (Email/Social):</label>
+                <input type="text" id="inputSetTelefono" class="modal-input" style="margin-bottom: 10px;">
             </div>
             <div class="input-group">
                 <label>Fecha de Nacimiento:</label>
                 <input type="date" id="inputSetFechaNac" class="modal-input" style="margin-bottom: 10px;" required>
             </div>
-            <div class="input-group">
-                <label>Teléfono:</label>
-                <input type="text" id="inputSetTelefono" class="modal-input" style="margin-bottom: 10px;">
+            <div class="input-group" id="groupSetCurso">
+                <label>Curso:</label>
+                <input type="text" id="inputSetCurso" class="modal-input" style="margin-bottom: 10px;" placeholder="Ej: 4º ESO, 2º Bach...">
             </div>
             <div class="modal-buttons" style="margin-top: 15px;">
                 <button id="btnCancelEditSettings" class="modal-btn cancel">Cancelar</button>
@@ -253,13 +249,12 @@
     <nav class="mobile-bottom-nav" style="display: none;">
         <a href="usuarios.html" class="nav-item">
             <img src="../assets/img/icons/icono-perfil.png" alt="Usuarios">
-            <span>Usuarios</span>
+            <span>Compañeros</span>
         </a>
-        <a href="trabajos.html" class="nav-item">
-            <img src="../assets/img/icons/icono-trabajos.png" alt="Trabajos">
-            <span>Trabajos</span>
+        <a href="tareas.html" class="nav-item">
+            <img src="../assets/img/icons/icono-trabajos.png" alt="Tareas">
+            <span>Tareas</span>
         </a>
-        <!-- Mapa eliminado -->
     </nav>
 
     <script type="module" src="../assets/js/general.js"></script>
@@ -309,4 +304,5 @@
 </footer>
 
 </html>
+
 

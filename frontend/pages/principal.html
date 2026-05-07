@@ -95,6 +95,10 @@
             <p id="stat-nivel">---</p>
         </div>
         <div class="stat-card">
+            <h3>Puntos Totales</h3>
+            <p id="stat-puntos">---</p>
+        </div>
+        <div class="stat-card">
             <h3>Nota Media</h3>
             <p id="stat-nota">---</p>
         </div>
@@ -172,7 +176,7 @@
           </div>
           <div class="manual-item">
             <h3>Tu Perfil</h3>
-            <p>Personaliza tu biografía, añade una foto de perfil y mantén al día tu Dirección. Aquí verás tu nivel, experiencia y valoraciones recibidas.</p>
+            <p>Personaliza tu biografía, añade una foto de perfil y mantén tus datos al día. Aquí verás tu nivel, experiencia y valoraciones recibidas.</p>
           </div>
           <div class="manual-item">
             <h3>Publicar Tareas</h3>
@@ -187,12 +191,11 @@
           <div class="manual-item">
             <h3>Gestión de Tareas</h3>
             <p>Sigue el estado de tus tareas en tiempo real: Pendiente, Aceptada, En Curso o Completada. La
-              comunicación directa por chat facilita todo el proceso.</p>
+              colaboración directa facilita todo el proceso.</p>
           </div>
           <div class="manual-item">
-            <h3>Seguridad y Pagos</h3>
-            <p>Tu dinero está protegido. El pago se retiene al inicio y solo se libera cuando confirmas que
-              el trabajo se ha realizado correctamente.</p>
+            <h3>Progreso Académico</h3>
+            <p>Tu esfuerzo tiene recompensa. Completa tareas para ganar puntos de asignatura y subir de nivel. Tu nota media refleja tu rendimiento global.</p>
           </div>
         </div>
 
@@ -215,25 +218,32 @@
       <input type="text" id="inputNombreClase" class="modal-input" placeholder="Nombre de la clase" maxlength="40">
       <select id="inputAsignaturaClase" class="modal-input">
         <option value="" disabled selected>Selecciona Asignatura</option>
-        <option value="General">General</option>
-        <option value="Matemáticas">Matemáticas</option>
-        <option value="Lengua">Lengua</option>
+        <option value="Matematicas">Matemáticas</option>
+        <option value="Filosofia">Filosofía</option>
+        <option value="Lengua Castellana">Lengua Castellana</option>
         <option value="Inglés">Inglés</option>
-        <option value="Ciencias Naturales">Ciencias Naturales</option>
-        <option value="Ciencias Sociales">Ciencias Sociales</option>
-        <option value="Educación Física">Educación Física</option>
-        <option value="Música">Música</option>
-        <option value="Plástica">Plástica</option>
-        <option value="Tecnología">Tecnología</option>
+        <option value="Lengua Extranjera 1">Lengua Extranjera 1</option>
+        <option value="Lengua Extranjera 2">Lengua Extranjera 2</option>
+        <option value="Segunda Lengua Oficial">Segunda Lengua Oficial</option>
+        <option value="Latin">Latín</option>
+        <option value="Ciencias">Ciencias</option>
+        <option value="Biología">Biología</option>
+        <option value="Fisica">Física</option>
+        <option value="Quimica">Química</option>
+        <option value="Educacion Fisica">Educación Física</option>
+        <option value="Musica">Música</option>
+        <option value="Plastica">Plástica</option>
+        <option value="Tecnologia">Tecnología</option>
+        <option value="Religion">Religión</option>
+        <option value="Informatica">Informática</option>
         <option value="Historia">Historia</option>
         <option value="Geografía">Geografía</option>
-        <option value="Física y Química">Física y Química</option>
-        <option value="Filosofía">Filosofía</option>
-        <option value="Economía">Economía</option>
-        <option value="Informática">Informática</option>
-        <option value="Tutoría">Tutoría</option>
-        <option value="Otros">Otros</option>
+        <option value="Economia">Economía</option>
+        <option value="Ciencias Sociales">Ciencias Sociales</option>
+        <option value="Dibujo Tecnico">Dibujo Técnico</option>
+        <option value="Otra">Otra...</option>
       </select>
+      <input type="text" id="inputAsignaturaPersonalizada" class="modal-input hidden" placeholder="Nombre de la asignatura personalizada" maxlength="40">
       <input type="text" id="inputDescClase" class="modal-input" placeholder="Descripción corta" maxlength="80">
       <div class="modal-buttons">
         <button class="modal-btn cancel" id="btnCancelarCrear">Cancelar</button>
@@ -297,11 +307,12 @@
     </a>
   </div>
   <div class="footer-bottom">
-    <p>&copy; 2026 LaburApp Schools Schools &mdash; Todos los derechos reservados.</p>
+    <p>&copy; 2026 LaburApp - Schools &mdash; Todos los derechos reservados.</p>
   </div>
 </footer>
 
 </html>
+
 
 
 

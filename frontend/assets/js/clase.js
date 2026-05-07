@@ -23,6 +23,7 @@ import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/fireba
 let currentClassId = new URLSearchParams(window.location.search).get('id');
 let userRole = null;
 let currentPerfil = null;
+let currentClassData = null; // Almacenar datos de la clase
 let selectedColor = '';
 
 const colorMap = {
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         userRole = esDocente ? 'docente' : 'alumno';
+        currentClassData = clase; // Guardar datos para usar en creación de tareas
         renderClassUI(clase);
         setupFeedListener();
         setupEventListeners(clase);
@@ -325,14 +327,47 @@ function setupEventListeners(clase) {
     // Editar Clase
     const btnEditar = document.getElementById('btnEditarClase');
     const modalEditar = document.getElementById('modalEditarClase');
+    const editSelectAsig = document.getElementById('editAsignaturaClase');
+    const editCustomAsig = document.getElementById('editAsignaturaPersonalizada');
+
     if (btnEditar) {
         btnEditar.onclick = () => {
             document.getElementById('editNombreClase').value = clase.nombre;
-            document.getElementById('editAsignaturaClase').value = clase.Asignatura || "General";
             document.getElementById('editDescClase').value = clase.Descripción || "";
+            
+            // Lógica de Asignatura
+            const currentAsig = clase.Asignatura || "General";
+            let found = false;
+            for (let i = 0; i < editSelectAsig.options.length; i++) {
+                if (editSelectAsig.options[i].value === currentAsig) {
+                    editSelectAsig.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found && currentAsig !== "General") {
+                editSelectAsig.value = "Otra";
+                editCustomAsig.value = currentAsig;
+                editCustomAsig.classList.remove('hidden');
+            } else {
+                editCustomAsig.classList.add('hidden');
+                editCustomAsig.value = "";
+            }
+
             selectedColor = clase.color || 'cat-2';
             renderColorPicker();
             modalEditar.classList.remove('hidden');
+        };
+    }
+
+    if (editSelectAsig) {
+        editSelectAsig.onchange = (e) => {
+            if (e.target.value === 'Otra') {
+                editCustomAsig.classList.remove('hidden');
+            } else {
+                editCustomAsig.classList.add('hidden');
+            }
         };
     }
 
@@ -340,7 +375,17 @@ function setupEventListeners(clase) {
     if (btnSaveEdit) {
         btnSaveEdit.onclick = async () => {
             const nuevoNombre = document.getElementById('editNombreClase').value.trim();
-            const nuevaAsig = document.getElementById('editAsignaturaClase').value.trim();
+            let nuevaAsig = editSelectAsig.value;
+            const customAsigVal = editCustomAsig.value.trim();
+
+            if (nuevaAsig === 'Otra') {
+                if (!customAsigVal) {
+                    window.showCustomAlert("Error", "Escribe el nombre de la asignatura personalizada.");
+                    return;
+                }
+                nuevaAsig = customAsigVal;
+            }
+
             const nuevaDesc = document.getElementById('editDescClase').value.trim();
 
             if (!nuevoNombre) return;
@@ -493,6 +538,7 @@ async function crearTarea() {
     const tipoTarea = document.getElementById('tareaTipo').value;
     const fSalida = document.getElementById('fechaSalida').value;
     const fEntrega = document.getElementById('fechaEntrega').value;
+    const puntos = parseInt(document.getElementById('tareaPuntos').value) || 1;
     const partTipo = document.getElementById('selectParticipantes').value;
 
     // Recoger archivos de los slots (máx 4)
@@ -541,7 +587,9 @@ async function crearTarea() {
             participantes_tipo: partTipo,
             num_participantes: partTipo === 'numero' ? document.getElementById('numPart').value : null,
             alumnos_especificos: alumnosEspec,
-            tipo: 'escolar'
+            tipo: 'escolar',
+            puntos: puntos,
+            id_categoria: currentClassData?.Asignatura || 'General' // Heredar asignatura de la clase
         });
 
         await crearNovedadClase(currentClassId, {

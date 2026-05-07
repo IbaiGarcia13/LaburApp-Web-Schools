@@ -1,4 +1,4 @@
-﻿import { auth } from './firebase-config.js';
+import { auth } from './firebase-config.js';
 import { obtenerValoracionesRecibidas, obtenerClasePorId } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -30,10 +30,30 @@ async function loadValoraciones(uid) {
     // (En el futuro las tareas tendrán id_Categoría, pero por ahora podemos mapear)
     
     displayValoraciones(allValoraciones);
+    updateStats(allValoraciones);
   } catch (e) {
     console.error("Error al cargar valoraciones:", e);
     listContainer.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: red;'>Error al cargar las valoraciones.</p>";
   }
+}
+
+function updateStats(list) {
+  const statsSummary = document.getElementById('statsSummary');
+  const avgScoreEl = document.getElementById('avgScore');
+  const totalTasksEl = document.getElementById('totalTasks');
+
+  if (list.length === 0) {
+    statsSummary.style.display = 'none';
+    return;
+  }
+
+  const total = list.length;
+  const sum = list.reduce((acc, curr) => acc + (curr.puntuacion || 0), 0);
+  const avg = (sum / total).toFixed(1);
+
+  avgScoreEl.innerText = avg;
+  totalTasksEl.innerText = total;
+  statsSummary.style.display = 'flex';
 }
 
 function displayValoraciones(list) {
@@ -71,7 +91,7 @@ function displayValoraciones(list) {
         <div class="val-score">${score}<span>/10</span></div>
         <div class="val-date">${dateStr}</div>
       </div>
-      <div class="val-title">${val.Título_trabajo || "Tarea sin Título"}</div>
+      <div class="val-title">${val.titulo_trabajo || "Tarea sin Título"}</div>
       <span class="val-subject">${val.asignatura || "General"}</span>
       <div class="val-comment">${val.comentario || "Sin comentarios."}</div>
     `;
@@ -87,15 +107,16 @@ function applyFilters() {
 
   let filtered = allValoraciones.filter(v => {
     // Filtro asignatura
-    if (asignatura !== 'todas' && v.id_Categoría !== asignatura) return false;
+    const vAsig = v.asignatura || v.id_Categoría || "";
+    if (asignatura !== 'todas' && vAsig !== asignatura) return false;
 
     // Filtro puntos
     if (puntosRange !== 'todas') {
       const score = v.puntuacion || 0;
       if (puntosRange === '9-10' && score < 9) return false;
-      if (puntosRange === '7-8' && (score < 7 || score > 8)) return false;
-      if (puntosRange === '5-6' && (score < 5 || score > 6)) return false;
-      if (puntosRange === '0-4' && score > 4) return false;
+      if (puntosRange === '7-8' && (score < 7 || score > 8.9)) return false;
+      if (puntosRange === '5-6' && (score < 5 || score > 6.9)) return false;
+      if (puntosRange === '0-4' && score >= 5) return false;
     }
 
     // Filtro fecha

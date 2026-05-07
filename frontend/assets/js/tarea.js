@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const trabajoId = urlParams.get('id');
 
     if (!trabajoId) {
-        console.error("No se proporcionó ID de trabajo");
+        console.error("No se proporcionó ID de tarea");
         return;
     }
 
@@ -20,10 +20,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderTrabajo(currentTrabajo);
             checkUserRelation(currentTrabajo);
         } else {
-            console.error("Trabajo no encontrado");
+            console.error("Tarea no encontrada");
         }
     } catch (e) {
-        console.error("Error cargando detalle del trabajo:", e);
+        console.error("Error cargando detalle de la tarea:", e);
     }
 
     async function checkUserRelation(trabajo) {
@@ -34,12 +34,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (!user) {
                 if (btnPostular) {
                     btnPostular.style.display = 'block';
-                    btnPostular.onclick = () => window.verificarSesion(null, "postularte a este trabajo");
+                    btnPostular.onclick = () => window.verificarSesion(null, "aceptar esta tarea");
                 }
                 if (btnChat) {
                     btnChat.onclick = (e) => {
                         e.preventDefault();
-                        window.verificarSesion(null, "chatear con el publicador");
+                        window.verificarSesion(null, "chatear con el docente");
                     };
                 }
                 return;
@@ -88,7 +88,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-   // --- 3. LÓGICA DEL BOTÓN DE CHAT ---
     const btnChat = document.getElementById("btn-chat");
     if (btnChat) {
         btnChat.addEventListener("click", function (e) {
@@ -98,7 +97,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (currentTrabajo && currentTrabajo.id_publicador) {
                     window.location.href = `chat.html?id=${trabajoId}&userId=${currentTrabajo.id_publicador}`;
                 }
-            }, "chatear con el publicador");
+            }, "chatear con el docente");
         });
     }
 });
@@ -116,35 +115,25 @@ function renderTrabajo(trabajo) {
     const descEl = document.querySelector('.job-description');
     if (descEl) descEl.innerText = trabajo.descripcion || "Sin descripción detallada.";
 
-    const locEl = document.querySelector('.italic');
-    if (locEl) locEl.innerText = trabajo.direccion || "Ubicación no especificada";
-
-    const xp = trabajo.xp_otorgada || Math.round(trabajo.pago_cliente * 10);
+    const puntos = trabajo.puntos || 1;
+    const xp = puntos * 100;
 
     const statValues = document.querySelectorAll('.stat-value');
     if (statValues.length >= 2) {
-        statValues[0].innerText = `${Number(trabajo.pago_cliente).toFixed(2)} €`;
+        statValues[0].innerText = `${puntos} Pts`;
         statValues[1].innerText = `${xp} XP`;
     }
 
     const infoTexts = document.querySelectorAll('.info-text');
     if (infoTexts.length >= 3) {
-       
-        const catName = trabajo.id_categoria ? trabajo.id_categoria.charAt(0).toUpperCase() + trabajo.id_categoria.slice(1) : "Otros";
-        infoTexts[0].innerText = catName;
-
+        infoTexts[0].innerText = trabajo.id_categoria || "Otra";
         infoTexts[1].innerText = `${trabajo.tiempo_estimado_horas}h`;
 
         let fechaStr = "Sin fecha";
         if (trabajo.fecha_limite) {
-           
             const f = trabajo.fecha_limite.toDate ? trabajo.fecha_limite.toDate() : new Date(trabajo.fecha_limite);
             fechaStr = f.toLocaleDateString();
         }
         infoTexts[2].innerText = fechaStr;
     }
-
-    // Mapa eliminado
 }
-
-// initMiniMap eliminado

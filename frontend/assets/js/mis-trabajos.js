@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { obtenerTrabajosAceptadosPorMi, gestionarBorradoTarea } from './database.js';
+import { obtenerTrabajosAceptadosPorMi, gestionarBorradoTarea, obtenerPerfilUsuario } from './database.js';
 
 let allJobs = [];
 let filteredJobs = [];
@@ -55,6 +55,15 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = '../index.html';
             return;
         }
+
+        // --- VERIFICACIÓN DE ROL (Escolar) ---
+        const perfil = await obtenerPerfilUsuario(user.uid);
+        if (perfil && perfil.rol === 'docente') {
+            console.warn("Acceso denegado: Los docentes no tienen 'Mis Trabajos'.");
+            window.location.href = 'principal.html';
+            return;
+        }
+
         await loadMyAcceptedJobs(user.uid);
     });
     setupEventListeners();

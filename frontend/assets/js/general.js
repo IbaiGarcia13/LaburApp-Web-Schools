@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         injectClassHeaderLinks(perfil, isPage, claseId);
                     }
                 } else {
-                    // Si navegamos fuera de clase.html, pero a usuarios o trabajos, mantenemos el contexto si existe
+                    // Si navegamos fuera de clase.html, pero a usuarios o tareas, mantenemos el contexto si existe
                     const lastClassId = sessionStorage.getItem('lastClassId');
                     ajustarNavegacionGlobal(perfil, isPage, lastClassId);
                 }
@@ -297,8 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
             "¿Estás seguro de que quieres cerrar sesión?",
             async () => {
                 try {
-                    // Limpiar sello de tiempo de "recordarme" para evitar auto-login
                     localStorage.removeItem("loginTimestamp");
+                    sessionStorage.setItem('justLoggedOut', 'true');
                     
                     await auth.signOut();
                     console.log("Sesión cerrada con éxito.");
@@ -397,33 +397,26 @@ function ajustarNavegacionGlobal(perfil, isPage, lastClassId = null) {
         const text = a.textContent.toLowerCase();
 
         // Renombrar
-        if (text === 'usuarios') a.textContent = labelUsers;
-        if (text === 'trabajos') a.textContent = 'Tareas';
+        if (text === 'usuarios' || text === 'compañeros') a.textContent = labelUsers;
+        if (text === 'trabajos' || text === 'tareas') a.textContent = 'Tareas';
         
-        // Ocultar eliminados
-        if (text.includes('mapa') || text.includes('postulaciones')) {
-            li.style.display = 'none';
-        }
-
-        // Suscripciones solo para no alumnos (o según lógica previa)
-        if (rol === 'alumno' && text.includes('suscrip')) {
-            li.style.display = 'none';
-        }
-
-        // Lógica Mis Tareas / Mis Trabajos
-        if (rol === 'alumno') {
-            if (text.includes('mis tareas')) {
-                a.href = isPage ? 'mis-trabajos.html' : 'pages/mis-trabajos.html';
+        // Ocultar eliminados del ámbito escolar
+        if (text.includes('mapa') || text.includes('postulaciones') || text.includes('suscrip') || text.includes('metodos de pago') || text.includes('historial de pago')) {
+            if (rol === 'alumno') {
+                li.style.display = 'none';
             }
+        }
+
+        // Lógica de visibilidad según ROL (Escolar)
+        if (rol === 'docente') {
+            // El docente crea tareas (Mis Tareas), pero no realiza trabajos
             if (text.includes('mis trabajos')) {
                 li.style.display = 'none';
             }
-        } else if (rol === 'docente') {
-            if (text.includes('mis trabajos')) {
-                li.style.display = 'none';
-            }
+        } else if (rol === 'alumno') {
+            // El alumno realiza trabajos (Mis Trabajos), pero no crea tareas
             if (text.includes('mis tareas')) {
-                a.href = isPage ? 'mis-tareas.html' : 'pages/mis-tareas.html';
+                li.style.display = 'none';
             }
         }
     });

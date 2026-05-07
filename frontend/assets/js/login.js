@@ -1,7 +1,7 @@
 
 import { auth } from './firebase-config.js';
 import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-// --- REFERENCIAS A LOS CONTENEDORES Y LOS DOS CAMPOS CLAVE DEL LOGIN ---
+
 const formulario = document.getElementById("formLogin");
 const usuarioInput = document.getElementById("username");
 const contraseñaInput = document.getElementById("password");
@@ -26,7 +26,12 @@ if (togglePassword) {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-       
+        // Si acabamos de cerrar sesión, no redirigir automáticamente
+        if (sessionStorage.getItem('justLoggedOut') === 'true') {
+            console.log("Sesión detectada pero acabamos de salir. Manteniendo en login.");
+            return;
+        }
+
         const loginTimestamp = localStorage.getItem("loginTimestamp");
         if (loginTimestamp) {
             const sieteDiasEnMs = 7 * 24 * 60 * 60 * 1000;
@@ -38,6 +43,9 @@ onAuthStateChanged(auth, (user) => {
             }
         }
         window.location.href = "pages/principal.html";
+    } else {
+        // Si no hay usuario, limpiamos el flag de logout si existiera
+        sessionStorage.removeItem('justLoggedOut');
     }
 });
 
@@ -55,11 +63,9 @@ if (formulario) {
         }
 
         try {
-           
             const persistence = recordar ? browserLocalPersistence : browserSessionPersistence;
             await setPersistence(auth, persistence);
 
-           // --- INTENTAR HACER LOGIN EN FIREBASE ---
             const userCredential = await signInWithEmailAndPassword(auth, email, contraseña);
 
             if (recordar) {
@@ -70,7 +76,6 @@ if (formulario) {
 
             const user = userCredential.user;
 
-            // --- VERIFICAR BANEO ---
             const { obtenerPerfilUsuario } = await import('./database.js');
             const perfil = await obtenerPerfilUsuario(user.uid);
             if (perfil && perfil.baneado) {
@@ -83,7 +88,6 @@ if (formulario) {
                 }
             }
 
-           // --- LOGIN EXITOSO, BORRAR ERROR Y REDIRIGIR ---
             mensajeError.textContent = "";
             window.location.href = "pages/principal.html";
         } catch (error) {
@@ -101,32 +105,23 @@ if (formulario) {
     });
 }
 
-const olvidarLink = document.getElementById("olvidar");
-if (olvidarLink) {
-    olvidarLink.addEventListener("click", async (e) => {
+const olvidarBtn = document.getElementById("olvidar");
+if (olvidarBtn) {
+    olvidarBtn.addEventListener("click", (e) => {
         e.preventDefault();
         const email = usuarioInput.value.trim();
-
-        if (!email) {
-            mensajeError.textContent = "Introduce tu correo para restablecer la contraseña.";
-            mensajeError.style.color = "var(--red-2)";
+        if (email === "") {
+            mensajeError.textContent = "Escribe tu correo para restablecer la contraseña.";
             return;
         }
-
-        try {
-            await sendPasswordResetEmail(auth, email);
-            mensajeError.textContent = "Se ha enviado un correo de recuperación a " + email;
-            mensajeError.style.color = "var(--green-1)";
-        } catch (error) {
-            console.error("Error al enviar email de recuperación:", error);
-            if (error.code === 'auth/user-not-found') {
-                mensajeError.textContent = "No hay ningún usuario registrado con ese correo.";
-            } else if (error.code === 'auth/invalid-email') {
-                mensajeError.textContent = "Formato de correo inválido.";
-            } else {
-                mensajeError.textContent = "Error al enviar el email. Inténtalo de nuevo.";
-            }
-            mensajeError.style.color = "var(--red-2)";
-        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                mensajeError.style.color = "var(--success-green)";
+                mensajeError.textContent = "Correo de restablecimiento enviado.";
+            })
+            .catch((error) => {
+                console.error("Error al enviar reset:", error);
+                mensajeError.textContent = "Error al enviar el correo.";
+            });
     });
 }
