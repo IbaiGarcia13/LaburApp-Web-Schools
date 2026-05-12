@@ -4,10 +4,8 @@ import {
     obtenerNotificaciones, 
     marcarNotificacionesComoLeidas, 
     eliminarNotificacion,
-    actualizarActividadSuscripcion,
     obtenerTareasPendientesConfirmacion,
     registrarRespuestaConfirmacion,
-    verificarSuscripcionesRecurrentes,
     ejecutarResolucionTarea
 } from './database.js';
 import { onSnapshot, collection, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -107,13 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                actualizarActividadSuscripcion(user.uid).catch(e => {
-                    console.error("Error actualizando actividad suscripción:", e);
-                });
-
-                verificarSuscripcionesRecurrentes(user.uid).catch(e => {
-                    console.error("Error verificando suscripciones recurrentes:", e);
-                });
 
                 gestionarVisibilidadAnuncios(perfil);
                 
@@ -401,7 +392,7 @@ function ajustarNavegacionGlobal(perfil, isPage, lastClassId = null) {
         if (text === 'trabajos' || text === 'tareas') a.textContent = 'Tareas';
         
         // Ocultar eliminados del ámbito escolar
-        if (text.includes('mapa') || text.includes('postulaciones') || text.includes('suscrip') || text.includes('metodos de pago') || text.includes('historial de pago')) {
+        if (text.includes('mapa') || text.includes('postulaciones')) {
             if (rol === 'alumno') {
                 li.style.display = 'none';
             }
@@ -440,14 +431,7 @@ function ajustarNavegacionGlobal(perfil, isPage, lastClassId = null) {
         }
     });
 
-    // 4. Dropdown Perfil
-    const dropdownLinks = document.querySelectorAll('.profile-dropdown a');
-    dropdownLinks.forEach(a => {
-        const text = a.textContent.toLowerCase();
-        if (rol === 'alumno' && text.includes('suscrip')) {
-            a.style.display = 'none';
-        }
-    });
+
 }
 
 function injectClassHeaderLinks(perfil, isPage, claseId) {

@@ -537,7 +537,9 @@ async function crearTarea() {
     const desc = document.getElementById('tareaDesc').value.trim();
     const tipoTarea = document.getElementById('tareaTipo').value;
     const fSalida = document.getElementById('fechaSalida').value;
+    const hSalida = document.getElementById('horaSalida').value;
     const fEntrega = document.getElementById('fechaEntrega').value;
+    const hEntrega = document.getElementById('horaEntrega').value;
     const puntos = parseInt(document.getElementById('tareaPuntos').value) || 1;
     const partTipo = document.getElementById('selectParticipantes').value;
 
@@ -548,7 +550,7 @@ async function crearTarea() {
         if (f) archivos.push(f);
     }
 
-    if (!titulo || !desc || !fSalida || !fEntrega) {
+    if (!titulo || !desc || !fSalida || !fEntrega || !hSalida || !hEntrega) {
         window.showCustomAlert("Error", "Todos los campos obligatorios deben estar rellenos.");
         return;
     }
@@ -578,8 +580,8 @@ async function crearTarea() {
             descripcion: desc,
             tipo_tarea: tipoTarea, // Obligatoria u Opcional
             fecha_publicacion: serverTimestamp(),
-            fecha_limite: new Date(fEntrega),
-            fecha_salida: new Date(fSalida),
+            fecha_limite: new Date(`${fEntrega}T${hEntrega}:00`),
+            fecha_salida: new Date(`${fSalida}T${hSalida}:00`),
             estado: "Pendiente",
             id_publicador: auth.currentUser.uid,
             id_clase: currentClassId,

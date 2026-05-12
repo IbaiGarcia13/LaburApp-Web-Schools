@@ -1,7 +1,7 @@
 import { auth, db, storage } from './firebase-config.js';
 import { collection, query, getDocs, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cancelarSuscripcionUsuario, cambiarPassword } from './database.js';
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerTodosPuntosCategorias, cambiarPassword } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,12 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const catGrid = document.querySelector('.cat-grid');
 
     const infoCards = document.querySelectorAll('.info-card');
-    let subsBody = null;
     let cuentaBody = null;
     infoCards.forEach(card => {
-        if (card.querySelector('.card-title') && card.querySelector('.card-title').textContent.includes('Suscripciones')) {
-            subsBody = card; // Guardamos la sección completa
-        }
         if (card.querySelector('.card-title') && card.querySelector('.card-title').textContent.includes('Cuenta')) {
             cuentaBody = card.querySelector('.card-body');
         }
@@ -187,67 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                   // --- 4. RENDER DE SUSCRIPCIONES ---
-                    if (subsBody) {
-                        const sTrabajador = perfil.id_suscripcion_trabajador || "ninguna";
-                        const sCliente = perfil.id_suscripcion_cliente || "ninguna";
 
-                        const workerSubRow = document.getElementById('workerSubRow');
-                        const clientSubRow = document.getElementById('clientSubRow');
-
-                        if (workerSubRow) {
-                            let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
-                            if (sTrabajador.toLowerCase() !== "ninguna") {
-                                const fechaV = perfil.fecha_vencimiento_trabajador?.toDate ? perfil.fecha_vencimiento_trabajador.toDate().toLocaleDateString() : null;
-                                workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
-                                if (fechaV) {
-                                    workerHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
-                                }
-                                workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
-                            } else {
-                                workerHtml += `Ninguna</p>`;
-                            }
-                            workerSubRow.innerHTML = workerHtml;
-                        }
-
-                        if (clientSubRow) {
-                            let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
-                            if (sCliente.toLowerCase() !== "ninguna") {
-                                const fechaV = perfil.fecha_vencimiento_cliente?.toDate ? perfil.fecha_vencimiento_cliente.toDate().toLocaleDateString() : null;
-                                clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
-                                if (fechaV) {
-                                    clientHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
-                                }
-                                clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
-                            } else {
-                                clientHtml += `Ninguna</p>`;
-                            }
-                            clientSubRow.innerHTML = clientHtml;
-                        }
-
-                        document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
-                            btn.onclick = () => {
-                                const tipo = btn.dataset.tipo;
-                                window.showCustomConfirm(
-                                    "Cancelar Suscripción",
-                                    `¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`,
-                                    async () => {
-                                        try {
-                                            await cancelarSuscripcionUsuario(user.uid, tipo);
-                                            window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
-                                            location.reload();
-                                        } catch (error) {
-                                            console.error("Error al cancelar:", error);
-                                            window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
-                                        }
-                                    },
-                                    "Confirmar",
-                                    "Volver",
-                                    "delete"
-                                );
-                            };
-                        });
-                    }
 
                     // --- OCULTAR ELEMENTOS SEGÚN ROL ---
                     const rol = (perfil.rol || "").toLowerCase();
@@ -300,9 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (categoriesTitle) categoriesTitle.textContent = "Categorías";
                     }
 
-                    if (rol === "alumno") {
-                        if (subsBody) subsBody.style.display = 'none';
-                    }
+
 
                    // --- 5. RENDER FOTO DE PERFIL Y CV ---
                     if (displayPic) {

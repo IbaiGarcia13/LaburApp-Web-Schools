@@ -8,11 +8,7 @@ const itemsPerPage = 4;
 
 let currentFilters = {
     cat: "todas",
-    status: "todas",
-    tMin: 1,
-    tMax: 100,
-    pMin: 2,
-    pMax: 1000
+    status: "todas"
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -104,11 +100,7 @@ function applyClientFilters() {
             matchStatus = statusVal === currentFilters.status.toLowerCase();
         }
 
-        const pago = j.pago_cliente || 0;
-        const matchPay = pago >= currentFilters.pMin && pago <= currentFilters.pMax;
-        const tiempo = j.tiempo_estimado_horas || 0;
-        const matchTime = tiempo >= currentFilters.tMin && tiempo <= currentFilters.tMax;
-        return matchCat && matchStatus && matchPay && matchTime;
+        return matchCat && matchStatus;
     });
     currentPage = 1;
     displayTareas();
@@ -155,11 +147,9 @@ function displayTareas() {
                     </div>
                     <p class="job-desc">${tarea.descripcion || "Sin descripción."}</p>
                     <div class="job-details">
-                        <span><img src="../assets/img/icons/icono-ubicacion.png" class="icon-img-small" alt=""> ${tarea.direccion || "No especificada"}</span>
-                        <span><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo estimado: ${tarea.tiempo_estimado_horas}h</span>
-                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Categoría: ${catName}</span>
+                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Asignatura: ${catName}</span>
                         <span><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> Experiencia: <strong>${xp} XP</strong></span>
-                        <span><img src="../assets/img/icons/icono-dinero.png" class="icon-img-small" style="width:20px; height: 20px" alt=""><strong>${Number(pagoCliente).toFixed(2)} €</strong></span>
+                        <span><img src="../assets/img/icons/icono-estrella-color.png" class="icon-img-small" style="width:18px; height: 18px" alt=""><strong> ${tarea.puntos || 1} Pts</strong></span>
                     </div>
                 </div>
             </article>`;
@@ -180,10 +170,6 @@ function setupEventListeners() {
     document.getElementById('update-btn').onclick = () => {
         currentFilters.cat = document.getElementById('filter-category').value;
         currentFilters.status = document.getElementById('filter-status').value;
-        currentFilters.tMin = parseInt(document.getElementById('time-min').value) || 1;
-        currentFilters.tMax = parseInt(document.getElementById('time-max').value) || 100;
-        currentFilters.pMin = parseFloat(document.getElementById('pay-min').value) || 2;
-        currentFilters.pMax = parseFloat(document.getElementById('pay-max').value) || 1000;
         applyClientFilters();
 
         const sidebar = document.getElementById('sidebar');

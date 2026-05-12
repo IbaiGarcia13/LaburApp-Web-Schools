@@ -8,8 +8,6 @@ const itemsPerPage = 5;
 
 let currentFilters = {
     cat: "todas",
-    tMin: 1,
-    tMax: 100,
     ptsMin: 1,
     ptsMax: 100
 };
@@ -57,9 +55,8 @@ async function loadJobs() {
 
 function applyClientFilters() {
     filteredJobs = allJobs.filter(j => {
-        const matchTime = (j.tiempo_estimado_horas || 0) >= currentFilters.tMin && (j.tiempo_estimado_horas || 0) <= currentFilters.tMax;
         const matchPts = (j.puntos || 1) >= currentFilters.ptsMin && (j.puntos || 1) <= currentFilters.ptsMax;
-        return matchTime && matchPts;
+        return matchPts;
     });
 
     currentPage = 1;
@@ -71,7 +68,7 @@ function displayJobs() {
     if (!container) return;
     container.innerHTML = "";
 
-    const isFiltered = currentFilters.cat !== "todas" || currentFilters.tMin !== 1 || currentFilters.tMax !== 100 || currentFilters.ptsMin !== 1 || currentFilters.ptsMax !== 100;
+    const isFiltered = currentFilters.cat !== "todas" || currentFilters.ptsMin !== 1 || currentFilters.ptsMax !== 100;
     const urlParams = new URLSearchParams(window.location.search);
     const context = urlParams.get('claseId') ? " de la Clase" : ": Todas";
     const iconHtml = '<img src="../assets/img/icons/icono-trabajos-blanco.png" style="width: 35px; vertical-align: middle; margin-right: 10px;" alt=""> ';
@@ -108,8 +105,7 @@ function displayJobs() {
                     </div>
                     <p class="job-desc">${job.descripcion || "Sin descripción"}</p>
                     <div class="job-details">
-                        <span><img src="../assets/img/icons/icono-relog.png" class="icon-img-small" alt=""> Tiempo: ${job.tiempo_estimado_horas}h</span>
-                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Asignatura: ${job.id_categoria || 'Otra'}</span>
+                        <span><img src="../assets/img/icons/icono-categoria.png" class="icon-img-small" alt=""> Asignatura: ${job.Asignatura || 'Otra'}</span>
                         <span><img src="../assets/img/icons/icono-xp.png" class="icon-img-small" alt=""> <strong>${xp} XP</strong></span>
                         <span><img src="../assets/img/icons/icono-estrella-color.png" class="icon-img-small" style="width:18px; height: 18px" alt=""> <strong> ${puntos} Pts</strong></span>
                     </div>
@@ -132,8 +128,6 @@ const btnUpdate = document.getElementById('update-btn');
 if (btnUpdate) {
     btnUpdate.onclick = async () => {
         const newCat = document.getElementById('filter-category').value;
-        const newTMin = parseInt(document.getElementById('time-min').value) || 1;
-        const newTMax = parseInt(document.getElementById('time-max').value) || 100;
         const newPtsMin = parseInt(document.getElementById('pts-min').value) || 1;
         const newPtsMax = parseInt(document.getElementById('pts-max').value) || 100;
 
@@ -141,8 +135,6 @@ if (btnUpdate) {
 
         currentFilters = {
             cat: newCat,
-            tMin: newTMin,
-            tMax: newTMax,
             ptsMin: newPtsMin,
             ptsMax: newPtsMax
         };

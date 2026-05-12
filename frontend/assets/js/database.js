@@ -347,12 +347,12 @@ export async function obtenerTrabajos(idCategoria = "todas") {
         q = query(
             collection(db, "trabajos"),
             where("id_categoria", "in", categoriesToSearch),
-            where("estado", "==", "Pendiente")
+            where("estado", "in", ["Pendiente", "Aceptada", "En curso", "Completada", "Pausada", "En disputa"])
         );
     } else {
         q = query(
             collection(db, "trabajos"),
-            where("estado", "in", ["Pendiente", "Pausada", "En disputa"])
+            where("estado", "in", ["Pendiente", "Aceptada", "En curso", "Completada", "Pausada", "En disputa"])
         );
     }
 
@@ -2001,4 +2001,67 @@ export async function obtenerEstadisticasAdmin() {
     }
 
     return stats;
+}
+
+export async function abandonarClase(idClase) {
+    const user = auth.currentUser;
+    if (!user) return;
+    const uid = user.uid;
+
+    const claseRef = doc(db, 'clases', idClase);
+    const claseSnap = await getDoc(claseRef);
+    if (!claseSnap.exists()) return;
+
+    const alumnos = claseSnap.data().alumnos || [];
+    const nuevosAlumnos = alumnos.filter(id => id !== uid);
+    await updateDoc(claseRef, { alumnos: nuevosAlumnos });
+
+    const userRef = doc(db, 'usuarios', uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+        const misClases = userSnap.data().clases || [];
+        const nuevasClases = misClases.filter(id => id !== idClase);
+        await updateDoc(userRef, { clases: nuevasClases });
+    }
+
+    const perfil = await obtenerPerfilUsuario(uid);
+    await addDoc(collection(db, 'clases', idClase, 'novedades'), {
+        tipo: 'abandonar',
+        autor_id: uid,
+        autor_nombre: perfil?.nombre || 'Un alumno',
+        mensaje: `${perfil?.nombre || 'Un alumno'} ha abandonado la clase.`,
+        fecha: serverTimestamp()
+    });
+}
+
+export async function eliminarClase(idClase) {
+    const claseRef = doc(db, 'clases', idClase);
+    const claseSnap = await getDoc(claseRef);
+    if (!claseSnap.exists()) return;
+    
+    const alumnos = claseSnap.data().alumnos || [];
+    const idDocente = claseSnap.data().id_docente;
+
+    // Remove from students
+    for (const uid of alumnos) {
+        const userRef = doc(db, 'usuarios', uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const nuevasClases = (userSnap.data().clases || []).filter(id => id !== idClase);
+            await updateDoc(userRef, { clases: nuevasClases });
+        }
+    }
+
+    // Remove from teacher
+    if (idDocente) {
+        const userRef = doc(db, 'usuarios', idDocente);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const nuevasClases = (userSnap.data().clases || []).filter(id => id !== idClase);
+            await updateDoc(userRef, { clases: nuevasClases });
+        }
+    }
+
+    // Delete class doc
+    await deleteDoc(claseRef);
 }

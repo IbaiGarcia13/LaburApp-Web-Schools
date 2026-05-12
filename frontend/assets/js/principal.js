@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, obtenerTodosPuntosCategorias } from './database.js';
+import { obtenerPerfilUsuario, obtenerTodosPuntosCategorias, abandonarClase, eliminarClase } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -96,7 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const nombreDocente = docente ? `${docente.nombre} ${docente.apellidos || ''}` : "Cargando...";
 
                     card.innerHTML = `
-                        <div class="class-card-header" style="background: ${headerColor}">
+                        <div class="class-card-header" style="background: ${headerColor}; position: relative;">
+                            <button class="btn-action-class" data-id="${id}" title="${perfil.rol === 'docente' ? 'Eliminar Clase' : 'Abandonar Clase'}" style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;">
+                                <img src="../assets/img/icons/icono-no-blanco.png" style="width: 16px; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));">
+                            </button>
                             <h3>${clase.nombre}</h3>
                             <p class="card-teacher-name" style="font-size: 0.9rem; color: #fff !important; opacity: 1; margin-top: 5px;">
                                 Docente: ${clase.id_docente ? `<a href="usuario.html?id=${clase.id_docente}" class="teacher-link" style="color: #fff; text-decoration: underline;">${nombreDocente}</a>` : nombreDocente}
@@ -107,6 +110,34 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p>${clase.Descripción || "Sin descripción disponible."}</p>
                         </div>
                     `;
+
+                    // Lógica del botón de acción (Eliminar/Abandonar)
+                    const btnAction = card.querySelector('.btn-action-class');
+                    btnAction.onmouseover = () => btnAction.style.background = '#e46363';
+                    btnAction.onmouseout = () => btnAction.style.background = 'rgba(255,255,255,0.2)';
+                    
+                    btnAction.onclick = (e) => {
+                        e.stopPropagation();
+                        const isDocente = perfil.rol === 'docente';
+                        const title = isDocente ? "Eliminar Clase" : "Abandonar Clase";
+                        const msg = isDocente 
+                            ? "¿Estás seguro de que quieres ELIMINAR esta clase? Se borrará para todos los alumnos y no se puede deshacer."
+                            : "¿Estás seguro de que quieres ABANDONAR esta clase?";
+
+                        window.showCustomConfirm(title, msg, async () => {
+                            try {
+                                if (isDocente) {
+                                    await eliminarClase(id);
+                                } else {
+                                    await abandonarClase(id);
+                                }
+                                window.location.reload();
+                            } catch (err) {
+                                console.error("Error al procesar acción de clase:", err);
+                                window.showCustomAlert("Error", "No se pudo completar la acción.");
+                            }
+                        }, isDocente ? "Eliminar" : "Abandonar", "Cancelar", isDocente ? "delete" : "info");
+                    };
 
                     // Evitar que al pulsar el docente se abra la clase
                     const teacherLink = card.querySelector('.teacher-link');

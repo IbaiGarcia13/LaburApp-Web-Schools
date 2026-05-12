@@ -196,12 +196,17 @@
 }
 
 /* Feed */
-.feed-post-box {
+.class-feed {
     background: var(--neutral-white);
     border-radius: 12px;
-    padding: 20px;
     border: 1px solid var(--gray-2);
+    overflow: hidden;
     margin-bottom: 25px;
+}
+
+.feed-post-box {
+    padding: 20px;
+    border-bottom: 1px solid var(--gray-2);
 }
 
 .feed-text {
@@ -387,11 +392,12 @@
 
 /* Reutilizando del anterior pero adaptando */
 .feed-item {
-    background: var(--neutral-white);
-    border-radius: 12px;
     padding: 20px;
-    border: 1px solid var(--gray-2);
-    margin-bottom: 20px;
+    border-bottom: 1px solid var(--gray-2);
+}
+
+.feed-item:last-child {
+    border-bottom: none;
 }
 
 .feed-item-header {

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -25,12 +25,7 @@
             </a>
         </div>
         <div class="header-right">
-            <nav>
-                <ul>
-                    <li><a href="usuarios.html">Compañeros</a></li>
-                    <li><a href="tareas.html">Tareas</a></li>
-                </ul>
-            </nav>
+            <nav><ul></ul></nav>
 
             <div class="header-icons">
                 <img src="../assets/img/avatar-defecto.png" alt="Perfil" class="profile-toggle" id="profileBtn">
@@ -63,8 +58,7 @@
             <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
             <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-trabajos.html">Mis Trabajos</a></li>
             <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-            <li><img src="../assets/img/icons/icono-suscripciones.png"><a href="suscripciones.html">Suscripciones</a>
-            </li>
+
             <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a>
             </li>
             <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
@@ -121,47 +115,7 @@
             </div>
         </section>
 
-        <section class="info-card" id="subsSection">
-            <h2 class="card-title">Suscripciones</h2>
-            <div class="card-body" id="subsContainer">
-                <div class="sub-item" id="workerSubRow">
-                    <p><strong>Suscripcion Trabajador:</strong> <span id="workerSubStatus">Cargando...</span></p>
-                </div>
-                <div class="sub-item" id="clientSubRow">
-                    <p><strong>Suscripción Cliente:</strong> <span id="clientSubStatus">Cargando...</span></p>
-                </div>
-            </div>
-        </section>
 
-        <section class="settings-card" id="paymentsSection">
-            <div class="card-header">
-                <h2 class="card-title">Método de Pago</h2>
-            </div>
-            <div class="card-body">
-                <ul class="payment-methods">
-                    <li><img src="../assets/img/icons/icono-estrella.png" class="icon-img-small" alt="Favorito">
-                        <strong>Cargando...</strong>
-                    </li>
-
-                </ul>
-                <div class="right-action">
-                    <a href="#" id="btnAddPayment">
-                        <img src="../assets/img/icons/icono-no-blanco.png" alt="Añadir"
-                            class="icon-add-payment icon-btn-mobile">
-                        <span>Añadir Método de Pago</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="settings-card" id="historySection">
-            <div class="card-header">
-                <h2 class="card-title">Historial de Pagos</h2>
-            </div>
-            <div class="card-body" id="paymentHistoryContainer">
-                <p>Cargando...</p>
-            </div>
-        </section>
 
         <div class="delete-account-container">
             <div class="delete-action" id="btnDeleteAccount">
@@ -173,47 +127,7 @@
     </main>
 
     <!-- === MODALES === -->
-    <div id="paymentModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3>Añadir Método de Pago</h3>
-            <div class="input-group">
-                <label>Tipo de Método:</label>
-                <select id="selectPaymentType"
-                    style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid var(--gray-3); box-sizing: border-box; margin-bottom: 10px; font-family: inherit;">
-                    <option value="tarjeta">Tarjeta Bancaria</option>
-                    <option value="plataforma">Plataforma de Pago</option>
-                </select>
-            </div>
-            <div id="tarjetaFields">
-                <div class="input-group">
-                    <label>Número de Tarjeta:</label>
-                    <input type="text" id="inputCardNumber" placeholder="XXXX XXXX XXXX XXXX">
-                </div>
-                <div class="input-group">
-                    <label>Fecha de Caducidad (MM/AA):</label>
-                    <input type="text" id="inputCardExpiry" placeholder="MM/AA">
-                </div>
-                <div class="input-group">
-                    <label>CVV:</label>
-                    <input type="text" id="inputCardCVV" placeholder="123">
-                </div>
-            </div>
-            <div id="plataformaFields" style="display: none;">
-                <div class="input-group">
-                    <label>Correo Electrónico:</label>
-                    <input type="email" id="inputPlataformaEmail" placeholder="correo@ejemplo.com">
-                </div>
-                <div class="input-group">
-                    <label>Contraseña:</label>
-                    <input type="password" id="inputPlataformaPass" placeholder="********">
-                </div>
-            </div>
-            <div class="modal-buttons" style="margin-top: 15px;">
-                <button id="btnCancelPayment" class="modal-btn cancel">Cancelar</button>
-                <button id="btnSavePayment" class="modal-btn confirm">Guardar</button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- === MODAL EDITAR DATOS PERSONALES === -->
     <div id="editSettingsModal" class="modal-overlay hidden">

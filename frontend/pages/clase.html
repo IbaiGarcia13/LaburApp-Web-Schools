@@ -60,8 +60,7 @@
       <li><img src="../assets/img/icons/icono-mis-tareas.png"><a href="mis-tareas.html">Mis Tareas</a></li>
       <li><img src="../assets/img/icons/icono-mis-trabajos.png"><a href="mis-tareas.html">Mis Tareas</a></li>
       <li><img src="../assets/img/icons/icono-mensajes.png"><a href="mensajes.html">Mensajes</a></li>
-      <li id="menuSuscripciones"><img src="../assets/img/icons/icono-Suscripciones.png"><a
-          href="Suscripciones.html">Suscripciones</a></li>
+      
       <li><img src="../assets/img/icons/icono-notificaciones.png"><a href="#" id="notifLink">Notificaciones</a></li>
       <li><img src="../assets/img/icons/icono-ajustes.png"><a href="ajustes.html">Ajustes</a></li>
     </ul>
@@ -260,11 +259,17 @@
               </div>
               <div class="input-group">
                 <label for="fechaSalida">Publicación</label>
-                <input type="date" id="fechaSalida" required>
+                <div style="display: flex; gap: 10px;">
+                  <input type="date" id="fechaSalida" required style="flex: 1;">
+                  <input type="time" id="horaSalida" required style="flex: 1;">
+                </div>
               </div>
               <div class="input-group">
                 <label for="fechaEntrega">Fecha Límite</label>
-                <input type="date" id="fechaEntrega" required>
+                <div style="display: flex; gap: 10px;">
+                  <input type="date" id="fechaEntrega" required style="flex: 1;">
+                  <input type="time" id="horaEntrega" required style="flex: 1;">
+                </div>
               </div>
               <div class="input-group">
                 <label for="tareaPuntos">Puntos de Asignatura</label>
@@ -304,15 +309,15 @@
               </div>
               <p class="file-hint">Formatos: PDF, Word, Imágenes</p>
             </div>
+            </div>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-btn cancel" id="btnCancelTarea">Cancelar</button>
+          <button type="submit" class="modal-btn confirm">Publicar Tarea</button>
+        </div>
+      </form>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="modal-btn cancel" id="btnCancelTarea">Cancelar</button>
-      <button type="submit" class="modal-btn confirm">Publicar Tarea</button>
-    </div>
-    </form>
-  </div>
   </div>
 
   <!-- === MODAL GESTIONAR ALUMNOS === -->

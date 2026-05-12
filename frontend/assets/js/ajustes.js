@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { obtenerPerfilUsuario, actualizarPerfilUsuario, obtenerMetodosPago, obtenerHistorialPagos, agregarMetodoPago, registrarPagoHistorial, eliminarCuentaUsuario, eliminarMetodoPago, cancelarSuscripcionUsuario, cambiarPassword } from './database.js';
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, eliminarCuentaUsuario, cambiarPassword } from './database.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,17 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayCurso = document.getElementById('displayCurso');
     const cursoRow = document.getElementById('cursoRow');
 
-    const settingsCards = document.querySelectorAll('.settings-card, .info-card');
-    let subsBody = null;
-    let paymentsList = null;
-    let historyContainer = null;
 
-    settingsCards.forEach(card => {
-        const title = card.querySelector('.card-title')?.textContent || "";
-        if (title.includes('Suscripciones')) subsBody = card.querySelector('.card-body');
-        if (title.includes('Método de Pago')) paymentsList = card.querySelector('.payment-methods');
-        if (title.includes('Historial de Pagos')) historyContainer = document.getElementById('paymentHistoryContainer');
-    });
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
@@ -61,91 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                   // --- 1. RENDER SUSCRIPCIONES ---
-                    if (subsBody) {
-                        const sTrabajador = perfil.id_suscripcion_trabajador || "ninguna";
-                        const sCliente = perfil.id_suscripcion_cliente || "ninguna";
 
-                        const workerSubRow = document.getElementById('workerSubRow');
-                        const clientSubRow = document.getElementById('clientSubRow');
-
-                        if (workerSubRow) {
-                            let workerHtml = `<p><strong>Suscripcion Trabajador:</strong> `;
-                            if (sTrabajador.toLowerCase() !== "ninguna") {
-                                const fechaV = perfil.fecha_vencimiento_trabajador?.toDate ? perfil.fecha_vencimiento_trabajador.toDate().toLocaleDateString() : null;
-                                workerHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sTrabajador.toUpperCase()}`;
-                                if (fechaV) {
-                                    workerHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
-                                }
-                                workerHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="trabajador" title="Cancelar Suscripción">`;
-                            } else {
-                                workerHtml += `Ninguna</p>`;
-                            }
-                            workerSubRow.innerHTML = workerHtml;
-                        }
-
-                        if (clientSubRow) {
-                            let clientHtml = `<p><strong>Suscripción Cliente:</strong> `;
-                            if (sCliente.toLowerCase() !== "ninguna") {
-                                const fechaV = perfil.fecha_vencimiento_cliente?.toDate ? perfil.fecha_vencimiento_cliente.toDate().toLocaleDateString() : null;
-                                clientHtml += `<img src="../assets/img/icons/icono-suscripciones.png" class="icon-img" alt="Diamante"> ${sCliente.toUpperCase()}`;
-                                if (fechaV) {
-                                    clientHtml += ` <span class="sub-renewal-date">(Renueva: ${fechaV})</span>`;
-                                }
-                                clientHtml += `</p><img src="../assets/img/icons/icono-no-blanco.png" class="btn-cancel-subscription" data-tipo="cliente" title="Cancelar Suscripción">`;
-                            } else {
-                                clientHtml += `Ninguna</p>`;
-                            }
-                            clientSubRow.innerHTML = clientHtml;
-                        }
-
-                        document.querySelectorAll('.btn-cancel-subscription').forEach(btn => {
-                            btn.onclick = () => {
-                                const tipo = btn.dataset.tipo;
-                                window.showCustomConfirm(
-                                    "Cancelar Suscripción",
-                                    `¿Estás seguro de que deseas cancelar tu suscripción de ${tipo}? Perderás todos los beneficios asociados.`,
-                                    async () => {
-                                        try {
-                                            await cancelarSuscripcionUsuario(user.uid, tipo);
-                                            window.showCustomAlert("¡Cancelada!", "Tu suscripción ha sido cancelada correctamente.");
-                                            location.reload();
-                                        } catch (error) {
-                                            console.error("Error al cancelar:", error);
-                                            window.showCustomAlert("Error", "No se pudo cancelar la suscripción.");
-                                        }
-                                    },
-                                    "Confirmar",
-                                    "Volver",
-                                    "delete"
-                                );
-                            };
-                        });
-                    }
-
-                   // --- 2. RENDER MÉTODOS DE PAGO ---
-                    if (paymentsList) {
-                        await renderizarMetodosPago(user.uid);
-                    }
-
-                   // --- 3. RENDER HISTORIAL DE PAGOS ---
-                    if (historyContainer) {
-                        const historial = await obtenerHistorialPagos(user.uid);
-                        renderHistorialPagos(historial, false);
-                    }
-
-                    // --- OCULTAR ELEMENTOS SEGÚN ROL ---
-                    const rol = (perfil.rol || "").toLowerCase();
-                    if (rol === 'alumno') {
-                        // Ocultar tarjetas de suscripciones y pagos
-                        const allCards = document.querySelectorAll('.settings-card, .info-card');
-                        allCards.forEach(card => {
-                            const title = card.querySelector('.card-title')?.textContent || "";
-                            if (title.includes('Suscripciones') || title.includes('Método de Pago') || title.includes('Historial de Pagos')) {
-                                card.style.display = 'none';
-                            }
-                        });
-                    }
 
                 }
             } catch (error) {
@@ -208,7 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 true
             );
         });
-      if (btnEditProfile) {
+    }
+
+    if (btnEditProfile) {
         btnEditProfile.onclick = async () => {
             const user = auth.currentUser;
             const perfil = await obtenerPerfilUsuario(user.uid);
@@ -292,216 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-   // --- MODAL Y LOGICA AÑADIR MÉTODO DE PAGO ---
-    const paymentModal = document.getElementById('paymentModal');
-    const selectPaymentType = document.getElementById('selectPaymentType');
-    const tarjetaFields = document.getElementById('tarjetaFields');
-    const plataformaFields = document.getElementById('plataformaFields');
-    const btnAddPayment = document.getElementById('btnAddPayment');
-    const btnCancelPayment = document.getElementById('btnCancelPayment');
-    const btnSavePayment = document.getElementById('btnSavePayment');
-
-    if (selectPaymentType) {
-        selectPaymentType.addEventListener('change', (e) => {
-            if (e.target.value === 'tarjeta') {
-                tarjetaFields.style.display = 'block';
-                plataformaFields.style.display = 'none';
-            } else {
-                tarjetaFields.style.display = 'none';
-                plataformaFields.style.display = 'block';
-            }
-        });
-    }
-
-    if (btnAddPayment) {
-        btnAddPayment.addEventListener('click', (e) => {
-            e.preventDefault();
-            paymentModal.classList.remove('hidden');
-
-            if (selectPaymentType) {
-                selectPaymentType.value = 'tarjeta';
-                tarjetaFields.style.display = 'block';
-                plataformaFields.style.display = 'none';
-            }
-            document.getElementById('inputCardNumber').value = '';
-            document.getElementById('inputCardExpiry').value = '';
-            document.getElementById('inputCardCVV').value = '';
-            document.getElementById('inputPlataformaEmail').value = '';
-            document.getElementById('inputPlataformaPass').value = '';
-        });
-    }
-
-    if (btnCancelPayment) {
-        btnCancelPayment.addEventListener('click', () => {
-            paymentModal.classList.add('hidden');
-        });
-    }
-
-    if (btnSavePayment) {
-        btnSavePayment.addEventListener('click', async () => {
-            let isValid = false;
-            let listEntry = '';
-            let dbTipo = '';
-            let dbDetalle = '';
-            const type = selectPaymentType ? selectPaymentType.value : 'tarjeta';
-
-            if (type === 'tarjeta') {
-                const num = document.getElementById('inputCardNumber').value.trim();
-                const exp = document.getElementById('inputCardExpiry').value.trim();
-                const cvv = document.getElementById('inputCardCVV').value.trim();
-
-                if (num && exp && cvv) {
-                    isValid = true;
-                    dbTipo = 'Tarjeta Bancaria';
-                    dbDetalle = `**** - *${num.slice(-4)}`;
-                    listEntry = `<li><span class="dot-icon">•</span> <strong>${dbTipo}:</strong> ${dbDetalle}</li>`;
-                }
-            } else {
-                const email = document.getElementById('inputPlataformaEmail').value.trim();
-                const pass = document.getElementById('inputPlataformaPass').value.trim();
-
-                if (email && pass) {
-                    isValid = true;
-                    dbTipo = 'Plataforma de Pago';
-                    dbDetalle = email;
-                    listEntry = `<li><span class="dot-icon">•</span> <strong>${dbTipo}:</strong> ${dbDetalle}</li>`;
-                }
-            }
-
-            if (isValid) {
-                try {
-                    const user = auth.currentUser;
-                    if (user) {
-                        const idMetodo = await agregarMetodoPago(user.uid, dbTipo, dbDetalle);
-                        await registrarPagoHistorial(user.uid, idMetodo, 0);
-                    }
-
-                    showCustomAlert("Éxito", "Método de pago añadido correctamente.");
-                    paymentModal.classList.add('hidden');
-
-                    if (paymentsList) {
-                        await renderizarMetodosPago(user.uid);
-                    }
-
-                    if (historyContainer) {
-                        const historial = await obtenerHistorialPagos(user.uid);
-                        renderHistorialPagos(historial, false);
-                    }
-                } catch (e) {
-                    console.error("Error al guardar método de pago:", e);
-                    showCustomAlert("Error", "No se pudo guardar en la base de datos.");
-                }
-            } else {
-                showCustomAlert("Error", "Por favor, rellena todos los campos.");
-            }
-        });
-    }
-
-   // --- RENDERIZADO DE HISTORIAL CON PAGINACIÓN ---
-    function renderHistorialPagos(historial, showAll) {
-        if (!historyContainer) return;
-
-        if (historial.length === 0) {
-            historyContainer.innerHTML = "<p style='color: var(--gray-6); font-style: italic;'>Aún no has realizado ningún movimiento de pago.</p>";
-            return;
-        }
-
-        const itemsToShow = showAll ? historial : historial.slice(0, 5);
-        let html = '<div class="payment-history">';
-        itemsToShow.forEach(p => {
-            const fecha = p.fecha_emision?.toDate ? p.fecha_emision.toDate().toLocaleDateString() : "Reciente";
-            const montoVal = Number(p.monto);
-            const sign = montoVal > 0 ? "+" : "";
-            const montoClase = montoVal < 0 ? 'negative-amount' : (montoVal > 0 ? 'positive-amount' : '');
-
-            html += `
-                <div class="payment-row">
-                    <p><strong>Pago:</strong> <strong class="${montoClase}">${sign}${p.monto}€</strong></p>
-                    <p><strong>Fecha Emisión:</strong> ${fecha}</p>
-                    <p><strong>Detalle:</strong> ${p.detalle_pago || 'Transacción de LaburApp'}</p>
-                </div>
-            `;
-        });
-        html += '</div>';
-
-        if (!showAll && historial.length > 5) {
-            html += `
-                <div class="view-more-container">
-                    <button id="btnViewMoreHistory" class="view-more-btn">Ver más</button>
-                </div>
-            `;
-        }
-
-        historyContainer.innerHTML = html;
-
-        const btnMore = document.getElementById('btnViewMoreHistory');
-        if (btnMore) {
-            btnMore.addEventListener('click', () => {
-                renderHistorialPagos(historial, true);
-            });
-        }
-    }
-
-    async function renderizarMetodosPago(uid) {
-        if (!paymentsList) return;
-        const metodos = await obtenerMetodosPago(uid);
-        paymentsList.innerHTML = "";
-
-        if (metodos.length === 0) {
-            paymentsList.innerHTML = "<p style='color: var(--gray-6); font-style: italic;'>No tienes métodos de pago guardados.</p>";
-            return;
-        }
-
-        metodos.forEach(m => {
-            const li = document.createElement('li');
-            const favorStar = m.es_principal ? '<span class="star-icon">★</span>' : '';
-            li.innerHTML = `
-                ${favorStar}
-                <span><strong>${m.tipo}:</strong> ${m.detalle}</span>
-                <img src="../assets/img/icons/icono-no-blanco.png" class="btn-delete-payment" title="Eliminar método" data-id="${m.id_metodo}">
-            `;
-            paymentsList.appendChild(li);
-        });
-
-        paymentsList.querySelectorAll('.btn-delete-payment').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idMetodo = e.target.getAttribute('data-id');
-                confirmarBorradoMetodo(uid, idMetodo);
-            });
-        });
-    }
-
-    function confirmarBorradoMetodo(uid, idMetodo) {
-        obtenerMetodosPago(uid).then(metodos => {
-            if (metodos.length <= 1) {
-                showCustomAlert("Acceso Restringido", "Debes tener al menos un método de pago. Añade uno nuevo antes de borrar este.");
-                return;
-            }
-
-            const metodo = metodos.find(m => m.id_metodo === idMetodo);
-            showCustomConfirm(
-                "Borrar Método de Pago",
-                `¿Estás seguro de que quieres eliminar tu ${metodo.tipo} (${metodo.detalle})?`,
-                async () => {
-                    try {
-                        await eliminarMetodoPago(uid, idMetodo);
-                        showCustomAlert("Éxito", "Método de pago eliminado.");
-                        await renderizarMetodosPago(uid);
-                    } catch (err) {
-                        console.error("Error eliminando método:", err);
-                        showCustomAlert("Error", "No se pudo eliminar el método.");
-                    }
-                },
-                "Eliminar",
-                "Cancelar",
-                "delete",
-                true
-            );
-        });
-    }
-
     window.addEventListener('click', (event) => {
-        if (event.target == paymentModal) paymentModal.classList.add('hidden');
         if (event.target == editModal) editModal.classList.add('hidden');
     });
 
